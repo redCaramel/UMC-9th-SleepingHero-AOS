@@ -18,13 +18,5 @@ class StartActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        binding.tvStart.setOnClickListener {
-            val mDialogView = LayoutInflater.from(this).inflate(R.layout.activity_login, null)
-            val mBuilder = AlertDialog.Builder(this, R.style.PopupAnimStyle)
-                .setView(mDialogView)
-                .setTitle("로그인")
-            mBuilder.show()
-        }
     }
 }

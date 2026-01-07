@@ -3,66 +3,158 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
-    android:background="@color/colorBackground"
+    android:background="@drawable/bg_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".StartActivity">
 
-    <TextView
-        android:id="@+id/tv_login_title1"
-        style="@style/Title1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="숙면 용사"
-        android:textColor="#262626"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_login_title2" />
-
-    <TextView
-        android:id="@+id/tv_login_title2"
-        style="@style/Title2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="숙면에 재미를 더하다,"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gl_start_A" />
-
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/gl_start_A"
+        android:id="@+id/gl_start_A1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.15"/>
+        app:layout_constraintGuide_percent="0.3"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/gl_start_A2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.31" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_start_B"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.85" />
+        app:layout_constraintGuide_percent="0.6" />
 
     <TextView
-        android:id="@+id/tv_start"
-        style="@style/Body2"
+        android:id="@+id/textView"
+        style="@style/Title1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="화면을 눌러 시작"
+        android:fontFamily="@font/gugi"
+
+        android:text="숙"
+        android:textColor="@color/white"
+        android:textSize="48sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/gl_start_A1"
+        app:layout_constraintEnd_toStartOf="@+id/textView2" />
+
+    <TextView
+        android:id="@+id/textView2"
+        style="@style/Title1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="4dp"
+        android:fontFamily="@font/dongle"
+        android:text="면"
+        android:textColor="@color/white"
+        android:textSize="48sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/gl_start_A2"
+        app:layout_constraintEnd_toStartOf="@+id/guideline" />
+
+    <TextView
+        android:id="@+id/textView3"
+        style="@style/Title1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:fontFamily="@font/gugi"
+        android:text="용"
+        android:textColor="@color/white"
+        android:textSize="48sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/gl_start_A1"
+        app:layout_constraintStart_toStartOf="@+id/guideline" />
+
+    <TextView
+        android:id="@+id/textView4"
+        style="@style/Title1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/dongle"
+        android:text="사"
+        android:textColor="@color/white"
+        android:textSize="48sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/gl_start_A2"
+        app:layout_constraintStart_toEndOf="@+id/textView3" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="214dp"
+        app:layout_constraintGuide_percent="0.5" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_login_naver2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/btn_rec_border"
+        android:backgroundTint="#03C75A"
+        android:fontFamily="sans-serif"
+        android:text="네이버 로그인"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toTopOf="@+id/gl_start_B"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_login_naver3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/btn_rec_border"
+        android:backgroundTint="#F9E000"
+        android:fontFamily="sans-serif"
+        android:text="카카오 로그인"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gl_start_B" />
 
     <ImageView
-        android:id="@+id/img_start_hero"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:src="@drawable/ic_launcher_background"
-        app:layout_constraintBottom_toTopOf="@+id/gl_start_B"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/gl_start_A" />
+        android:id="@+id/imageView"
+        android:layout_width="20dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="1dp"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_login_naver3"
+        app:layout_constraintStart_toStartOf="@+id/btn_login_naver3"
+        app:layout_constraintTop_toTopOf="@+id/btn_login_naver3"
+        app:srcCompat="@drawable/kakao" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:padding="1dp"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_login_naver2"
+        app:layout_constraintStart_toStartOf="@+id/btn_login_naver2"
+        app:layout_constraintTop_toTopOf="@+id/btn_login_naver2"
+        app:srcCompat="@drawable/naver" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
