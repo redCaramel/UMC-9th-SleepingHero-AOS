@@ -3,17 +3,32 @@
     <color name="white">#FFFFFF</color>
     <color name="black">#222222</color>
 
-    <color name="main_gray">#353434</color>
-    <color name="main_green">#93A97C</color>
-    <color name="main_purple">#865FCC</color>
-    <color name="main_red">#922C22</color>
+    <color name="primary_500">#1B4E81</color> <!--기준색-->
+    <color name="primary_700">#12385E</color> <!--강조,헤더,선택 상태-->
+    <color name="primary_300">#4F78A3</color> <!--보조 버튼, 포커스-->
+    <color name="primary_100">#D6E2EF</color> <!--배경, 서브 영역-->
 
-    <color name="sub_gray">#474646</color>
-    <color name="sub_green">#C2DBA8</color>
-    <color name="sub_purple">#9170CE</color>
-    <color name="sub_red">#A4453D</color>
-    <color name="tri_gray">#737373</color>
+    <color name="gray_900">#1F2933</color> <!--본문 텍스트-->
+    <color name="gray_700">#4B5563</color> <!--서브 텍스트-->
+    <color name="gray_500">#9AA5B1</color> <!--비활성 텍스트-->
+    <color name="gray_200">#E5E7EB</color> <!--디바이더, 보더-->
+    <color name="gray_50">#F8FAFC</color> <!--전체 배경-->
 
-    <color name="colorBackground">#FCFCFC</color>
-    <color name="deep_gray">#232222</color>
+    <color name="accent_teal">#2FA4A9</color> <!--CTA, 포인트-->
+    <color name="accent_sky">#6FB7E9</color> <!--그래프, 보조 강조-->
+    <color name="accent_sand">#E9DFC9</color> <!--카드 배경, 톤 완화-->
+
+    <color name="success">#2E8B57</color>
+    <color name="warning">#F2A900</color>
+    <color name="error">#D64545</color>
+    <color name="info">3A7BD5</color>
+
+    <!--
+        사용 가이드 요약
+        버튼 Primary -> #1B4E81 / Hover -> #12385E
+        전체 배경 -> #F8FAFC
+        카드 배경 -> #FFFFFF + Border #E5E7EB
+        강조 CTA -> #2FA4A9
+        텍스트 대비는 Primary 위에 흰색(#FFFFFF) 사용 권장
+    -->
 </resources>
