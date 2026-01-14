@@ -94,7 +94,7 @@
 
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_login_naver2"
+        android:id="@+id/btn_login_naver"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -102,6 +102,8 @@
         android:layout_marginBottom="8dp"
         android:background="@drawable/btn_rec_border"
         android:backgroundTint="#03C75A"
+        android:drawableLeft="@drawable/naver"
+        android:paddingLeft="20dp"
         android:fontFamily="sans-serif"
         android:text="네이버 로그인"
         android:textColor="@color/white"
@@ -112,7 +114,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_login_naver3"
+        android:id="@+id/btn_login_kakao"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -120,6 +122,8 @@
         android:layout_marginEnd="32dp"
         android:background="@drawable/btn_rec_border"
         android:backgroundTint="#F9E000"
+        android:drawableLeft="@drawable/kakao"
+        android:paddingLeft="20dp"
         android:fontFamily="sans-serif"
         android:text="카카오 로그인"
         android:textColor="@color/black"
@@ -128,33 +132,5 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gl_start_B" />
-
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="20dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:padding="1dp"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_login_naver3"
-        app:layout_constraintStart_toStartOf="@+id/btn_login_naver3"
-        app:layout_constraintTop_toTopOf="@+id/btn_login_naver3"
-        app:srcCompat="@drawable/kakao" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:padding="1dp"
-        android:elevation="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/btn_login_naver2"
-        app:layout_constraintStart_toStartOf="@+id/btn_login_naver2"
-        app:layout_constraintTop_toTopOf="@+id/btn_login_naver2"
-        app:srcCompat="@drawable/naver" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

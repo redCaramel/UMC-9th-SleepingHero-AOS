@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,9 +22,16 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        //local property
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+        buildConfigField("String", "KAKAO_NATIVE_KEY", "\"${properties.getProperty("KAKAO_NATIVE_KEY")}\"")
+        manifestPlaceholders.put("KAKAO_NATIVE_KEY", properties.getProperty("KAKAO_NATIVE_KEY"))
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     buildTypes {
         release {
@@ -67,4 +76,8 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Kakao SDK
+    implementation("com.kakao.sdk:v2-user:2.23.0")
+    implementation("com.kakao.sdk:v2-auth:2.23.0")
 }
