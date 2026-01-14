@@ -27,9 +27,15 @@ class MainActivity : AppCompatActivity() {
                         .commit()
                     true
                 }
-                else -> false
 
-                //TODO - 자기 파트 화면전환 추가
+                R.id.Settings -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SettingFragment())
+                        .commit()
+                    true
+                }
+
+                else -> false
             }
         }
     }
