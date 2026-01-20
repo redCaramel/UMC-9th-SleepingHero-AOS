@@ -3,16 +3,14 @@ package com.umc_9th.sleepinghero
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.umc_9th.sleepinghero.databinding.ActivityStartBinding
 
 class StartActivity : AppCompatActivity() {
@@ -27,7 +25,7 @@ class StartActivity : AppCompatActivity() {
         val keyHash = com.kakao.sdk.common.util.Utility.getKeyHash(this)
         Log.d("KeyHash", keyHash)
         binding.btnLoginNaver.setOnClickListener {
-            // TODO - 네이버 로그인 구현
+            NaverIdLoginSDK.authenticate(this, naverLoginCallback)
         }
         binding.btnLoginKakao.setOnClickListener {
             kakaoLogin()
@@ -60,8 +58,25 @@ class StartActivity : AppCompatActivity() {
             UserApiClient.instance.loginWithKakaoAccount(this, callback = callback)
         }
     }
-
-    private fun accessService(token: String) {
+    val naverLoginCallback = object : OAuthLoginCallback {
+        override fun onSuccess() {
+            Log.d("test", "AccessToken : " + NaverIdLoginSDK.getAccessToken())
+            Log.d("test", "ReFreshToken : " + NaverIdLoginSDK.getRefreshToken())
+            Log.d("test", "Expires : " + NaverIdLoginSDK.getExpiresAt().toString())
+            Log.d("test", "TokenType : " + NaverIdLoginSDK.getTokenType())
+            Log.d("test", "State : " + NaverIdLoginSDK.getState().toString())
+            accessService(NaverIdLoginSDK.getAccessToken())
+        }
+        override fun onFailure(httpStatus: Int, message: String) {
+            val errorCode = NaverIdLoginSDK.getLastErrorCode().code
+            val errorDescription = NaverIdLoginSDK.getLastErrorDescription()
+            Log.e("test", "$errorCode $errorDescription")
+        }
+        override fun onError(errorCode: Int, message: String) {
+            onFailure(errorCode, message)
+        }
+    }
+    private fun accessService(token: String?) {
         var intent = Intent(this, MainActivity::class.java)
         intent.putExtra("token", token)
         startActivity(intent)
