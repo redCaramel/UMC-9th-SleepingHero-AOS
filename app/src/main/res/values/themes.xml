@@ -17,7 +17,7 @@
         <item name="colorOnSurface">@color/black</item>
         <item name="colorOnError">@color/error</item>
 
-        <item name="android:fontFamily">@font/dongle</item>
+        <item name="android:fontFamily">@font/inter</item>
 
     </style>
     <style name="Title1">
