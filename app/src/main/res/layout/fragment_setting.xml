@@ -35,7 +35,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#d9d9d9"
-                android:paddingBottom="20dp">
+                android:paddingBottom="20dp"
+                android:layout_marginBottom="30dp">
 
                 <TextView
                     android:id="@+id/textView8"
@@ -95,7 +96,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
                 <Switch
-                    android:id="@+id/sw_alarm"
+                    android:id="@+id/sw_alarm_active"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
@@ -103,24 +104,24 @@
                     app:layout_constraintEnd_toEndOf="parent" />
 
                 <CheckBox
-                    android:id="@+id/checkBox"
+                    android:id="@+id/cb_alarm_push"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:layout_marginEnd="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/sw_alarm" />
+                    app:layout_constraintTop_toBottomOf="@+id/sw_alarm_active" />
 
                 <CheckBox
-                    android:id="@+id/checkBox2"
+                    android:id="@+id/cb_alarm_dnb"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="32dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+                    app:layout_constraintTop_toBottomOf="@+id/cb_alarm_push" />
 
                 <TextView
-                    android:id="@+id/textView11"
+                    android:id="@+id/tv_set_dnb_a"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="24dp"
@@ -133,7 +134,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
                 <TextView
-                    android:id="@+id/textView12"
+                    android:id="@+id/tv_set_dnb_b"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -153,11 +154,11 @@
                     android:layout_marginTop="16dp"
                     android:fontFamily="@font/dohyeon"
                     android:text="~"
-                    app:layout_constraintStart_toEndOf="@+id/textView11"
+                    app:layout_constraintStart_toEndOf="@+id/tv_set_dnb_a"
                     app:layout_constraintTop_toBottomOf="@+id/textView10" />
 
                 <SeekBar
-                    android:id="@+id/seekBar2"
+                    android:id="@+id/sb_alarm_volume"
                     android:layout_width="211dp"
                     android:layout_height="13dp"
                     android:layout_marginEnd="24dp"
@@ -176,10 +177,10 @@
                     android:orientation="horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textView14"
-                    app:layout_constraintTop_toBottomOf="@+id/checkBox2">
+                    app:layout_constraintTop_toBottomOf="@+id/cb_alarm_dnb">
 
                     <RadioButton
-                        android:id="@+id/radioButton6"
+                        android:id="@+id/rb_nouse"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
@@ -188,30 +189,37 @@
                         android:text="사용 X" />
 
                     <RadioButton
-                        android:id="@+id/radioButton5"
+                        android:id="@+id/rb_sound"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/dohyeon"
                         android:layoutDirection="rtl"
+                        android:layout_marginHorizontal="10dp"
                         android:text="소리" />
 
                     <RadioButton
-                        android:id="@+id/radioButton4"
+                        android:id="@+id/rb_vibrate"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/dohyeon"
                         android:layoutDirection="rtl"
+                        android:layout_marginHorizontal="10dp"
                         android:text="진동" />
                 </RadioGroup>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <View
+                android:id="@+id/view5"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
-                android:layout_marginTop="30dp"
                 android:background="#d9d9d9">
 
                 <TextView
@@ -237,10 +245,15 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <View
+                android:id="@+id/view"
+                android:background="@color/black"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
-                android:layout_marginTop="30dp"
                 android:background="#d9d9d9">
 
                 <TextView
@@ -266,10 +279,15 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <View
+                android:id="@+id/view2"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
-                android:layout_marginTop="30dp"
                 android:background="#d9d9d9">
 
                 <TextView
@@ -295,10 +313,15 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <View
+                android:id="@+id/view3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black" />
+
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="70dp"
-                android:layout_marginTop="30dp"
                 android:background="#d9d9d9">
 
                 <TextView
@@ -321,7 +344,14 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:id="@+id/view4"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/black" />
         </LinearLayout>
     </ScrollView>
 
