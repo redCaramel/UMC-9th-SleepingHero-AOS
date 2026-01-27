@@ -35,6 +35,13 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                 R.id.Social -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                    true
+                }
+
                 else -> false
             }
         }
