@@ -15,15 +15,17 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SleepingHero">
         <activity
+            android:name=".CreateGroupActivity"
+            android:exported="false" />
+        <activity
             android:name=".SplashActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".TimeSettingActivity"
             android:exported="false" />
@@ -36,7 +38,6 @@
         <activity
             android:name=".StartActivity"
             android:exported="true">
-
         </activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"

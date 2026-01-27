@@ -1,5 +1,6 @@
 package com.umc_9th.sleepinghero
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -58,6 +59,7 @@ class SocialFragment : Fragment() {
         }
 
         selectTab(binding.tabFriend)
+        replaceInnerFragment(FriendFragment())
     }
 
     private fun selectTab(selectedLayout: LinearLayout) {
@@ -74,6 +76,12 @@ class SocialFragment : Fragment() {
                 layout.setBackgroundResource(R.drawable.tab_selected)
                 text.setTextColor(Color.parseColor("#FFFFFF"))
                 icon.setColorFilter(Color.parseColor("#FFFFFF"))
+                if(layout == binding.tabFriend) {
+                    replaceInnerFragment(FriendFragment())
+                }
+                else if(layout == binding.tabGroup) {
+                    replaceInnerFragment(GroupFragment())
+                }
             } else {
                 layout.setBackgroundResource(R.drawable.tab_unselected)
                 text.setTextColor(Color.parseColor("#666666"))
@@ -81,6 +89,9 @@ class SocialFragment : Fragment() {
             }
         }
     }
-
-
+    private fun replaceInnerFragment(fragment: Fragment) {
+        childFragmentManager.beginTransaction()
+            .replace(R.id.container_social, fragment)
+            .commit()
+    }
 }
