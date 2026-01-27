@@ -9,61 +9,6 @@
     android:layout_height="match_parent"
     tools:context=".LoadingActivity">
 
-    <TextView
-        android:id="@+id/textView"
-        style="@style/Title1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/gugi"
-
-        android:text="숙"
-        android:textColor="@color/white"
-        android:textSize="48sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/gl_loading_B"
-        app:layout_constraintEnd_toStartOf="@+id/textView2" />
-
-    <TextView
-        android:id="@+id/textView2"
-        style="@style/Title1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:fontFamily="@font/dongle"
-        android:text="면"
-        android:textColor="@color/white"
-        android:textSize="48sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/gl_loading_C"
-        app:layout_constraintEnd_toStartOf="@+id/gl_loading_A" />
-
-    <TextView
-        android:id="@+id/textView3"
-        style="@style/Title1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:fontFamily="@font/gugi"
-        android:text="용"
-        android:textColor="@color/white"
-        android:textSize="48sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/gl_loading_B"
-        app:layout_constraintStart_toStartOf="@+id/gl_loading_A" />
-
-    <TextView
-        android:id="@+id/textView4"
-        style="@style/Title1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/dongle"
-        android:text="사"
-        android:textColor="@color/white"
-        android:textSize="48sp"
-        android:textStyle="normal"
-        app:layout_constraintBottom_toTopOf="@+id/gl_loading_C"
-        app:layout_constraintStart_toEndOf="@+id/textView3" />
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/gl_loading_A"
         android:layout_width="wrap_content"
@@ -95,8 +40,8 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/gl_loading_D"
-        app:layout_constraintEnd_toEndOf="@+id/textView4"
-        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gl_loading_C"
         app:srcCompat="@drawable/hero_armor" />
 
@@ -112,4 +57,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/gl_loading_D" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/gl_loading_C"
+        app:layout_constraintEnd_toEndOf="@+id/textView5"
+        app:layout_constraintStart_toStartOf="@+id/textView5"
+        app:srcCompat="@drawable/img_logo" />
 </androidx.constraintlayout.widget.ConstraintLayout>
