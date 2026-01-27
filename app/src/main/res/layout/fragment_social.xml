@@ -73,13 +73,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:layout_marginRight="140dp"
-                    android:layout_weight="1"
+                    android:layout_marginRight="130dp"
                     android:background="@drawable/bg_level_a"
-                    android:padding="5dp"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="5dp"
+                    android:drawableLeft="@drawable/ic_level"
+                    android:drawablePadding="4dp"
                     android:text="Lv.11"
                     android:textAlignment="center"
                     android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btn_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_setting" />
             </LinearLayout>
 
             <LinearLayout

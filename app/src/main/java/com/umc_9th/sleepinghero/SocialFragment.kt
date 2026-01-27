@@ -19,6 +19,21 @@ class SocialFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSocialBinding.inflate(inflater, container, false)
+        binding.btnProfile.setOnClickListener {
+            val bundle = Bundle().apply {
+                putString("name",binding.tvSocialName.text.toString())
+                putString("time",binding.tvSocialTime.text.toString())
+                putString("streak",binding.tvSocialStreak.text.toString())
+                putString("level",binding.tvSocialLevel.text.toString())
+                putString("follower",binding.tvSocialFollower.text.toString())
+                putString("following",binding.tvSocialFollowing.text.toString())
+            }
+            ProfileFragment().arguments = bundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container_main, ProfileFragment())
+                .addToBackStack(null)
+                .commit()
+        }
         return binding.root
     }
 
