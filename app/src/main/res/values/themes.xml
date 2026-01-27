@@ -18,7 +18,7 @@
         <item name="colorOnError">@color/error</item>
 
         <item name="android:fontFamily">@font/inter</item>
-
+        <item name="android:windowIsTranslucent">true</item>
     </style>
     <style name="Title1">
         <item name="android:textSize">40sp</item>
