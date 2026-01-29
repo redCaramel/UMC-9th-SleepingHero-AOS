@@ -28,6 +28,7 @@
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
                 android:text="루틴"
                 android:textSize="26sp"
                 android:textStyle="bold" />
@@ -45,6 +46,7 @@
                 android:id="@+id/cardSleepSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:cardUseCompatPadding="false"
@@ -63,10 +65,10 @@
                         android:layout_marginBottom="12dp"
                         android:text="수면 시간 설정"
                         android:textColor="#404040"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:textSize="16sp" />
 
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/bedContainer"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginBottom="10dp"
@@ -95,7 +97,7 @@
                                 android:layout_marginStart="10dp"
                                 android:text="취침 시간"
                                 android:textColor="#404040"
-                                android:textSize="14sp"
+                                android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/icBed"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -106,7 +108,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="11:00 PM"
                                 android:textColor="#404040"
-                                android:textSize="14sp"
+                                android:textSize="18sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/icBedArrow"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -123,6 +125,7 @@
                     </androidx.cardview.widget.CardView>
 
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/wakeContainer"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:layout_marginBottom="14dp"
@@ -151,7 +154,7 @@
                                 android:layout_marginStart="10dp"
                                 android:text="기상 시간"
                                 android:textColor="#404040"
-                                android:textSize="14sp"
+                                android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@id/icWake"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -162,7 +165,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="07:00 AM"
                                 android:textColor="#404040"
-                                android:textSize="14sp"
+                                android:textSize="18sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@id/icWakeArrow"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -177,6 +180,12 @@
                                 app:layout_constraintTop_toTopOf="parent" />
                         </androidx.constraintlayout.widget.ConstraintLayout>
                     </androidx.cardview.widget.CardView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="#314158"/>
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -221,7 +230,7 @@
                     android:layout_height="wrap_content"
                     android:background="#DCE5EF"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="25dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -238,8 +247,7 @@
                         android:layout_marginBottom="10dp"
                         android:text="0일"
                         android:textColor="#1B4E81"
-                        android:textSize="34sp"
-                        android:textStyle="bold" />
+                        android:textSize="34sp" />
 
                     <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
@@ -297,8 +305,8 @@
                         android:gravity="center"
                         android:text="주간"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#404040"
+                        android:textColor="#FFFFFF"
+                        android:background="#1B4E81"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -312,9 +320,7 @@
                         android:gravity="center"
                         android:text="월간"
                         android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#FFFFFF"
-                        android:background="#1B4E81"
+                        android:textColor="#404040"
                         app:layout_constraintStart_toEndOf="@id/btnWeekly"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -347,7 +353,7 @@
                             android:id="@+id/tvMonthlyTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="월간 리포트"
+                            android:text="주간 리포트"
                             android:textSize="16sp"
                             android:textColor="#404040"
                             app:layout_constraintStart_toStartOf="parent"
@@ -369,7 +375,6 @@
                             android:layout_height="wrap_content"
                             android:text="안정"
                             android:textSize="14sp"
-                            android:textStyle="bold"
                             android:textColor="#1B4E81"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent"/>
@@ -452,7 +457,7 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- 수면 기록 (그래프) 넣기-->
+            <!-- TODO - 수면 기록 (그래프) 넣기-->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardChart"
                 android:layout_width="match_parent"
@@ -467,7 +472,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:padding="16dp"
-                    android:background="@android:color/white">
+                    android:background="#E5E7EB">
 
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
@@ -505,6 +510,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="240dp"
                         android:background="#EEF1F4"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="10dp"
+                        android:background="#314158"/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -554,6 +565,10 @@
                             android:textSize="12sp"
                             android:textColor="#2B2B2B"/>
                     </LinearLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>

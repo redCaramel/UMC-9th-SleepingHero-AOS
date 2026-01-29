@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:paddingBottom="30dp"
+    tools:context=".TimeSettingActivity">
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_timeset_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_200"
+        android:text="취소"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_timeset_mindown" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_timeset_confirm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/primary_300"
+        android:text="확인"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/btn_timeset_mindown" />
+
+    <TextView
+        android:id="@+id/tv_timeset_hour"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="24dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_200"
+        android:text="11"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_timeset_hourup" />
+
+    <TextView
+        android:id="@+id/tv_timeset_min"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_200"
+        android:text="00"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@+id/textView26"
+        app:layout_constraintTop_toBottomOf="@+id/btn_timeset_minup" />
+
+    <TextView
+        android:id="@+id/tv_timeset_ampm"
+        android:layout_width="60dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="24dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_200"
+        android:text="PM"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv_timeset_min"
+        app:layout_constraintTop_toBottomOf="@+id/btn_timeset_ampm_a" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_hourdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_hour"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_hour"
+        app:layout_constraintTop_toBottomOf="@+id/tv_timeset_hour"
+        app:srcCompat="@drawable/ic_down_btn" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_mindown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_min"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_min"
+        app:layout_constraintTop_toBottomOf="@+id/tv_timeset_min"
+        app:srcCompat="@drawable/ic_down_btn" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_ampm_b"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_ampm"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_ampm"
+        app:layout_constraintTop_toBottomOf="@+id/tv_timeset_ampm"
+        app:srcCompat="@drawable/ic_down_btn" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_hourup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_hour"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_hour"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_up_btn" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_minup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_min"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_min"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_up_btn" />
+
+    <ImageView
+        android:id="@+id/btn_timeset_ampm_a"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_timeset_ampm"
+        app:layout_constraintStart_toStartOf="@+id/tv_timeset_ampm"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_up_btn" />
+
+    <TextView
+        android:id="@+id/textView26"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:text=":"
+        android:textAlignment="center"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_timeset_hour"
+        app:layout_constraintStart_toEndOf="@+id/tv_timeset_hour"
+        app:layout_constraintTop_toTopOf="@+id/tv_timeset_hour" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

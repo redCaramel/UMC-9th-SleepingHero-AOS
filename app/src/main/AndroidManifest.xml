@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SleepingHero">
         <activity
+            android:name=".TimeSettingActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
