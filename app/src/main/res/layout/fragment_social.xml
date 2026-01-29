@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_200"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp"
+            android:text="소셜"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="16dp"
+            android:text="친구들과 함께 수면 목표를 달성하세요"
+            android:textColor="#777777"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:src="@drawable/ic_user_sample" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="김민주"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_social_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="총 245시간"
+                        android:textColor="#666666"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_social_level"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="130dp"
+                    android:background="@drawable/bg_level_a"
+                    android:drawableLeft="@drawable/ic_level"
+                    android:drawablePadding="4dp"
+                    android:paddingHorizontal="5dp"
+                    android:paddingVertical="5dp"
+                    android:text="Lv.11"
+                    android:textAlignment="center"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:id="@+id/btn_profile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:srcCompat="@drawable/ic_setting" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_following"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="34"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="팔로잉"
+                        android:textColor="#777777"
+                        android:textSize="12sp" />
+
+                </LinearLayout>
+
+                <View
+                    android:id="@+id/view6"
+                    android:layout_width="1dp"
+                    android:layout_height="28dp"
+                    android:background="#e0e0e0" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_follower"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="34"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="팔로워"
+                        android:textColor="#777777"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="28dp"
+                    android:background="#e0e0e0" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_streak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="16"
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="연속일"
+                        android:textColor="#777777"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/et_social_search"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_search"
+            android:drawableLeft="@drawable/ic_find"
+            android:drawablePadding="10dp"
+            android:hint="친구 검색..."
+            android:paddingHorizontal="16dp"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/tabContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/tab_friend"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_unselected"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/iconMyFriends"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/ic_friend" />
+
+                <TextView
+                    android:id="@+id/textMyFriends"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="내 친구"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tab_group"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_unselected"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/iconGroup"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/ic_group" />
+
+                <TextView
+                    android:id="@+id/textGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="그룹"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/tab_recommend"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_unselected"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:id="@+id/iconRecommend"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginEnd="6dp"
+                    android:src="@drawable/ic_recommend"
+                    app:tint="@color/gray_700" />
+
+                <TextView
+                    android:id="@+id/textRecommend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="추천"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="8dp"
+            android:background="#DDDDDD" />
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/container_social"
+            android:layout_width="match_parent"
+            android:layout_height="450dp"
+            android:layout_weight="1" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

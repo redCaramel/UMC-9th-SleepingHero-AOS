@@ -1,5 +1,36 @@
 <resources>
     <string name="app_name">SleepingHero</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Home Fragment -->
+    <string name="home_user_name">김민주 님</string>
+    <string name="home_sleep_days">12일째 숙면 중</string>
+    <string name="home_diary_button">전투 일지</string>
+
+    <string name="home_level_label">레벨</string>
+    <string name="home_level_value">12</string>
+
+    <string name="home_point_label">포인트</string>
+    <string name="home_point_value">2450</string>
+
+    <string name="home_achievement_label">연속성공</string>
+    <string name="home_achievement_value">7일</string>
+
+    <string name="home_badge_label">뱃지</string>
+    <string name="home_badge_value">15</string>
+
+    <string name="home_sleep_goal">수면 목표 시간</string>
+    <string name="home_sleep_hours">8시간</string>
+
+    <string name="home_start_button">수면 시작하기</string>
+
+    <!-- Sleep Tracker Fragment -->
+    <string name="sleep_tracker_timer">00 : 00 : 01</string>
+    <string name="sleep_tracker_progress">0.0 / 8.5 시간</string>
+    <string name="sleep_tracker_time_range">23 : 30 - 7 : 00</string>
+    <string name="sleep_tracker_percent">0%</string>
+    <string name="sleep_tracker_alarm">알람 설정</string>
+    <string name="sleep_tracker_stop">수면 종료</string>
+    <string name="sleep_tracker_ready">수면 달성 시 200 포인트 획득!</string>
+    <string name="sleep_tracker_screen_lock">화면 잠금 설정</string>
+
 </resources>

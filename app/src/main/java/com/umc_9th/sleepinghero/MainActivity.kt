@@ -29,6 +29,21 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
 
+                R.id.Settings -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SettingFragment())
+                        .commit()
+                    true
+                }
+
+                 R.id.Social -> {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                    true
+                }
+
+
                 R.id.Hero -> {
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.container_main, HeroFragment())
@@ -44,7 +59,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 else -> false
-
 
                 //TODO - 자기 파트 화면전환 추가
             }

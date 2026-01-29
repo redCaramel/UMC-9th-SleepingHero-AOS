@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:paddingBottom="30dp"
+    tools:context=".CreateGroupActivity">
+
+    <TextView
+        android:id="@+id/textView28"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:text="그룹 아이콘"
+        android:textColor="@color/gray_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="그룹 이름"
+        android:textColor="@color/gray_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scrollView3" />
+
+    <TextView
+        android:id="@+id/textView37"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="그룹 소개"
+        android:textColor="@color/gray_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inp_group_name" />
+
+    <TextView
+        android:id="@+id/textView39"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="미리보기"
+        android:textColor="@color/gray_700"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/inp_group_info" />
+
+    <ScrollView
+        android:id="@+id/scrollView3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView28">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imageView129"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView128"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView228"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView229"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView19"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView18"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView29"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+            <ImageView
+                android:id="@+id/imageView28"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/bg_card"
+                app:srcCompat="@drawable/kakao" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inp_group_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="text"
+        app:counterEnabled="true"
+        app:counterMaxLength="20"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView30">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_group_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:backgroundTint="@color/gray_200"
+            android:hint="예: 아침형 인간 모임"
+            android:maxLength="20" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inp_group_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:inputType="text"
+        app:counterEnabled="true"
+        app:counterMaxLength="100"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView37">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_group_info"
+            android:layout_width="match_parent"
+            android:layout_height="148dp"
+            android:background="@drawable/bg_card"
+            android:backgroundTint="@color/gray_200"
+            android:hint="그룹에 대해 간단히 설명해주세요."
+            android:maxLength="100" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_200"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView39">
+
+        <TextView
+            android:id="@+id/textView40"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:ellipsize="end"
+            android:ems="9"
+            android:maxLines="1"
+            android:text="그룹 이름"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textView41"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="end"
+            android:ems="11"
+            android:maxLines="1"
+            android:text="그룹 소개"
+            android:textColor="@color/gray_700"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@+id/textView40" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.2" />
+
+        <ImageView
+            android:id="@+id/imageView30"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/bg_card"
+            android:backgroundTint="@color/gray_500"
+            app:layout_constraintBottom_toBottomOf="@+id/textView41"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/textView40"
+            app:srcCompat="@drawable/kakao" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_create_group_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/gray_700"
+        android:text="취소"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_create_group_confirm"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_card"
+        android:backgroundTint="@color/primary_500"
+        android:text="만들기"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

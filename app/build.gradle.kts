@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -20,9 +22,26 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        //local property
+        val properties = Properties().apply {
+            load(rootProject.file("local.properties").inputStream())
+        }
+
+        val configValues = mapOf(
+            "KAKAO_NATIVE_KEY" to properties.getProperty("KAKAO_NATIVE_KEY"),
+            "NAVER_CLIENT_ID" to properties.getProperty("NAVER_CLIENT_ID"),
+            "NAVER_CLIENT_SECRET" to properties.getProperty("NAVER_CLIENT_SECRET")
+        )
+        buildConfigField("String", "KAKAO_NATIVE_KEY", "\"${configValues["KAKAO_NATIVE_KEY"]}\"")
+        buildConfigField("String", "NAVER_CLIENT_ID", "\"${configValues["NAVER_CLIENT_ID"]}\"")
+        buildConfigField("String", "NAVER_CLIENT_SECRET", "\"${configValues["NAVER_CLIENT_SECRET"]}\"")
+
+        manifestPlaceholders.putAll(configValues)
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     buildTypes {
         release {
@@ -67,4 +86,11 @@ dependencies {
     // Glide
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Kakao SDK
+    implementation("com.kakao.sdk:v2-user:2.23.0")
+    implementation("com.kakao.sdk:v2-auth:2.23.0")
+
+    // Naver SDK
+    implementation("com.navercorp.nid:oauth-jdk8:5.1.0")
 }

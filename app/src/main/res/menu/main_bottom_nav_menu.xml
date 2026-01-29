@@ -10,6 +10,9 @@
         android:id="@+id/Routine"
         android:title="Routine" />
     <item
+        android:id="@+id/Social"
+        android:title="Social" />
+    <item
         android:id="@+id/Settings"
         android:title="Settings" />
 </menu>
