@@ -2,11 +2,13 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="#F3F5F7">
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/routineScroll"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
@@ -16,203 +18,562 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="12dp">
+            android:padding="16dp">
 
-            <!-- 수면시간 설정 카드 -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="루틴"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="수면 패턴과 통계를 한번에"
+                android:textSize="14sp"
+                android:textColor="#8A8A8A"
+                android:layout_marginBottom="14dp"/>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSleepSetting"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#D9D9D9"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                android:layout_marginTop="25dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:cardUseCompatPadding="false"
+                android:layout_marginBottom="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="수면시간 설정"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="8dp"/>
-
-                <!-- 취침 시간 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dp">
+                    android:background="@android:color/white"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="취침 시간"
-                        android:textSize="14sp"
-                        android:textColor="#1C1C1C"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        android:layout_marginBottom="12dp"
+                        android:text="수면 시간 설정"
+                        android:textColor="#404040"
+                        android:textSize="16sp" />
 
-                    <TextView
-                        android:id="@+id/tvSleepTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Label"
-                        android:background="@drawable/bg_round_outline"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/bedContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="10dp"
+                        app:cardBackgroundColor="#E5E7EB"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
 
-                <!-- 기상 시간 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="6dp">
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="14dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="기상 시간"
-                        android:textSize="14sp"
-                        android:textColor="#1C1C1C"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                            <ImageView
+                                android:id="@+id/icBed"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_alarm"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:id="@+id/tvWakeTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Label"
-                        android:background="@drawable/bg_round_outline"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                            <TextView
+                                android:id="@+id/tvBedLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="취침 시간"
+                                android:textColor="#404040"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/icBed"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                <!-- 총 수면 시간 -->
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                            <TextView
+                                android:id="@+id/tvBedTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="11:00 PM"
+                                android:textColor="#404040"
+                                android:textSize="18sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/icBedArrow"
+                                app:layout_constraintTop_toTopOf="parent" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="총 수면시간"
-                        android:textSize="14sp"
-                        android:textColor="#1C1C1C"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                            <ImageView
+                                android:id="@+id/icBedArrow"
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:src="@drawable/ic_arrow_forward"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
 
-                    <TextView
-                        android:id="@+id/tvTotalSleep"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Label"
-                        android:background="@drawable/bg_round_outline"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/wakeContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:layout_marginBottom="14dp"
+                        app:cardBackgroundColor="#E5E7EB"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
 
-            </LinearLayout>
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingHorizontal="14dp">
 
-            <!-- 주간 그래프 카드 -->
-            <LinearLayout
+                            <ImageView
+                                android:id="@+id/icWake"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_alarm"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tvWakeLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="10dp"
+                                android:text="기상 시간"
+                                android:textColor="#404040"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@id/icWake"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/tvWakeTime"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="07:00 AM"
+                                android:textColor="#404040"
+                                android:textSize="18sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@id/icWakeArrow"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <ImageView
+                                android:id="@+id/icWakeArrow"
+                                android:layout_width="18dp"
+                                android:layout_height="16dp"
+                                android:src="@drawable/ic_arrow_forward"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="#314158"/>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvGoalLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="목표 수면 시간"
+                            android:textColor="#404040"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvGoalValue"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="8시간"
+                            android:textColor="#2FA4A9"
+                            android:textSize="16sp"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardStreak"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#D9D9D9"
-                android:padding="12dp"
-                android:layout_marginBottom="12dp">
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="14dp">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp">
+                    android:background="#DCE5EF"
+                    android:orientation="vertical"
+                    android:padding="25dp">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="주간 그래프"
-                        android:textStyle="bold"
-                        android:textSize="16sp"
-                        android:textColor="#1C1C1C"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
+                        android:text="연속 수면 일수"
+                        android:textColor="#404040"
+                        android:textSize="14sp" />
 
-                    <Switch
-                        android:id="@+id/switchWeekly"
+                    <TextView
+                        android:id="@+id/tvStreakDays"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"/>
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        android:layout_marginTop="6dp"
+                        android:layout_marginBottom="10dp"
+                        android:text="0일"
+                        android:textColor="#1B4E81"
+                        android:textSize="34sp" />
 
-                <!-- 그래프 placeholder -->
-                <View
-                    android:id="@+id/viewGraph"
-                    android:layout_width="match_parent"
-                    android:layout_height="180dp"
-                    android:background="#B0B0B0"/>
-            </LinearLayout>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardBackgroundColor="#F1F5F9"
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
 
-            <!-- 연속 수면 일수 카드 -->
-            <LinearLayout
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="현재 보너스"
+                                android:textColor="#16426E"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/tvBonus"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="없음"
+                                android:textColor="#404040"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#D9D9D9"
-                android:padding="12dp">
+                app:cardCornerRadius="14dp"
+                app:cardElevation="4dp"
+                android:layout_marginHorizontal="5dp"
+                android:layout_marginBottom="14dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="연속 수면일수"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="8dp"/>
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:background="@android:color/white"
+                    android:padding="6dp">
 
-                <TextView
-                    android:id="@+id/tvStreakStart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="연속 수면 시작일 : 11/1"
-                    android:textSize="14sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="4dp"/>
+                    <TextView
+                        android:id="@+id/btnWeekly"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="주간"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:background="#1B4E81"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/btnMonthly"
+                        app:layout_constraintHorizontal_weight="1"/>
 
-                <TextView
-                    android:id="@+id/tvStreakCount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="연속 수면 일수 : 12일 연속 수면중!!"
-                    android:textSize="14sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="4dp"/>
+                    <TextView
+                        android:id="@+id/btnMonthly"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:text="월간"
+                        android:textSize="14sp"
+                        android:textColor="#404040"
+                        app:layout_constraintStart_toEndOf="@id/btnWeekly"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_weight="1"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.cardview.widget.CardView>
 
-                <TextView
-                    android:id="@+id/tvStreakBonus"
-                    android:layout_width="wrap_content"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMonthlyReport"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="연속 수면 보너스 : 경험치 +10%"
-                    android:textSize="14sp"
-                    android:textColor="#1C1C1C"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="#E5E7EB">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:id="@+id/tvMonthlyTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="주간 리포트"
+                            android:textSize="16sp"
+                            android:textColor="#404040"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+
+                        <ImageView
+                            android:id="@+id/icStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_stable"
+                            android:layout_marginEnd="5dp"
+                            app:layout_constraintEnd_toStartOf="@id/tvStatus"
+                            app:layout_constraintTop_toTopOf="@id/tvStatus"
+                            app:layout_constraintBottom_toBottomOf="@id/tvStatus"/>
+
+                        <TextView
+                            android:id="@+id/tvStatus"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="안정"
+                            android:textSize="14sp"
+                            android:textColor="#1B4E81"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvTotalHours"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0h"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#404040"
+                            android:layout_marginStart="30dp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="총 시간"
+                            android:textSize="12sp"
+                            android:textColor="#90A1B9"
+                            app:layout_constraintStart_toStartOf="@id/tvTotalHours"
+                            app:layout_constraintEnd_toEndOf="@id/tvTotalHours"
+                            app:layout_constraintTop_toBottomOf="@id/tvTotalHours"
+                            android:layout_marginTop="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvDailyAvg"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.0h"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#404040"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="일평균"
+                            android:textSize="12sp"
+                            android:textColor="#90A1B9"
+                            app:layout_constraintTop_toBottomOf="@id/tvDailyAvg"
+                            app:layout_constraintStart_toStartOf="@id/tvDailyAvg"
+                            app:layout_constraintEnd_toEndOf="@id/tvDailyAvg"
+                            android:layout_marginTop="2dp"/>
+
+                        <TextView
+                            android:id="@+id/tvRecordedDays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0/30"
+                            android:textSize="24sp"
+                            android:textStyle="bold"
+                            android:textColor="#404040"
+                            android:layout_marginEnd="30dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="기록일"
+                            android:textSize="12sp"
+                            android:textColor="#90A1B9"
+                            app:layout_constraintStart_toStartOf="@id/tvRecordedDays"
+                            app:layout_constraintEnd_toEndOf="@id/tvRecordedDays"
+                            app:layout_constraintTop_toBottomOf="@id/tvRecordedDays"
+                            android:layout_marginTop="2dp"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- TODO - 수면 기록 (그래프) 넣기-->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardChart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="14dp">
+
+                <LinearLayout
+                    android:id="@+id/tvSleepRecordGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:background="#E5E7EB">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp">
+
+                        <ImageView
+                            android:id="@+id/icSleepRecord"
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:src="@drawable/ic_sleep_record"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/tvSleepRecordTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="수면 기록"
+                            android:textStyle="bold"
+                            android:textSize="16sp"
+                            android:textColor="#2B2B2B"
+                            android:layout_marginStart="8dp"
+                            app:layout_constraintStart_toEndOf="@id/icSleepRecord"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                    <!-- 그래프 placeholder: 나중에 ChartView로 교체 -->
+                    <FrameLayout
+                        android:id="@+id/chartContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="240dp"
+                        android:background="#EEF1F4"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="10dp"
+                        android:background="#314158"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginTop="10dp">
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/circle_red" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="6시간↓"
+                            android:textSize="12sp"
+                            android:textColor="#2B2B2B"
+                            android:layout_marginEnd="12dp"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/circle_blue" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="6-7시간"
+                            android:textSize="12sp"
+                            android:textColor="#2B2B2B"
+                            android:layout_marginEnd="12dp"/>
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="10dp"
+                            android:src="@drawable/circle_green" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="7시간↑"
+                            android:textSize="12sp"
+                            android:textColor="#2B2B2B"/>
+                    </LinearLayout>
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
-
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
