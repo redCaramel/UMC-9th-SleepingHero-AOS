@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
-    <!-- 스크롤 필요하면 NestedScrollView, 아니면 이걸 빼고 바로 content 넣어도 됨 -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/heroScroll"
         android:layout_width="0dp"
@@ -23,7 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <!-- (1) 상단 헤더 바 -->
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/headerBar"
                 android:layout_width="0dp"
@@ -74,7 +72,6 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <!-- (2) 질병 아이콘 (왼쪽) -->
             <LinearLayout
                 android:id="@+id/diseaseIconColumn"
                 android:layout_width="48dp"
@@ -85,7 +82,6 @@
                 app:layout_constraintTop_toBottomOf="@id/headerBar"
                 app:layout_constraintStart_toStartOf="parent">
 
-                <!-- 감기 아이콘 -->
                 <ImageButton
                     android:id="@+id/btnDisease1"
                     android:layout_width="40dp"
@@ -94,7 +90,6 @@
                     android:src="@drawable/ic_disease"
                     android:contentDescription="질병1" />
 
-                <!-- 골절 아이콘 -->
                 <ImageButton
                     android:id="@+id/btnDisease2"
                     android:layout_width="40dp"
@@ -105,7 +100,6 @@
 
             </LinearLayout>
 
-            <!-- (3) 옷장 버튼 (오른쪽) -->
             <Button
                 android:id="@+id/btnWardrobe"
                 android:layout_width="wrap_content"
@@ -118,7 +112,6 @@
                 app:layout_constraintTop_toBottomOf="@id/headerBar"
                 app:layout_constraintEnd_toEndOf="parent"/>
 
-            <!-- (4) 캐릭터 이미지 -->
             <ImageView
                 android:id="@+id/imgHero"
                 android:layout_width="0dp"
@@ -131,7 +124,6 @@
                 app:layout_constraintEnd_toStartOf="@id/btnWardrobe"
                 app:layout_constraintHorizontal_bias="0.5"/>
 
-            <!-- 스탯 + 질병 섹션 배경(회색) -->
             <LinearLayout
                 android:id="@+id/panel"
                 android:layout_width="0dp"
@@ -144,7 +136,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 
-                <!-- 스탯 타이틀 -->
                 <TextView
                     android:id="@+id/tvStatTitle"
                     android:layout_width="wrap_content"
@@ -155,13 +146,11 @@
                     android:textColor="#1C1C1C"
                     android:layout_marginBottom="10dp"/>
 
-                <!-- 스탯 리스트 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <!-- STR -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -193,7 +182,6 @@
                                 android:contentDescription="STR -"
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_add"
-                                android:tint="#2B2B2B"
                                 android:layout_marginEnd="10dp"/>
 
                             <ImageButton
@@ -201,14 +189,12 @@
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:contentDescription="STR -"
-                                android:src="@drawable/ic_remove"
-                                android:tint="#2B2B2B" />
+                                android:src="@drawable/ic_remove" />
 
                         </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- INT -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -240,7 +226,6 @@
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_add"
                                 android:contentDescription="INT -"
-                                android:tint="#2B2B2B"
                                 android:layout_marginEnd="10dp"/>
 
                             <ImageButton
@@ -248,14 +233,11 @@
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:src="@drawable/ic_remove"
-                                android:contentDescription="INT -"
-                                android:tint="#2B2B2B"/>
-
+                                android:contentDescription="INT -" />
                         </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
-                    <!-- DEX -->
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -287,7 +269,6 @@
                                 android:scaleType="centerCrop"
                                 android:src="@drawable/ic_add"
                                 android:contentDescription="DEX -"
-                                android:tint="#2B2B2B"
                                 android:layout_marginEnd="10dp"/>
 
                             <ImageButton
@@ -295,15 +276,13 @@
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:src="@drawable/ic_remove"
-                                android:contentDescription="DEX -"
-                                android:tint="#2B2B2B"/>
+                                android:contentDescription="DEX -" />
                         </LinearLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 
-                <!-- 남은 스탯 + 확인 버튼 -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -334,7 +313,6 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <!-- 질병 섹션 -->
                 <TextView
                     android:id="@+id/tvDiseaseTitle"
                     android:layout_width="wrap_content"
