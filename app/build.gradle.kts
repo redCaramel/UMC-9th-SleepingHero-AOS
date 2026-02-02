@@ -93,4 +93,11 @@ dependencies {
 
     // Naver SDK
     implementation("com.navercorp.nid:oauth-jdk8:5.1.0")
+
+    // EncryptedSharedPreferences
+    implementation("androidx.security:security-crypto-ktx:1.1.0-alpha03")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.2")
 }
