@@ -1,6 +1,7 @@
 package com.umc_9th.sleepinghero.api
 
 import com.umc_9th.sleepinghero.api.service.AuthService
+import com.umc_9th.sleepinghero.api.service.SettingService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -27,7 +28,7 @@ object ApiClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    // TODO - service interface 생성 이후 정의 (이 주석은 삭제해주세요!)
     val authService : AuthService = retrofit.create(AuthService::class.java)
+    val settingService: SettingService = retrofit.create(SettingService::class.java)
 }
 
