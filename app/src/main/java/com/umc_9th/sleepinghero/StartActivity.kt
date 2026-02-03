@@ -38,12 +38,19 @@ class StartActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        checkLogin()
         observeLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
         }
         binding.btnLoginKakao.setOnClickListener {
             kakaoLogin()
+        }
+    }
+
+    private fun checkLogin() {
+        if(TokenManager.isLoggedin(this)) {
+            accessService(TokenManager.getAccessToken(this).toString())
         }
     }
 
