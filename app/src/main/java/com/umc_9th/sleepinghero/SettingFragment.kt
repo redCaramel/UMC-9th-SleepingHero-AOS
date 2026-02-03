@@ -2,13 +2,20 @@ package com.umc_9th.sleepinghero
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import com.kakao.sdk.common.KakaoSdk
+import com.kakao.sdk.user.UserApiClient
+import com.navercorp.nid.NaverIdLoginSDK
+import com.navercorp.nid.oauth.NidOAuthLogin
+import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
 import com.umc_9th.sleepinghero.databinding.FragmentSettingBinding
 
@@ -185,6 +192,24 @@ class SettingFragment : Fragment() {
                 dialog.dismiss()
             }
             dialog.show()
+        }
+
+        binding.btnLogout.setOnClickListener {
+            TokenManager.clearAll(requireContext())
+            //kakao
+            UserApiClient.instance.logout { error ->
+                if(error != null) {
+                    Log.e("test", "로그아웃 실패, SDK에서 토큰 폐기됨", error)
+                }
+                else {
+                    Log.i("test", "로그아웃 성공")
+                }
+            }
+            //naver
+            NaverIdLoginSDK.logout()
+            var intent = Intent(requireContext(), StartActivity::class.java)
+            startActivity(intent)
+            activity?.finish()
         }
     }
 
