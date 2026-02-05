@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray_200"
-    tools:context=".GroupFragment">
+    tools:context=".RankingFragment">
 
 
     <ScrollView
@@ -17,28 +17,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btn_create_group"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bg_card"
-                android:backgroundTint="@color/primary_300"
-                android:textSize="16sp"
-                android:textColor="@color/white"
-                android:layout_margin="10dp"
-                android:text="+ 새 그룹 만들기" />
-
-            <ImageView
-                android:id="@+id/imageView17"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_group_bg" />
-
             <TextView
                 android:id="@+id/tv_ranking_none"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="아직 그룹이 없습니다"
+                android:text="친구가 없습니다."
                 android:textAlignment="center" />
         </LinearLayout>
     </ScrollView>

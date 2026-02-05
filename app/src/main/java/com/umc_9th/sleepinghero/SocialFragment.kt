@@ -23,11 +23,10 @@ class SocialFragment : Fragment() {
         binding.btnProfile.setOnClickListener {
             val bundle = Bundle().apply {
                 putString("name",binding.tvSocialName.text.toString())
-                putString("time",binding.tvSocialTime.text.toString())
+                putString("time",binding.tvSocialTotal.text.toString())
                 putString("streak",binding.tvSocialStreak.text.toString())
                 putString("level",binding.tvSocialLevel.text.toString())
-                putString("follower",binding.tvSocialFollower.text.toString())
-                putString("following",binding.tvSocialFollowing.text.toString())
+                putString("friend", binding.tvSocialFriend.text.toString())
             }
             ProfileFragment().arguments = bundle
             requireActivity().supportFragmentManager.beginTransaction()
@@ -40,16 +39,16 @@ class SocialFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        selectTab(binding.tabFriend)
+        selectTab(binding.tabSearch)
         setupTabs()
     }
 
     private fun setupTabs() {
 
         val tabs = listOf(
-            Triple(binding.tabFriend, binding.textMyFriends, binding.iconMyFriends),
+            Triple(binding.tabSearch, binding.textMyFriends, binding.iconMyFriends),
             Triple(binding.tabGroup, binding.textGroup, binding.iconGroup),
-            Triple(binding.tabRecommend, binding.textRecommend, binding.iconRecommend)
+            Triple(binding.tabRanking, binding.textRecommend, binding.iconRecommend)
         )
 
         tabs.forEach { (layout, text, icon) ->
@@ -58,16 +57,16 @@ class SocialFragment : Fragment() {
             }
         }
 
-        selectTab(binding.tabFriend)
+        selectTab(binding.tabSearch)
         replaceInnerFragment(FriendFragment())
     }
 
     private fun selectTab(selectedLayout: LinearLayout) {
 
         val tabs = listOf(
-            Triple(binding.tabFriend, binding.textMyFriends, binding.iconMyFriends),
+            Triple(binding.tabSearch, binding.textMyFriends, binding.iconMyFriends),
             Triple(binding.tabGroup, binding.textGroup, binding.iconGroup),
-            Triple(binding.tabRecommend, binding.textRecommend, binding.iconRecommend)
+            Triple(binding.tabRanking, binding.textRecommend, binding.iconRecommend)
         )
 
         tabs.forEach { (layout, text, icon) ->
@@ -76,11 +75,14 @@ class SocialFragment : Fragment() {
                 layout.setBackgroundResource(R.drawable.tab_selected)
                 text.setTextColor(Color.parseColor("#FFFFFF"))
                 icon.setColorFilter(Color.parseColor("#FFFFFF"))
-                if(layout == binding.tabFriend) {
+                if(layout == binding.tabSearch) {
                     replaceInnerFragment(FriendFragment())
                 }
                 else if(layout == binding.tabGroup) {
                     replaceInnerFragment(GroupFragment())
+                }
+                else {
+                    replaceInnerFragment(RankingFragment())
                 }
             } else {
                 layout.setBackgroundResource(R.drawable.tab_unselected)

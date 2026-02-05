@@ -60,16 +60,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="김민주"
-                        android:textSize="18sp"
+                        android:textSize="24sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tv_social_time"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="총 245시간"
-                        android:textColor="#666666"
-                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <TextView
@@ -85,7 +78,7 @@
                     android:paddingVertical="5dp"
                     android:text="Lv.11"
                     android:textAlignment="center"
-                    android:textSize="14sp" />
+                    android:textSize="16sp" />
 
                 <ImageView
                     android:id="@+id/btn_profile"
@@ -102,68 +95,15 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_social_following"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="34"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="팔로잉"
-                        android:textColor="#777777"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-                <View
-                    android:id="@+id/view6"
-                    android:layout_width="1dp"
-                    android:layout_height="28dp"
-                    android:background="#e0e0e0" />
-
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_social_follower"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="34"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="팔로워"
-                        android:textColor="#777777"
-                        android:textSize="12sp" />
-                </LinearLayout>
-
-                <View
-                    android:layout_width="1dp"
-                    android:layout_height="28dp"
-                    android:background="#e0e0e0" />
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:background="@drawable/bg_card"
+                    android:backgroundTint="@color/gray_200"
+                    android:elevation="10dp"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginVertical="10dp"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -171,31 +111,132 @@
                         android:id="@+id/tv_social_streak"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="16"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_marginTop="8dp"
+                        android:text="10일"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView272" />
 
                     <TextView
+                        android:id="@+id/textView272"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="연속일"
+                        android:text="연속 수면"
                         android:textColor="#777777"
-                        android:textSize="12sp" />
-                </LinearLayout>
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView20"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/textView272"
+                        app:layout_constraintEnd_toStartOf="@+id/textView272"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/textView272"
+                        app:srcCompat="@drawable/ic_streak" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card"
+                    android:backgroundTint="@color/gray_200"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginVertical="10dp"
+                    android:elevation="10dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="245시간"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView22" />
+
+                    <TextView
+                        android:id="@+id/textView22"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="총 수면"
+                        android:textColor="#777777"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/imageView209"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/textView22"
+                        app:layout_constraintEnd_toStartOf="@+id/textView22"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/textView22"
+                        app:srcCompat="@drawable/ic_total_sleep" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_card"
+                    android:backgroundTint="@color/gray_200"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_marginVertical="10dp"
+                    android:elevation="10dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_social_friend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="10명"
+                        android:textSize="20sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView27" />
+
+                    <TextView
+                        android:id="@+id/textView27"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:text="친구"
+                        android:textColor="#777777"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageView
+                        android:id="@+id/img_friend"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        app:layout_constraintBottom_toBottomOf="@+id/textView27"
+                        app:layout_constraintEnd_toStartOf="@+id/textView27"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/textView27"
+                        app:srcCompat="@drawable/ic_friend"
+                        app:tint="@color/accent_sky" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </LinearLayout>
         </LinearLayout>
-
-        <EditText
-            android:id="@+id/et_social_search"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_search"
-            android:drawableLeft="@drawable/ic_find"
-            android:drawablePadding="10dp"
-            android:hint="친구 검색..."
-            android:paddingHorizontal="16dp"
-            android:textSize="14sp" />
 
         <LinearLayout
             android:id="@+id/tabContainer"
@@ -206,7 +247,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/tab_friend"
+                android:id="@+id/tab_search"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_margin="5dp"
@@ -223,13 +264,13 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_friend" />
+                    android:src="@drawable/ic_find" />
 
                 <TextView
                     android:id="@+id/textMyFriends"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="내 친구"
+                    android:text="탐색"
                     android:textColor="#666666"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -264,7 +305,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/tab_recommend"
+                android:id="@+id/tab_ranking"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_margin="5dp"
@@ -281,14 +322,14 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="6dp"
-                    android:src="@drawable/ic_recommend"
+                    android:src="@drawable/ic_ranking"
                     app:tint="@color/gray_700" />
 
                 <TextView
                     android:id="@+id/textRecommend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="추천"
+                    android:text="랭킹"
                     android:textColor="#666666"
                     android:textSize="14sp" />
             </LinearLayout>
