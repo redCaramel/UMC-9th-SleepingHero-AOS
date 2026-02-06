@@ -2,6 +2,7 @@ package com.umc_9th.sleepinghero.api
 
 import com.umc_9th.sleepinghero.api.service.AuthService
 import com.umc_9th.sleepinghero.api.service.SettingService
+import com.umc_9th.sleepinghero.api.service.SocialService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -30,5 +31,6 @@ object ApiClient {
 
     val authService : AuthService = retrofit.create(AuthService::class.java)
     val settingService: SettingService = retrofit.create(SettingService::class.java)
+    val socialService: SocialService = retrofit.create(SocialService::class.java)
 }
 
