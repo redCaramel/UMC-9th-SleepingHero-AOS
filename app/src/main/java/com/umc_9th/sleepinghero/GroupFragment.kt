@@ -3,10 +3,13 @@ package com.umc_9th.sleepinghero
 import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.widget.addTextChangedListener
 import com.umc_9th.sleepinghero.databinding.ActivityCreateGroupBinding
 import com.umc_9th.sleepinghero.databinding.FragmentGroupBinding
 
@@ -29,6 +32,36 @@ class GroupFragment : Fragment() {
                 .setView(dialogBinding.root)
                 .setTitle("새 그룹 만들기")
                 .create()
+            var iconList : List<View> = listOf(
+                dialogBinding.imgGroupIconA,
+                dialogBinding.imgGroupIconB,
+                dialogBinding.imgGroupIconC,
+                dialogBinding.imgGroupIconD,
+                dialogBinding.imgGroupIconE,
+                dialogBinding.imgGroupIconF,
+                dialogBinding.imgGroupIconG,
+                dialogBinding.imgGroupIconH,
+                dialogBinding.imgGroupIconI,
+                dialogBinding.imgGroupIconJ,
+                dialogBinding.imgGroupIconK,
+                dialogBinding.imgGroupIconL
+            )
+            iconList.forEach { icon ->
+                Log.d("tests", "${icon.isSelected}")
+                icon.setOnClickListener {
+                    iconList.forEach { it.isSelected = false }
+                    icon.isSelected = true
+                    val img = icon as ImageView
+                    dialogBinding.imgPreviewIcon.setImageDrawable(img.drawable)
+                    Log.d("tests", "${icon.id}")
+                }
+            }
+            dialogBinding.etGroupName.addTextChangedListener { editText ->
+                dialogBinding.tvPreviewName.text = dialogBinding.etGroupName.text
+            }
+            dialogBinding.etGroupInfo.addTextChangedListener { editText ->
+                dialogBinding.tvPreviewInfo.text = dialogBinding.etGroupInfo.text
+            }
             dialogBinding.btnCreateGroupCancel.setOnClickListener {
                 dialog.dismiss()
             }
