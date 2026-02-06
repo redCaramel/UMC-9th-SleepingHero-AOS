@@ -351,9 +351,9 @@ class SettingFragment : Fragment() {
             //Result -> status, code 등이 있고 이 안 data에 값이 존재
             result.onSuccess { data ->
                 Toast.makeText(requireContext(), "외부 링크로 연결합니다...", Toast.LENGTH_LONG).show()
-                val faqIntent = Intent(Intent.ACTION_VIEW, data.inquiryUrl.toUri())
+                val faqIntent = Intent(Intent.ACTION_VIEW, data.url.toUri())
                 startActivity(faqIntent)
-                Log.d("test", "외부 링크 연결 - ${data.inquiryUrl}")
+                Log.d("test", "외부 링크 연결 - ${data.url}")
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "연결 실패: $message")
