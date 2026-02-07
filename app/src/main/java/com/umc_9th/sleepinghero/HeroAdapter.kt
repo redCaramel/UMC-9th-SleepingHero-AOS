@@ -43,7 +43,9 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"
-
+                    binding.btnFriendInvite.setOnClickListener {
+                        onInvited(hero)
+                    }
                 }
             }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
 import com.umc_9th.sleepinghero.api.dto.FAQResponse
+import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
 import com.umc_9th.sleepinghero.api.dto.MyCharResponse
 import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import kotlinx.coroutines.launch
@@ -17,6 +18,9 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
 
     private val _myCharResponse = MutableLiveData<Result<MyCharResponse>>()
     val myCharResponse : LiveData<Result<MyCharResponse>> = _myCharResponse
+
+    private val _friendRankingResponse = MutableLiveData<Result<List<FriendRankingResponse>>>()
+    val friendRankingResponse : LiveData<Result<List<FriendRankingResponse>>> = _friendRankingResponse
 
     fun charSearch(accessToken : String, name : String) {
         viewModelScope.launch {
@@ -33,5 +37,11 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
         }
     }
 
+    fun loadFriendRanking(accessToken: String) {
+        viewModelScope.launch {
+            val result = repository.LoadFriendRank(accessToken)
+            _friendRankingResponse.postValue(result)
+        }
+    }
 
 }

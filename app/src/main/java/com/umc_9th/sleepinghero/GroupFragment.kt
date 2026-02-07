@@ -56,6 +56,7 @@ class GroupFragment : Fragment() {
                     Log.d("tests", "${icon.id}")
                 }
             }
+            dialogBinding.imgGroupIconA.isSelected = true
             dialogBinding.etGroupName.addTextChangedListener { editText ->
                 dialogBinding.tvPreviewName.text = dialogBinding.etGroupName.text
             }

@@ -3,6 +3,7 @@ package com.umc_9th.sleepinghero.api.service
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
+import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
 import com.umc_9th.sleepinghero.api.dto.MyCharResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -20,4 +21,9 @@ interface SocialService {
     suspend fun MyCharacter(
         @Header("Authorization") token: String
     ) : Response<ApiResponse<MyCharResponse>>
+
+    @GET("/friends/ranking")
+    suspend fun FriendRanking(
+        @Header("Authorization") token: String
+    ) : Response<ApiResponse<List<FriendRankingResponse>>>
 }

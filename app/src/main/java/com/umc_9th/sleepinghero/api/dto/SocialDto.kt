@@ -22,3 +22,9 @@ data class MyCharResponse(
     val needExp : Int,
     val currentStage : Int
 )
+
+data class FriendRankingResponse (
+    val nickName : String,
+    val totalSleepTime : String,
+    val rank : Int
+)
