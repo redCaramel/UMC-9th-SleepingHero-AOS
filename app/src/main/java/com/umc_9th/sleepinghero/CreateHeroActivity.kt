@@ -59,6 +59,9 @@ class CreateHeroActivity : AppCompatActivity() {
                 var intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "이름 변경 실패 : $message")
             }
         }
     }

@@ -259,7 +259,13 @@ class SettingFragment : Fragment() {
         }
 
         binding.settingBugReport.setOnClickListener {
-            settingViewModel.FAQUrl(TokenManager.getAccessToken(requireContext()).toString())
+            val bundle = Bundle()
+            ReportFragment().arguments = bundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container_main, ReportFragment())
+                .addToBackStack(null)
+                .commit()
+            //settingViewModel.FAQUrl(TokenManager.getAccessToken(requireContext()).toString())
         }
     }
 

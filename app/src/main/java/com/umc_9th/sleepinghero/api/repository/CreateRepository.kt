@@ -1,6 +1,8 @@
 package com.umc_9th.sleepinghero.api.repository
 
 import android.util.Log
+import com.umc_9th.sleepinghero.api.ApiClient.retrofit
+import com.umc_9th.sleepinghero.api.dto.ApiResponse
 import com.umc_9th.sleepinghero.api.dto.CreateHeroResponse
 import com.umc_9th.sleepinghero.api.service.CreateService
 
@@ -21,7 +23,11 @@ class CreateRepository(private val service : CreateService) {
                 Result.success(data)
             }
         } else {
-            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+            ApiResponse::class.java,
+            arrayOfNulls<Annotation>(0)
+            )
+            val errMsg = adapter.convert(response.errorBody())?.message ?: "Unknown error"
             Log.d("test", "error ${response.code()} : $errMsg")
             Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
         }

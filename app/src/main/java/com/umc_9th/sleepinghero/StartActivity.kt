@@ -47,9 +47,24 @@ class StartActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        checkLogin()
+
         observeLogin()
         observeCheck()
+        // --------------------
+        TokenManager.clearAll(this)
+        //kakao
+        UserApiClient.instance.logout { error ->
+            if(error != null) {
+                Log.e("test", "로그아웃 실패, SDK에서 토큰 폐기됨", error)
+            }
+            else {
+                Log.i("test", "로그아웃 성공")
+            }
+        }
+        //naver
+        NaverIdLoginSDK.logout()
+        // ---------------------
+        checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
         }
