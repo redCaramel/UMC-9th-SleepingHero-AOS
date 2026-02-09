@@ -28,3 +28,16 @@ data class FriendRankingResponse (
     val totalSleepTime : String,
     val rank : Int
 )
+
+data class ChangeNameRequest (
+    val name : String
+)
+
+data class ChangeNameResponse (
+    val heroId : Int,
+    val name : String,
+    val currentLevel : Int,
+    val currentExp : Int,
+    val needExp : Int,
+    val currentStage : Int
+)

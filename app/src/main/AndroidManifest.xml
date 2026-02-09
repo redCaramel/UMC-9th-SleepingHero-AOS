@@ -16,6 +16,9 @@
         android:theme="@style/Theme.SleepingHero"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".CreateHeroActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateGroupActivity"
             android:exported="false" />
         <activity
@@ -35,12 +38,11 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:windowSoftInputMode="adjustPan"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".StartActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">

@@ -4,6 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
+import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
 import com.umc_9th.sleepinghero.api.dto.FAQResponse
@@ -21,6 +23,9 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
 
     private val _friendRankingResponse = MutableLiveData<Result<List<FriendRankingResponse>>>()
     val friendRankingResponse : LiveData<Result<List<FriendRankingResponse>>> = _friendRankingResponse
+
+    private val _changeNameResponse = MutableLiveData<Result<ChangeNameResponse>>()
+    val changeNameResponse : LiveData<Result<ChangeNameResponse>> = _changeNameResponse
 
     fun charSearch(accessToken : String, name : String) {
         viewModelScope.launch {
@@ -44,4 +49,11 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
         }
     }
 
+    fun changeName(accessToken: String, name : String) {
+        viewModelScope.launch {
+            val request = ChangeNameRequest(name)
+            val result = repository.ChangeName(accessToken, request)
+            _changeNameResponse.postValue(result)
+        }
+    }
 }
