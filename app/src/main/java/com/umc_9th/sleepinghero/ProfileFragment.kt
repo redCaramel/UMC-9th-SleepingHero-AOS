@@ -1,19 +1,35 @@
 package com.umc_9th.sleepinghero
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import com.umc_9th.sleepinghero.api.ApiClient
+import com.umc_9th.sleepinghero.api.TokenManager
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
 import com.umc_9th.sleepinghero.databinding.FragmentProfileBinding
+import kotlin.getValue
 
 class ProfileFragment : Fragment() {
     private lateinit var binding : FragmentProfileBinding
+    private val socialRepository by lazy {
+        SocialRepository(ApiClient.socialService)
+    }
+    private val socialViewModel : SocialViewModel by viewModels(
+        factoryProducer = { SocialViewModelFactory(socialRepository) }
+    )
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentProfileBinding.inflate(inflater, container, false)
+        observeSocial()
+        socialViewModel.myCharacter(TokenManager.getAccessToken(requireContext()).toString())
         binding.btnProfileBack.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.container_main, SocialFragment())
@@ -31,5 +47,19 @@ class ProfileFragment : Fragment() {
                 .commit()
         }
         return binding.root
+    }
+    private fun observeSocial() {
+        socialViewModel.myCharResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                binding.etNicknameSetting.setText(data.name)
+                binding.tvPreviewNickname.text = data.name
+                binding.tvPreviewLevel.text = "Lv.${data.currentLevel}"
+
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+
+            }
+        }
     }
 }
