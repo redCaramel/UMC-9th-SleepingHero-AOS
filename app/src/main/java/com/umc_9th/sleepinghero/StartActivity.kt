@@ -5,25 +5,40 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.model.AuthErrorCause
 import com.kakao.sdk.user.UserApiClient
 import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.umc_9th.sleepinghero.databinding.ActivityStartBinding
+import androidx.core.content.edit
+import com.umc_9th.sleepinghero.api.ApiClient
+import com.umc_9th.sleepinghero.api.TokenManager
+import com.umc_9th.sleepinghero.api.repository.AuthRepository
+import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModelFactory
 
 class StartActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityStartBinding
+    private val authyRepository by lazy {
+        AuthRepository(ApiClient.authService)
+    }
+    private val authViewModel: AuthViewModel by viewModels(
+        factoryProducer = { AuthViewModelFactory(authyRepository) }
+    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val keyHash = com.kakao.sdk.common.util.Utility.getKeyHash(this)
-        Log.d("KeyHash", keyHash)
+        observeLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
         }
@@ -47,8 +62,7 @@ class StartActivity : AppCompatActivity() {
             }
             else if (token != null) {
                 Log.d("KakaoLogin", "카카오 로그인 성공: ${token.accessToken}")
-                // TODO - 카카오 로그인 후 토큰 처리
-                accessService(token.accessToken)
+                authViewModel.kakaoLogin(token.accessToken)
             }
         }
 
@@ -65,7 +79,7 @@ class StartActivity : AppCompatActivity() {
             Log.d("test", "Expires : " + NaverIdLoginSDK.getExpiresAt().toString())
             Log.d("test", "TokenType : " + NaverIdLoginSDK.getTokenType())
             Log.d("test", "State : " + NaverIdLoginSDK.getState().toString())
-            accessService(NaverIdLoginSDK.getAccessToken())
+            authViewModel.naverLogin(NaverIdLoginSDK.getAccessToken() as String)
         }
         override fun onFailure(httpStatus: Int, message: String) {
             val errorCode = NaverIdLoginSDK.getLastErrorCode().code
@@ -76,10 +90,38 @@ class StartActivity : AppCompatActivity() {
             onFailure(errorCode, message)
         }
     }
-    private fun accessService(token: String?) {
+    private fun accessService(token: String) {
+        TokenManager.setAccessToken(this, token)
         var intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("token", token)
         startActivity(intent)
         finish()
     }
+
+    private fun observeLogin() {
+        authViewModel.kakaoLoginResult.observe(this) { result ->
+            //Result -> status, code 등이 있고 이 안 data에 값이 존재
+            result.onSuccess { data ->
+                Toast.makeText(this, "로그인 성공! 회원 ID: ${data.memberId}", Toast.LENGTH_LONG).show()
+                accessService(data.accessToken)
+                Log.d("test", "카카오 로그인 - ${data.accessToken} / ${data.memberId} / ${data.nickName}")
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류가 발생했습니다."
+                Log.d("tag", "로그인 실패: $message")
+                Toast.makeText(this, "로그인 실패: $message", Toast.LENGTH_LONG).show()
+            }
+        }
+        authViewModel.naverLoginResult.observe(this) { result ->
+            //Result -> status, code 등이 있고 이 안 data에 값이 존재
+            result.onSuccess { data ->
+                Toast.makeText(this, "로그인 성공! 회원 ID: ${data.memberId}", Toast.LENGTH_LONG).show()
+                accessService(data.accessToken)
+                Log.d("test", "네이버 로그인 - ${data.accessToken} / ${data.memberId} / ${data.nickName}")
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류가 발생했습니다."
+                Log.d("tag", "로그인 실패: $message")
+                Toast.makeText(this, "로그인 실패: $message", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
 }
