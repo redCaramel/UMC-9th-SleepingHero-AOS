@@ -132,11 +132,21 @@ class SocialFragment : Fragment() {
             result.onSuccess { data ->
                 binding.tvSocialName.text = data.name
                 binding.tvSocialLevel.text = "Lv.${data.currentLevel}"
-
+                socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), data.name)
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
 
+            }
+        }
+        socialViewModel.charSearchResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                binding.tvSocialStreak.text = "${data.continuousSleepDays}일"
+                binding.tvSocialTotal.text = "${data.totalSleepHour}시간"
+                // TODO - 친구 인원수 구현
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
             }
         }
     }

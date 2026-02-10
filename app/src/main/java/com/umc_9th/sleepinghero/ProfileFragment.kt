@@ -44,6 +44,7 @@ class ProfileFragment : Fragment() {
         }
         binding.etNicknameSetting.addTextChangedListener {
             binding.tvPreviewNickname.text = binding.etNicknameSetting.text
+
         }
         binding.btnProfileConfirm.setOnClickListener {
             socialViewModel.changeName(TokenManager.getAccessToken(requireContext()).toString(),
@@ -61,7 +62,8 @@ class ProfileFragment : Fragment() {
                 binding.etNicknameSetting.setText(data.name)
                 binding.tvPreviewNickname.text = data.name
                 binding.tvPreviewLevel.text = "Lv.${data.currentLevel}"
-
+                binding.tvInfoLevel.text = "Lv.${data.currentLevel}"
+                socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), data.name)
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
@@ -71,6 +73,18 @@ class ProfileFragment : Fragment() {
         socialViewModel.changeNameResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 Toast.makeText(requireContext(), "적용 성공!", Toast.LENGTH_LONG).show()
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+            }
+        }
+        socialViewModel.charSearchResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                binding.tvPreviewStreak.text = "${data.continuousSleepDays}일"
+                binding.tvPreviewHour.text = "${data.totalSleepHour}시간"
+                binding.tvInfoStreak.text = "${data.continuousSleepDays}일"
+                binding.tvInfoHour.text = "${data.totalSleepHour}시간"
+                // TODO - 친구 인원수 구현
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
