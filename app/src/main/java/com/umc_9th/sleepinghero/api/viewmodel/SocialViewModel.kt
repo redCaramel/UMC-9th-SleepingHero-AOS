@@ -74,9 +74,9 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
         }
     }
 
-    fun friendInvite(accessToken: String, name: String) {
+    fun friendInvite(accessToken: String, nickName: String) {
         viewModelScope.launch {
-            val request = FriendInviteRequest(name)
+            val request = FriendInviteRequest(nickName)
             val result = repository.FriendInvite(accessToken, request)
             _friendInviteResponse.postValue(result)
         }

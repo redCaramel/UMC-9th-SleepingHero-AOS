@@ -1,5 +1,7 @@
 package com.umc_9th.sleepinghero.api.dto
 
+import com.google.gson.annotations.SerializedName
+
 data class CharSearchRequest (
     val name : String
 )
@@ -44,11 +46,12 @@ data class ChangeNameResponse (
 
 data class MyFriendResponse (
     val nickName : String,
-    val memberId : Int,
+    val memberId : Long,
     val profilePicture : String
 )
 
 data class FriendInviteRequest (
+    @SerializedName("nickName")
     val nickName : String
 )
 

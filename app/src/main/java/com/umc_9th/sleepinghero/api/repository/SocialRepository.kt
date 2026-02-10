@@ -84,7 +84,11 @@ class SocialRepository(private val service : SocialService) {
                 Result.success(data)
             }
         } else {
-            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+                ApiResponse::class.java,
+                arrayOfNulls<Annotation>(0)
+            )
+            val errMsg = adapter.convert(response.errorBody())?.message ?: "Unknown error"
             Log.d("test", "error ${response.code()} : $errMsg")
             Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
         }
@@ -153,6 +157,7 @@ class SocialRepository(private val service : SocialService) {
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
         Log.d("test", token)
+        val test = FriendInviteRequest("UMC칼리")
         val response = service.FriendInvite(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {

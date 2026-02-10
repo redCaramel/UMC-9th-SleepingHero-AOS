@@ -43,7 +43,7 @@ class CreateGroupActivity : AppCompatActivity() {
             false
         }
 
-        binding.imgGroupIconA.isSelected = true
+        updateSelection(binding.imgGroupIconA)
         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.setFlags(

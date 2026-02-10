@@ -9,13 +9,35 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.umc_9th.sleepinghero.api.ApiClient
+import com.umc_9th.sleepinghero.api.TokenManager
+import com.umc_9th.sleepinghero.api.repository.GroupRepository
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
+import com.umc_9th.sleepinghero.api.viewmodel.GroupViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.GroupViewModelFactory
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
 import com.umc_9th.sleepinghero.databinding.ActivityCreateGroupBinding
+import com.umc_9th.sleepinghero.databinding.ActivityGroupInfoBinding
 import com.umc_9th.sleepinghero.databinding.FragmentGroupBinding
+import kotlin.getValue
 
 class GroupFragment : Fragment() {
     private lateinit var binding: FragmentGroupBinding
+    private lateinit var adapter: GroupAdapter
     lateinit var mainActivity: MainActivity
+    val GroupList = mutableListOf<GroupData>()
+
+    private val groupRepository by lazy {
+        GroupRepository(ApiClient.groupService)
+    }
+    private val groupViewModel : GroupViewModel by viewModels(
+        factoryProducer = { GroupViewModelFactory(groupRepository) }
+    )
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -25,6 +47,29 @@ class GroupFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentGroupBinding.inflate(inflater, container, false)
+        observeGroup()
+        adapter = GroupAdapter(GroupList,
+            detailEvent = {groupData ->
+                val dialogBinding = ActivityGroupInfoBinding.inflate(layoutInflater)
+                val dialog = AlertDialog.Builder(mainActivity, R.style.PopupAnimStyle)
+                    .setView(dialogBinding.root)
+                    .setTitle("그룹 상세정보")
+                    .create()
+                dialogBinding.tvGroupName.text = groupData.groupName
+                dialogBinding.tvGroupInfo.text = groupData.description
+                dialogBinding.tvGroupPeople.text = "${groupData.totalMembers}명"
+                dialogBinding.tvGroupTotal.text = "${groupData.totalTime}시간"
+                dialogBinding.tvGroupStreak.text = "${groupData.streak}일"
+                dialogBinding.tvGroupMember.text = "멤버 (${groupData.totalMembers})"
+                dialog.show()
+            },
+            inviteEvent =  { groupData ->
+                //TODO - 그룹 초대
+
+            })
+        binding.groupContainer.adapter = adapter
+        binding.groupContainer.layoutManager = LinearLayoutManager(requireContext())
+        groupViewModel.groupCheck(TokenManager.getAccessToken(requireContext()).toString())
         binding.btnCreateGroup.setOnClickListener {
             val dialogBinding = ActivityCreateGroupBinding.inflate(layoutInflater)
 
@@ -56,7 +101,11 @@ class GroupFragment : Fragment() {
                     Log.d("tests", "${icon.id}")
                 }
             }
+            iconList.forEach { it.isSelected = false }
             dialogBinding.imgGroupIconA.isSelected = true
+            val img = dialogBinding.imgGroupIconA
+            dialogBinding.imgPreviewIcon.setImageDrawable(img.drawable)
+
             dialogBinding.etGroupName.addTextChangedListener { editText ->
                 dialogBinding.tvPreviewName.text = dialogBinding.etGroupName.text
             }
@@ -67,11 +116,63 @@ class GroupFragment : Fragment() {
                 dialog.dismiss()
             }
             dialogBinding.btnCreateGroupConfirm.setOnClickListener {
-                // TODO - 그룹 생성 구현
+                groupViewModel.createGroup(TokenManager.getAccessToken(requireContext()).toString(), dialogBinding.etGroupName.text.toString(), dialogBinding.etGroupInfo.text.toString(), 30)
                 dialog.dismiss()
             }
             dialog.show()
         }
+
         return binding.root
+    }
+    private fun observeGroup() {
+        groupViewModel.createGroupResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                Toast.makeText(
+                    requireContext(),
+                    "그룹 생성을 완료했습니다!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "생성 실패: $message")
+                Toast.makeText(
+                    requireContext(),
+                    "요청 전송 실패 - $message",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+        groupViewModel.groupCheckResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                if(data.isEmpty()) binding.viewNoGroup.visibility=View.VISIBLE
+                else binding.viewNoGroup.visibility=View.GONE
+                GroupList.clear()
+                data.forEach { group ->
+                    Log.d("test", "그룹 조회 성공 - ${group.name}")
+                    groupViewModel.groupRank(TokenManager.getAccessToken(requireContext()).toString(), group.name)
+                }
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "그룹 조회 실패: $message")
+            }
+        }
+        groupViewModel.groupRankResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                Log.d("test", "상세 조회 성공- ${data.groupName}")
+                val group = GroupData(
+                    data.groupName,
+                    data.description,
+                    data.totalMembers,
+                    data.totalGroupSleepTime,
+                    data.averageConsecutiveDays,
+                    data.groupName // TODO - 그룹장 계산
+                )
+                GroupList.add(group)
+                adapter.updateList(GroupList.toList())
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "상세 조회 실패: $message")
+            }
+        }
     }
 }
