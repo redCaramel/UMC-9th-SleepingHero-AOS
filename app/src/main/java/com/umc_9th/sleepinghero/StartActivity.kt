@@ -47,23 +47,8 @@ class StartActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         observeLogin()
         observeCheck()
-        // --------------------
-        TokenManager.clearAll(this)
-        //kakao
-        UserApiClient.instance.logout { error ->
-            if(error != null) {
-                Log.e("test", "로그아웃 실패, SDK에서 토큰 폐기됨", error)
-            }
-            else {
-                Log.i("test", "로그아웃 성공")
-            }
-        }
-        //naver
-        NaverIdLoginSDK.logout()
-        // ---------------------
         checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
@@ -162,12 +147,11 @@ class StartActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }.onFailure { error ->
-                Log.d("test","용사 생성 화면 송출")
-                var intent = Intent(this, CreateHeroActivity::class.java)
-                startActivity(intent)
-                finish()
-                if(error.message == "존재하지 않는 캐릭터입니다.") {
-
+                if(error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {
+                    Log.d("test","용사 생성 화면 송출")
+                    var intent = Intent(this, CreateHeroActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 }
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")

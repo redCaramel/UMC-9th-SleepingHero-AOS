@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
@@ -40,8 +42,13 @@ class ProfileFragment : Fragment() {
                 .replace(R.id.container_main, SocialFragment())
                 .commit()
         }
+        binding.etNicknameSetting.addTextChangedListener {
+            binding.tvPreviewNickname.text = binding.etNicknameSetting.text
+        }
         binding.btnProfileConfirm.setOnClickListener {
-            // TODO - 프로필 변경사항 적용
+            socialViewModel.changeName(TokenManager.getAccessToken(requireContext()).toString(),
+                binding.etNicknameSetting.text.toString().trim()
+            )
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.container_main, SocialFragment())
                 .commit()
@@ -59,6 +66,14 @@ class ProfileFragment : Fragment() {
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
 
+            }
+        }
+        socialViewModel.changeNameResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                Toast.makeText(requireContext(), "적용 성공!", Toast.LENGTH_LONG).show()
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
             }
         }
     }

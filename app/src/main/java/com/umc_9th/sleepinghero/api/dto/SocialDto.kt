@@ -41,3 +41,19 @@ data class ChangeNameResponse (
     val needExp : Int,
     val currentStage : Int
 )
+
+data class MyFriendResponse (
+    val nickName : String,
+    val memberId : Int,
+    val profilePicture : String
+)
+
+data class FriendInviteRequest (
+    val nickName : String
+)
+
+data class RequestCheckResponse (
+    val memberId : Int,
+    val nickname : String,
+    val profilePicture : String
+)

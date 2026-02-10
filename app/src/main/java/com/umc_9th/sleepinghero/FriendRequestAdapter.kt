@@ -4,19 +4,18 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.parser.ColorParser
-import com.umc_9th.sleepinghero.databinding.ItemFriendSearchBinding
+import com.umc_9th.sleepinghero.databinding.ItemFriendRequestBinding
 import okhttp3.internal.notify
 
-class HeroAdapter(private var heroList : MutableList<HeroData>,
-    private val clickEvent: (HeroData) -> Unit,
-    private val type : Int
-    ) : RecyclerView.Adapter<HeroAdapter.HeroViewHolder>() {
+class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
+                           private val acceptEvent: (HeroData) -> Unit,
+                           private val rejectEvent: (HeroData) -> Unit
+    ) : RecyclerView.Adapter<FriendRequestAdapter.HeroViewHolder>() {
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
     ): HeroViewHolder {
-       val binding = ItemFriendSearchBinding.inflate(
+       val binding = ItemFriendRequestBinding.inflate(
            LayoutInflater.from(parent.context),
            parent, false)
         return HeroViewHolder(binding)
@@ -38,7 +37,7 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
         heroList.addAll(newList)
         notifyDataSetChanged()
     }
-    inner class HeroViewHolder(val binding : ItemFriendSearchBinding) :
+    inner class HeroViewHolder(val binding : ItemFriendRequestBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : HeroData) {
                     binding.tvCharName.text = hero.name
@@ -46,14 +45,11 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"
-                    binding.btnFriendInvite.setOnClickListener {
-                        clickEvent(hero)
+                    binding.btnAccept.setOnClickListener {
+                        acceptEvent(hero)
                     }
-                    if(type == 2) {
-                        binding.btnFriendInvite.setText("삭제")
-                        binding.btnFriendInvite.setTextColor(Color.parseColor("#FFFFFF"))
-                        binding.btnFriendInvite.setBackgroundColor(Color.parseColor("#CF2323"))
-                        binding.btnFriendInvite.icon = null
+                    binding.btnReject.setOnClickListener {
+                        rejectEvent(hero)
                     }
                 }
             }

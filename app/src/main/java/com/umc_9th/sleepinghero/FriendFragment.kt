@@ -40,18 +40,19 @@ class FriendFragment : Fragment() {
     ): View? {
         binding = FragmentFriendBinding.inflate(inflater, container, false)
         observeSearch()
-
+        observeInvite()
 
         adapter = HeroAdapter(searchedHeroList,
-            onInvited =  { heroData ->
-                // TODO - 초대 구현
-            })
+            clickEvent =  { heroData ->
+                Log.d("test", heroData.name)
+                socialViewModel.friendInvite(TokenManager.getAccessToken(requireContext()).toString(), heroData.name)
+            },
+            1)
 
         binding.heroContainer.adapter = adapter
         binding.heroContainer.layoutManager = LinearLayoutManager(requireContext())
         binding.etHeroSearch.addTextChangedListener { text ->
             socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), text.toString())
-
         }
         return binding.root
     }
@@ -67,16 +68,35 @@ class FriendFragment : Fragment() {
                 adapter.updateList(newList)
                 binding.viewNoHero.visibility = View.GONE
             }.onFailure { error ->
-                if(error.message == "존재하지 않는 캐릭터입니다.") {
-                    binding.viewNoHero.visibility = View.VISIBLE
-                }
-                else {
-                    val message = error.message ?: "알 수 없는 오류"
-                    Log.d("test", "연결 실패: $message")
-                }
+                binding.viewNoHero.visibility = View.VISIBLE
+                val newList = mutableListOf<HeroData>()
+                adapter.updateList(newList)
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "연결 실패: $message")
             }
         }
+    }
+    private fun observeInvite() {
+        socialViewModel.friendInviteResponse.observe(viewLifecycleOwner) { result ->
+            //Result -> status, code 등이 있고 이 안 data에 값이 존재
+            result.onSuccess { data ->
+                Toast.makeText(
+                    requireContext(),
+                    "친구 요청을 전송했습니다!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }.onFailure { error ->
 
-
+                val newList = mutableListOf<HeroData>()
+                adapter.updateList(newList)
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "연결 실패: $message")
+                Toast.makeText(
+                    requireContext(),
+                    "요청 전송 실패 - $message",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }

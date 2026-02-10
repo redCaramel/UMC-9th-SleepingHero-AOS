@@ -1,5 +1,6 @@
 package com.umc_9th.sleepinghero
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.media.session.MediaSession
@@ -48,6 +49,15 @@ class SocialFragment : Fragment() {
             ProfileFragment().arguments = bundle
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(R.id.container_main, ProfileFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+        binding.tabFriend.setOnClickListener {
+            val bundle = Bundle().apply {
+            }
+            RelationFragment().arguments = bundle
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(R.id.container_main, RelationFragment())
                 .addToBackStack(null)
                 .commit()
         }

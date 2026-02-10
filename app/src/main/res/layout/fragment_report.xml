@@ -15,16 +15,16 @@
         android:text="버그 및 불편 사항"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView19"
-        app:layout_constraintStart_toEndOf="@+id/imageView19"
-        app:layout_constraintTop_toTopOf="@+id/imageView19" />
+        app:layout_constraintBottom_toBottomOf="@+id/btn_report_back"
+        app:layout_constraintStart_toEndOf="@+id/btn_report_back"
+        app:layout_constraintTop_toTopOf="@+id/btn_report_back" />
 
     <ImageView
-        android:id="@+id/imageView19"
+        android:id="@+id/btn_report_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="48dp"
         android:src="@drawable/arrow_back"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
