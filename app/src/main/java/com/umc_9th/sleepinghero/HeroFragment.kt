@@ -26,32 +26,10 @@ class HeroFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 옷장 버튼 클릭
-        binding.btnWardrobe.setOnClickListener {
-            showWardrobe()
-        }
+
     }
 
-    private fun showWardrobe() {
-        binding.wardrobeContainer.visibility = View.VISIBLE
 
-        childFragmentManager.beginTransaction()
-            .replace(R.id.wardrobeContainer, WardrobeFragment())
-            .commit()
-    }
-
-    fun hideWardrobe() {
-        val fragment =
-            childFragmentManager.findFragmentById(R.id.wardrobeContainer)
-
-        if (fragment != null) {
-            childFragmentManager.beginTransaction()
-                .remove(fragment)
-                .commit()
-        }
-
-        binding.wardrobeContainer.visibility = View.GONE
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()

@@ -24,9 +24,5 @@ class WardrobeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 👉 적용 버튼 누르면 옷장 닫고 Hero로 돌아가기
-        binding.btnApplyCloth.setOnClickListener {
-            (parentFragment as? HeroFragment)?.hideWardrobe()
-        }
     }
 }
