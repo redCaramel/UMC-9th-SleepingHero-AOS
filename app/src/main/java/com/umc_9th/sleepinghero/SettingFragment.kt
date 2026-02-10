@@ -32,12 +32,7 @@ class SettingFragment : Fragment() {
     private lateinit var binding : FragmentSettingBinding
     lateinit var mainActivity: MainActivity
     lateinit var settingManager: SettingManager
-    private val settingRepository by lazy {
-        SettingRepository(ApiClient.settingService)
-    }
-    private val settingViewModel : SettingViewModel by viewModels(
-        factoryProducer = { SettingViewModelFactory(settingRepository) }
-    )
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mainActivity = context as MainActivity
@@ -47,7 +42,6 @@ class SettingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentSettingBinding.inflate(layoutInflater)
-        observeFAQ()
         settingManager = SettingManager(requireContext())
         return binding.root
     }
@@ -349,22 +343,6 @@ class SettingFragment : Fragment() {
         else {
             if(time < 10) return "0$time"
             else return time.toString()
-        }
-    }
-
-    private fun observeFAQ() {
-        settingViewModel.faqUrlResult.observe(viewLifecycleOwner) { result ->
-            //Result -> status, code 등이 있고 이 안 data에 값이 존재
-            result.onSuccess { data ->
-                Toast.makeText(requireContext(), "외부 링크로 연결합니다...", Toast.LENGTH_LONG).show()
-                val faqIntent = Intent(Intent.ACTION_VIEW, data.url.toUri())
-                startActivity(faqIntent)
-                Log.d("test", "외부 링크 연결 - ${data.url}")
-            }.onFailure { error ->
-                val message = error.message ?: "알 수 없는 오류"
-                Log.d("test", "연결 실패: $message")
-                Toast.makeText(requireContext(),"외부 링크 연결에 실패했습니다.", Toast.LENGTH_LONG).show()
-            }
         }
     }
 }

@@ -8,7 +8,6 @@ import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
 import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
-import com.umc_9th.sleepinghero.api.dto.FAQResponse
 import com.umc_9th.sleepinghero.api.dto.FriendInviteRequest
 import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
 import com.umc_9th.sleepinghero.api.dto.MyCharResponse

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.umc_9th.sleepinghero.api.dto.CreateHeroResponse
-import com.umc_9th.sleepinghero.api.dto.FAQResponse
 import com.umc_9th.sleepinghero.api.repository.CreateRepository
 import com.umc_9th.sleepinghero.api.repository.SettingRepository
 import kotlinx.coroutines.launch

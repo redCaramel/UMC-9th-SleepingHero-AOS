@@ -1,18 +1,18 @@
 package com.umc_9th.sleepinghero.api.repository
 
 import android.util.Log
-import com.umc_9th.sleepinghero.api.dto.FAQResponse
+import com.umc_9th.sleepinghero.api.dto.FAQRequest
 import com.umc_9th.sleepinghero.api.service.SettingService
 
 
 class SettingRepository(private val service : SettingService) {
 
     suspend fun FAQUrl(
-        accessToken: String
-    ): Result<FAQResponse> = try {
+        accessToken: String, req : FAQRequest
+    ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
         Log.d("test", token)
-        val response = service.FAQUrl(token)
+        val response = service.FAQUrl(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
                 Log.d("test", "Response body is null")
@@ -29,5 +29,5 @@ class SettingRepository(private val service : SettingService) {
         }
     } catch (e: Exception) {
         Result.failure(e)
-    } as Result<FAQResponse>
+    } as Result<String>
 }
