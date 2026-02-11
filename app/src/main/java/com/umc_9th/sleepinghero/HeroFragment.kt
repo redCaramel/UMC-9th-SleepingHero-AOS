@@ -7,11 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.umc_9th.sleepinghero.R
 import com.umc_9th.sleepinghero.SleepRecordAdapter
 import com.umc_9th.sleepinghero.SleepRecordUiModel
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.HeroRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
+import com.umc_9th.sleepinghero.api.repository.SkinRepository
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
 import com.umc_9th.sleepinghero.databinding.FragmentHeroBinding
 import kotlinx.coroutines.launch
@@ -22,16 +24,11 @@ class HeroFragment : Fragment() {
     private var _binding: FragmentHeroBinding? = null
     private val binding get() = _binding!!
 
-    private val heroRepository by lazy {
-        HeroRepository()
-    }
-
-    private val homeRepository by lazy {
-        HomeRepository()
-    }
-
+    private val heroRepository by lazy { HeroRepository() }
+    private val homeRepository by lazy { HomeRepository() }
     private val sleepRepository by lazy { SleepRepository() }
     private val sleepAdapter by lazy { SleepRecordAdapter() }
+    private val skinRepository by lazy { SkinRepository() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +46,7 @@ class HeroFragment : Fragment() {
         fetchRecentSleep()
         fetchHeroInfo()
         fetchDashboard()
+        fetchEquippedSkinAndApply()
     }
 
     private fun fetchHeroInfo() {
@@ -67,8 +65,7 @@ class HeroFragment : Fragment() {
                 binding.tvLevelRight.text = "Level ${hero.currentLevel + 1}"
                 binding.tvExpRight.text = "${hero.needExp} EXP"
 
-                val progress =
-                    (hero.currentExp * 100 / hero.needExp).coerceIn(0, 100)
+                val progress = (hero.currentExp * 100 / hero.needExp).coerceIn(0, 100)
                 binding.progressExp.progress = progress
             }
         }
@@ -115,7 +112,6 @@ class HeroFragment : Fragment() {
         }
     }
 
-
     private fun fetchRecentSleep() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
@@ -159,7 +155,28 @@ class HeroFragment : Fragment() {
         }
     }
 
+    private fun fetchEquippedSkinAndApply() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val raw = TokenManager.getAccessToken(requireContext())
+            if (raw.isNullOrEmpty()) return@launch
 
+            val token = "Bearer $raw"
+            val res = skinRepository.getMySkins(token)
+
+            if (!res.isSuccess || res.result == null) {
+                Log.e("SKIN_ERR", res.message)
+                return@launch
+            }
+
+            val equippedSkinId = res.result.skins.firstOrNull { it.equipped }?.skinId ?: 1L
+            applySkinImage(equippedSkinId)
+        }
+    }
+
+    private fun applySkinImage(skinId: Long) {
+        val resId = resources.getIdentifier("hero_skin_${skinId}", "drawable", requireContext().packageName)
+        binding.ivHero.setImageResource(if (resId != 0) resId else R.drawable.hero_skin_1)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

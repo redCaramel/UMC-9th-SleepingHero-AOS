@@ -3,6 +3,7 @@ package com.umc_9th.sleepinghero.api
 import com.umc_9th.sleepinghero.api.service.AuthService
 import com.umc_9th.sleepinghero.api.service.HeroService
 import com.umc_9th.sleepinghero.api.service.HomeService
+import com.umc_9th.sleepinghero.api.service.SkinService
 import com.umc_9th.sleepinghero.api.service.SleepService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -34,6 +35,7 @@ object ApiClient {
     val heroService: HeroService = retrofit.create(HeroService::class.java)
     val homeService: HomeService = retrofit.create(HomeService::class.java)
     val sleepService: SleepService = retrofit.create(SleepService::class.java)
+    val skinService: SkinService = retrofit.create(SkinService::class.java)
 
 }
 

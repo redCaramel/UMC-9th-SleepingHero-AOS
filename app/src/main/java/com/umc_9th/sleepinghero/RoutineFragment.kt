@@ -341,9 +341,9 @@ class RoutineFragment : Fragment() {
 
         val colors = weeklyHours.map { h ->
             when {
-                h < 6f -> Color.parseColor("#E74C3C")
-                h < 7f -> Color.parseColor("#2E86DE")
-                else -> Color.parseColor("#27AE60")
+                h < 6f -> Color.parseColor("#B91C14")
+                h < 7f -> Color.parseColor("#1B4E81")
+                else -> Color.parseColor("#2F623C")
             }
         }
         dataSet.colors = colors
@@ -429,6 +429,9 @@ class RoutineFragment : Fragment() {
         binding.tvTotalHours.text = "${total.toInt()}h"
         binding.tvDailyAvg.text = String.format(Locale.KOREA, "%.1fh", avg)
         binding.tvRecordedDays.text = "${recorded}/${hours.size}"
+
+        val isStable = recorded == hours.size
+        binding.tvStatus.text = if (isStable) "안정" else "불안정"
     }
 
     // -----------------------------
