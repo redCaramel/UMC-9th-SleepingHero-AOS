@@ -56,26 +56,16 @@
                 android:background="@drawable/bg_card">
 
                 <ImageView
-                    android:id="@+id/imageView16"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:background="@drawable/bg_circle_head"
-                    android:src="@drawable/ic_launcher_foreground"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView3" />
-
-                <ImageView
                     android:id="@+id/img_profile_head"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="160dp"
+                    android:layout_height="160dp"
                     android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
                     android:adjustViewBounds="true"
                     android:background="@drawable/bg_circle_head"
                     android:backgroundTint="@color/gray_200"
-                    android:src="@drawable/ic_launcher_foreground"
+                    android:src="@drawable/ic_hero_1"
+                    app:layout_constraintBottom_toTopOf="@+id/textView4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/textView3" />
@@ -96,15 +86,13 @@
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="16dp"
                     android:text="탭하여 아바타 변경"
                     android:textColor="@color/gray_500"
                     android:textSize="12sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/imageView16" />
+                    app:layout_constraintStart_toStartOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -234,7 +222,7 @@
                     android:backgroundTint="@color/gray_200"
                     android:adjustViewBounds="true"
                     android:background="@drawable/bg_circle_body"
-                    android:src="@drawable/ic_launcher_foreground"
+                    android:src="@drawable/ic_hero_1"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/guideline3"
                     app:layout_constraintStart_toStartOf="parent"

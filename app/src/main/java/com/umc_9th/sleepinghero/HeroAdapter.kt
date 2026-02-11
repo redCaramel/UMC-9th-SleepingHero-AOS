@@ -1,6 +1,7 @@
 package com.umc_9th.sleepinghero
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -42,10 +43,25 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : HeroData) {
                     binding.tvCharName.text = hero.name
-                    binding.imgCharProfile.setImageResource(hero.skinId)
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"
+                    val skinImgList = arrayOf(
+                        R.drawable.ic_hero_1,
+                        R.drawable.ic_hero_2,
+                        R.drawable.ic_hero_3,
+                        R.drawable.ic_hero_4,
+                        R.drawable.ic_hero_5,
+                        R.drawable.ic_hero_6,
+                        R.drawable.ic_hero_7,
+                        R.drawable.ic_hero_8,
+                        R.drawable.ic_hero_9,
+                        R.drawable.ic_hero_10,
+                        R.drawable.ic_hero_11,
+                        R.drawable.ic_hero_12
+                    )
+                    Log.d("test", "${hero.skinId}")
+                    binding.imgCharProfile.setImageResource(skinImgList[hero.skinId])
                     binding.btnFriendInvite.setOnClickListener {
                         clickEvent(hero)
                     }

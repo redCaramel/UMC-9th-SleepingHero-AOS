@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.SocialRepository
@@ -42,6 +43,9 @@ class FriendRequestFragment : Fragment() {
 
             }
         )
+        binding.heroContainer.adapter = adapter
+        binding.heroContainer.layoutManager = LinearLayoutManager(requireContext())
+        socialViewModel.checkRequest(TokenManager.getAccessToken(requireContext()).toString())
         return binding.root
     }
     private fun observeRequest() {
@@ -49,6 +53,7 @@ class FriendRequestFragment : Fragment() {
             result.onSuccess { data ->
                 requestList.clear()
                 data.forEach { hero ->
+                    Log.d("test", "요청 감지 - ${hero.nickname}")
                     socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickname)
                 }
             }.onFailure { error ->

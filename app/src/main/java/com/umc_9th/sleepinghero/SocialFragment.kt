@@ -31,6 +31,20 @@ class SocialFragment : Fragment() {
     private val socialViewModel : SocialViewModel by viewModels(
         factoryProducer = { SocialViewModelFactory(socialRepository) }
     )
+    private val skinImgList = arrayOf(
+        R.drawable.ic_hero_1,
+        R.drawable.ic_hero_2,
+        R.drawable.ic_hero_3,
+        R.drawable.ic_hero_4,
+        R.drawable.ic_hero_5,
+        R.drawable.ic_hero_6,
+        R.drawable.ic_hero_7,
+        R.drawable.ic_hero_8,
+        R.drawable.ic_hero_9,
+        R.drawable.ic_hero_10,
+        R.drawable.ic_hero_11,
+        R.drawable.ic_hero_12
+    )
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -143,10 +157,19 @@ class SocialFragment : Fragment() {
             result.onSuccess { data ->
                 binding.tvSocialStreak.text = "${data.continuousSleepDays}일"
                 binding.tvSocialTotal.text = "${data.totalSleepHour}시간"
+                socialViewModel.checkSkin(TokenManager.getAccessToken(requireContext()).toString())
                 // TODO - 친구 인원수 구현
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
+            }
+        }
+        socialViewModel.checkSkinResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data->
+                data.skins.forEach { skin ->
+                    if(skin.equipped) binding.imgSocialIcon.setImageResource(skinImgList[skin.skinId.toInt()-1])
+                }
+
             }
         }
     }

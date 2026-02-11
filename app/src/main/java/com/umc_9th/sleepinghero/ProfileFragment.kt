@@ -33,6 +33,21 @@ class ProfileFragment : Fragment() {
         SocialRepository(ApiClient.socialService)
     }
     private var skinList = arrayOf(true, false, false, false)
+    private var equippedSkin = 1
+    private val skinImgList = arrayOf(
+        R.drawable.ic_hero_1,
+        R.drawable.ic_hero_2,
+        R.drawable.ic_hero_3,
+        R.drawable.ic_hero_4,
+        R.drawable.ic_hero_5,
+        R.drawable.ic_hero_6,
+        R.drawable.ic_hero_7,
+        R.drawable.ic_hero_8,
+        R.drawable.ic_hero_9,
+        R.drawable.ic_hero_10,
+        R.drawable.ic_hero_11,
+        R.drawable.ic_hero_12
+    )
     private val socialViewModel : SocialViewModel by viewModels(
         factoryProducer = { SocialViewModelFactory(socialRepository) }
     )
@@ -94,6 +109,65 @@ class ProfileFragment : Fragment() {
             }
             dialogBinding.progressBar.setProgress(skinNum)
             dialogBinding.tvCharacterNum.text = "$skinNum / 4"
+
+            dialogBinding.btnHeroA.setOnClickListener {
+                if(!skinList[0]) Toast.makeText(requireContext(), "모험을 진행하며 아바타를 해금하세요!", Toast.LENGTH_LONG).show()
+                else if(equippedSkin >= 1 && equippedSkin <=3) Toast.makeText(requireContext(), "이미 착용중인 아바타입니다!", Toast.LENGTH_LONG).show()
+                else {
+                    socialViewModel.equipSKin(TokenManager.getAccessToken(requireContext()).toString(), 1)
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                }
+            }
+            dialogBinding.btnHeroB.setOnClickListener {
+                if(!skinList[1]) Toast.makeText(requireContext(), "모험을 진행하며 아바타를 해금하세요!", Toast.LENGTH_LONG).show()
+                else if(equippedSkin >= 4 && equippedSkin <=6) Toast.makeText(requireContext(), "이미 착용중인 아바타입니다!", Toast.LENGTH_LONG).show()
+                else {
+                    socialViewModel.equipSKin(TokenManager.getAccessToken(requireContext()).toString(), 4)
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                }
+            }
+            dialogBinding.btnHeroC.setOnClickListener {
+                if(!skinList[2]) Toast.makeText(requireContext(), "모험을 진행하며 아바타를 해금하세요!", Toast.LENGTH_LONG).show()
+                else if(equippedSkin >= 7 && equippedSkin <=9) Toast.makeText(requireContext(), "이미 착용중인 아바타입니다!", Toast.LENGTH_LONG).show()
+                else {
+                    socialViewModel.equipSKin(TokenManager.getAccessToken(requireContext()).toString(), 7)
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                }
+            }
+            dialogBinding.btnHeroD.setOnClickListener {
+                if(!skinList[3]) Toast.makeText(requireContext(), "모험을 진행하며 아바타를 해금하세요!", Toast.LENGTH_LONG).show()
+                else if(equippedSkin >= 10 && equippedSkin <=12) Toast.makeText(requireContext(), "이미 착용중인 아바타입니다!", Toast.LENGTH_LONG).show()
+                else {
+                    socialViewModel.equipSKin(TokenManager.getAccessToken(requireContext()).toString(), 10)
+                    requireActivity().supportFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, SocialFragment())
+                        .commit()
+                }
+            }
+
+            if(equippedSkin >= 1 && equippedSkin <=3) {
+                dialogBinding.btnHeroA.text = "선택 중"
+                dialogBinding.btnHeroA.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D6E2EF"))
+            }
+            if(equippedSkin >=4 && equippedSkin <=6) {
+                dialogBinding.btnHeroB.text = "선택 중"
+                dialogBinding.btnHeroB.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D6E2EF"))
+            }
+            if(equippedSkin >= 7 && equippedSkin <=9) {
+                dialogBinding.btnHeroC.text = "선택 중"
+                dialogBinding.btnHeroC.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D6E2EF"))
+            }
+            if(equippedSkin >=10 && equippedSkin <=12) {
+                dialogBinding.btnHeroD.text = "선택 중"
+                dialogBinding.btnHeroD.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#D6E2EF"))
+            }
+
             dialog.show()
         }
         binding.btnProfileBack.setOnClickListener {
@@ -160,10 +234,22 @@ class ProfileFragment : Fragment() {
                     if(skin.skinId==4.toLong()) skinList[1] = true
                     if(skin.skinId==7.toLong()) skinList[2] = true
                     if(skin.skinId==10.toLong()) skinList[3] = true
+                    if(skin.equipped) equippedSkin = skin.skinId.toInt()
                 }
+                binding.imgProfileHead.setImageResource(skinImgList[equippedSkin-1])
+                binding.imgProfileBody.setImageResource(skinImgList[equippedSkin-1])
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "열람 실패 : $message")
+            }
+        }
+        socialViewModel.equipSKinResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                Toast.makeText(requireContext(), "아바타를 변경하였습니다!", Toast.LENGTH_SHORT).show()
+            }.onFailure { error ->
+                Toast.makeText(requireContext(), "아바타를 변경할 수 없습니다!", Toast.LENGTH_SHORT).show()
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "변경 실패 : $message")
             }
         }
     }

@@ -45,6 +45,21 @@ class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"
+                    val skinImgList = arrayOf(
+                        R.drawable.ic_hero_1,
+                        R.drawable.ic_hero_2,
+                        R.drawable.ic_hero_3,
+                        R.drawable.ic_hero_4,
+                        R.drawable.ic_hero_5,
+                        R.drawable.ic_hero_6,
+                        R.drawable.ic_hero_7,
+                        R.drawable.ic_hero_8,
+                        R.drawable.ic_hero_9,
+                        R.drawable.ic_hero_10,
+                        R.drawable.ic_hero_11,
+                        R.drawable.ic_hero_12
+                    )
+                    binding.imgCharProfile.setImageResource(skinImgList[hero.skinId-1])
                     binding.btnAccept.setOnClickListener {
                         acceptEvent(hero)
                     }
