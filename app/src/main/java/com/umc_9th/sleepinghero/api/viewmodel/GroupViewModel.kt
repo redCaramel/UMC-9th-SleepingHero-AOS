@@ -21,9 +21,9 @@ class GroupViewModel(private val repository: GroupRepository) : ViewModel() {
     private val _groupRankResponse = MutableLiveData<Result<GroupRankingInsideResponse>>()
     val groupRankResponse : LiveData<Result<GroupRankingInsideResponse>> = _groupRankResponse
 
-    fun createGroup(accessToken : String, name : String, info : String, max : Long) {
+    fun createGroup(accessToken : String, name : String, info : String, max : Long, icon : Int) {
         viewModelScope.launch {
-            val request = GroupCreateRequest(name, info, max)
+            val request = GroupCreateRequest(name, info, max, icon)
             val result = repository.CreateGroup(accessToken, request)
             _createGroupResponse.postValue(result)
         }

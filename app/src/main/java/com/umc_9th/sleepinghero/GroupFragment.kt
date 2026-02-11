@@ -29,9 +29,10 @@ import kotlin.getValue
 class GroupFragment : Fragment() {
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
+    private lateinit var grAdapter : GroupRankingAdapter
     lateinit var mainActivity: MainActivity
     val GroupList = mutableListOf<GroupData>()
-
+    val GroupMemberList = mutableListOf<GroupRankingData>()
     private val groupRepository by lazy {
         GroupRepository(ApiClient.groupService)
     }
@@ -57,10 +58,29 @@ class GroupFragment : Fragment() {
                     .create()
                 dialogBinding.tvGroupName.text = groupData.groupName
                 dialogBinding.tvGroupInfo.text = groupData.description
+                var iconList = listOf(
+                    R.drawable.ic_group_a,
+                    R.drawable.ic_group_b,
+                    R.drawable.ic_group_c,
+                    R.drawable.ic_group_d,
+                    R.drawable.ic_group_e,
+                    R.drawable.ic_group_f,
+                    R.drawable.ic_group_g,
+                    R.drawable.ic_group_h,
+                    R.drawable.ic_group_i,
+                    R.drawable.ic_group_j,
+                    R.drawable.ic_group_k,
+                    R.drawable.ic_group_l
+                )
+                dialogBinding.imgGroupIcon.setImageResource(iconList[groupData.icon.toInt()])
                 dialogBinding.tvGroupPeople.text = "${groupData.totalMembers}명"
                 dialogBinding.tvGroupTotal.text = "${groupData.totalTime}시간"
                 dialogBinding.tvGroupStreak.text = "${groupData.streak}일"
                 dialogBinding.tvGroupMember.text = "멤버 (${groupData.totalMembers})"
+
+                grAdapter = GroupRankingAdapter(GroupMemberList)
+                dialogBinding.heroContainer.adapter = grAdapter
+                dialogBinding.heroContainer.layoutManager = LinearLayoutManager(requireContext())
                 dialog.show()
             },
             inviteEvent =  { groupData ->
@@ -116,7 +136,8 @@ class GroupFragment : Fragment() {
                 dialog.dismiss()
             }
             dialogBinding.btnCreateGroupConfirm.setOnClickListener {
-                groupViewModel.createGroup(TokenManager.getAccessToken(requireContext()).toString(), dialogBinding.etGroupName.text.toString(), dialogBinding.etGroupInfo.text.toString(), 30)
+                var iconNum = iconList.indexOfFirst { it.isSelected }
+                groupViewModel.createGroup(TokenManager.getAccessToken(requireContext()).toString(), dialogBinding.etGroupName.text.toString(), dialogBinding.etGroupInfo.text.toString(), 30, iconNum)
                 dialog.dismiss()
             }
             dialog.show()
@@ -165,7 +186,8 @@ class GroupFragment : Fragment() {
                     data.totalMembers,
                     data.totalGroupSleepTime,
                     data.averageConsecutiveDays,
-                    data.groupName // TODO - 그룹장 계산
+                    data.groupMasterNickname,
+                    data.groupImageId.toLong()
                 )
                 GroupList.add(group)
                 adapter.updateList(GroupList.toList())

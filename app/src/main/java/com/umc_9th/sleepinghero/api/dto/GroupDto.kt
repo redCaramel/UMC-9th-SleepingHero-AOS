@@ -3,7 +3,8 @@ package com.umc_9th.sleepinghero.api.dto
 data class GroupCreateRequest (
     val groupName : String,
     val description: String,
-    val maxPeople : Long
+    val maxPeople : Long,
+    val groupImageId: Int
 )
 
 data class GroupRankingResponse (
@@ -11,7 +12,8 @@ data class GroupRankingResponse (
     val name : String,
     val maxPeople : Long,
     val currentPeople : Long,
-    val rank : Long
+    val rank : Long,
+    val groupImageId : Int
 )
 
 data class GroupRankingInsideResponse (
@@ -20,7 +22,9 @@ data class GroupRankingInsideResponse (
     val totalMembers : Long,
     val totalGroupSleepTime : Long,
     val averageConsecutiveDays : Long,
-    val memberRankings : MutableList<GroupMemberRanking>
+    val memberRankings : MutableList<GroupMemberRanking>,
+    val groupImageId : Int,
+    val groupMasterNickname : String
 )
 
 data class GroupMemberRanking (

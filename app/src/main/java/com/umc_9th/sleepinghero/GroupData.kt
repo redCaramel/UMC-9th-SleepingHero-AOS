@@ -6,5 +6,6 @@ data class GroupData(
     val totalMembers : Long,
     val totalTime : Long,
     val streak : Long,
-    val leader : String
+    val leader : String,
+    val icon : Long
 )

@@ -46,6 +46,21 @@ class GroupAdapter(private var groupList : MutableList<GroupData>,
             binding.tvGroupStreak.text = "${group.streak}일"
             binding.tvGroupPeople.text = "${group.totalMembers}명"
             binding.tvGroupLeader.text = group.leader
+            var iconList = listOf(
+                R.drawable.ic_group_a,
+                R.drawable.ic_group_b,
+                R.drawable.ic_group_c,
+                R.drawable.ic_group_d,
+                R.drawable.ic_group_e,
+                R.drawable.ic_group_f,
+                R.drawable.ic_group_g,
+                R.drawable.ic_group_h,
+                R.drawable.ic_group_i,
+                R.drawable.ic_group_j,
+                R.drawable.ic_group_k,
+                R.drawable.ic_group_l
+            )
+            binding.imgGroupIcon.setImageResource(iconList[group.icon.toInt()])
             binding.btnGroupDetail.setOnClickListener {
                 detailEvent(group)
             }

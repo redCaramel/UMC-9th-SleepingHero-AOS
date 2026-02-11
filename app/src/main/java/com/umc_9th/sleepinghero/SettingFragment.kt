@@ -27,6 +27,8 @@ import com.umc_9th.sleepinghero.api.viewmodel.SettingViewModelFactory
 import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
 import com.umc_9th.sleepinghero.databinding.FragmentSettingBinding
 import androidx.core.net.toUri
+import com.navercorp.nid.oauth.OAuthLoginCallback
+import java.net.CookieManager
 
 class SettingFragment : Fragment() {
     private lateinit var binding : FragmentSettingBinding
@@ -247,6 +249,7 @@ class SettingFragment : Fragment() {
             }
             //naver
             NaverIdLoginSDK.logout()
+
             var intent = Intent(requireContext(), StartActivity::class.java)
             startActivity(intent)
             activity?.finish()
