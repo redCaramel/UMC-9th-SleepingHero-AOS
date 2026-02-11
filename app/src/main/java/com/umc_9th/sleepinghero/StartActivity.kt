@@ -16,11 +16,15 @@ import com.navercorp.nid.NaverIdLoginSDK
 import com.navercorp.nid.oauth.OAuthLoginCallback
 import com.umc_9th.sleepinghero.databinding.ActivityStartBinding
 import androidx.core.content.edit
+import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.AuthRepository
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModelFactory
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
 
 class StartActivity : AppCompatActivity() {
 
@@ -31,7 +35,12 @@ class StartActivity : AppCompatActivity() {
     private val authViewModel: AuthViewModel by viewModels(
         factoryProducer = { AuthViewModelFactory(authyRepository) }
     )
-
+    private val socialRepository by lazy {
+        SocialRepository(ApiClient.socialService)
+    }
+    private val socialViewModel : SocialViewModel by viewModels(
+        factoryProducer = { SocialViewModelFactory(socialRepository) }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +48,32 @@ class StartActivity : AppCompatActivity() {
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
         observeLogin()
+        observeCheck()
+        TokenManager.clearAll(this)
+
+        //kakao
+        UserApiClient.instance.logout { error ->
+            if(error != null) {
+                Log.e("test", "로그아웃 실패, SDK에서 토큰 폐기됨", error)
+            }
+            else {
+                Log.i("test", "로그아웃 성공")
+            }
+        }
+        //naver
+        NaverIdLoginSDK.logout()
+        checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
         }
         binding.btnLoginKakao.setOnClickListener {
             kakaoLogin()
+        }
+    }
+
+    private fun checkLogin() {
+        if(TokenManager.isLoggedin(this)) {
+            accessService(TokenManager.getAccessToken(this).toString())
         }
     }
 
@@ -92,9 +122,8 @@ class StartActivity : AppCompatActivity() {
     }
     private fun accessService(token: String) {
         TokenManager.setAccessToken(this, token)
-        var intent = Intent(this, MainActivity::class.java)
-        startActivity(intent)
-        finish()
+        socialViewModel.myCharacter(token)
+
     }
 
     private fun observeLogin() {
@@ -120,6 +149,26 @@ class StartActivity : AppCompatActivity() {
                 val message = error.message ?: "알 수 없는 오류가 발생했습니다."
                 Log.d("tag", "로그인 실패: $message")
                 Toast.makeText(this, "로그인 실패: $message", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+    private fun observeCheck() {
+        socialViewModel.myCharResponse.observe(this) { result ->
+            result.onSuccess { data ->
+                Log.d("test", "사용자 인식 성공 - ${data.name}")
+                var intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            }.onFailure { error ->
+                if(error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {
+                    Log.d("test","용사 생성 화면 송출")
+                    var intent = Intent(this, CreateHeroActivity::class.java)
+                    startActivity(intent)
+                    finish()
+                }
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+
             }
         }
     }

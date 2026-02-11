@@ -1,6 +1,10 @@
 package com.umc_9th.sleepinghero.api
 
 import com.umc_9th.sleepinghero.api.service.AuthService
+import com.umc_9th.sleepinghero.api.service.CreateService
+import com.umc_9th.sleepinghero.api.service.GroupService
+import com.umc_9th.sleepinghero.api.service.SettingService
+import com.umc_9th.sleepinghero.api.service.SocialService
 import com.umc_9th.sleepinghero.api.service.CharacterService
 import com.umc_9th.sleepinghero.api.service.FriendService
 import com.umc_9th.sleepinghero.api.service.HomeService
@@ -31,7 +35,12 @@ object ApiClient {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val authService: AuthService = retrofit.create(AuthService::class.java)
+
+    val authService : AuthService = retrofit.create(AuthService::class.java)
+    val settingService: SettingService = retrofit.create(SettingService::class.java)
+    val socialService: SocialService = retrofit.create(SocialService::class.java)
+    val createService : CreateService = retrofit.create(CreateService::class.java)
+    val groupService : GroupService = retrofit.create(GroupService::class.java)
     val homeService: HomeService = retrofit.create(HomeService::class.java)
     val characterService: CharacterService = retrofit.create(CharacterService::class.java)
     val sleepService: SleepService = retrofit.create(SleepService::class.java)
