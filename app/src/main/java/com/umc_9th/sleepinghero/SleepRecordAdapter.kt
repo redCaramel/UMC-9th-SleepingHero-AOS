@@ -14,9 +14,15 @@ data class SleepRecordUiModel(
     val advice: String
 )
 
-class SleepRecordAdapter(
-    private val items: List<SleepRecordUiModel>
-) : RecyclerView.Adapter<SleepRecordAdapter.SleepRecordViewHolder>() {
+class SleepRecordAdapter : RecyclerView.Adapter<SleepRecordAdapter.SleepRecordViewHolder>() {
+
+    private val items = mutableListOf<SleepRecordUiModel>()
+
+    fun submitList(newItems: List<SleepRecordUiModel>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
+    }
 
     inner class SleepRecordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvDate: TextView = itemView.findViewById(R.id.tvDate)
@@ -25,10 +31,7 @@ class SleepRecordAdapter(
         val tvAdvice: TextView = itemView.findViewById(R.id.tvAdvice)
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): SleepRecordViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SleepRecordViewHolder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_sleep_record, parent, false)
         return SleepRecordViewHolder(view)

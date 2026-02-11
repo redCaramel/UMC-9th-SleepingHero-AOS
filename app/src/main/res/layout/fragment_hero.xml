@@ -80,6 +80,34 @@
                         android:textSize="28sp"
                         android:textStyle="bold" />
 
+                    <LinearLayout
+                        android:id="@+id/layoutConditionDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvNonSleepStreak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="연속 무기록 : 1일"
+                            android:textColor="#404040"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvExpPenalty"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="효과 : -5 % exp"
+                            android:textColor="#404040"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+
                     <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
