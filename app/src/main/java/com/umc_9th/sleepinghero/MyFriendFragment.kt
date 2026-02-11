@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.umc_9th.sleepinghero.api.ApiClient
@@ -35,7 +36,8 @@ class MyFriendFragment : Fragment() {
         observeFriend()
         adapter = HeroAdapter(friendList,
             clickEvent = { heroData ->
-                // TODO - 친삭 구현
+                socialViewModel.deleteFriend(TokenManager.getAccessToken(requireContext()).toString(), heroData.name)
+                adapter.removeItem(heroData)
             },
             2)
         binding.heroContainer.adapter = adapter
@@ -46,9 +48,11 @@ class MyFriendFragment : Fragment() {
     private fun observeFriend() {
         socialViewModel.myFriendResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-               friendList.clear()
+                if(data.isEmpty()) binding.viewNoHero.visibility = View.VISIBLE
+                else binding.viewNoHero.visibility = View.GONE
                 data.forEach { hero ->
-                    socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickName)
+                    Log.d("test", "친구 감지 - ${hero.nickname ?: "김용사"}")
+                    socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickname ?: "김용사")
                 }
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
@@ -61,12 +65,20 @@ class MyFriendFragment : Fragment() {
                val info = HeroData(
                    data.heroName,
                    data.level,
-                   R.drawable.ic_delete,
+                   data.skinId,
                    data.continuousSleepDays,
                    data.totalSleepHour
                )
-                friendList.add(info)
-                adapter.updateList(friendList)
+                adapter.uploadList(info)
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "탐색 실패: $message")
+
+            }
+        }
+        socialViewModel.deleteFriendResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                Toast.makeText(requireContext(), "친구가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "탐색 실패: $message")

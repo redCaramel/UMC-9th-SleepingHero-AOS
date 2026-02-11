@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.umc_9th.sleepinghero.api.ApiClient
@@ -37,9 +38,12 @@ class FriendRequestFragment : Fragment() {
         adapter = FriendRequestAdapter(requestList,
             acceptEvent = {heroData ->
                 // TODO - 수락/거절
+                socialViewModel.responseRequest(TokenManager.getAccessToken(requireContext()).toString(), "APPROVE", heroData.name)
+                adapter.removeItem(heroData)
             },
             rejectEvent = {heroData ->
-
+                socialViewModel.responseRequest(TokenManager.getAccessToken(requireContext()).toString(), "REJECTED", heroData.name)
+                adapter.removeItem(heroData)
             }
         )
         binding.heroContainer.adapter = adapter
@@ -75,6 +79,14 @@ class FriendRequestFragment : Fragment() {
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "탐색 실패: $message")
 
+            }
+        }
+        socialViewModel.responseRequestResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                Toast.makeText(requireContext(), "친구 요청을 처리하였습니다!", Toast.LENGTH_SHORT).show()
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "탐색 실패: $message")
             }
         }
     }

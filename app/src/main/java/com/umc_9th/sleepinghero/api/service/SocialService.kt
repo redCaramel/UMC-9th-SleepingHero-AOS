@@ -14,6 +14,7 @@ import com.umc_9th.sleepinghero.api.dto.MyFriendResponse
 import com.umc_9th.sleepinghero.api.dto.RequestCheckResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
@@ -61,6 +62,13 @@ interface SocialService {
         @Header("Authorization") token : String
     ): Response<ApiResponse<List<RequestCheckResponse>>>
 
+    @PATCH("friends/requests/{status}")
+    suspend fun ResponseRequest(
+        @Header("Authorization") token : String,
+        @Path("status") status : String,
+        @Body nickName : String
+    ) : Response<ApiResponse<String>>
+
     @GET("/wardrobe/me/skins")
     suspend fun CheckSkin(
         @Header("Authorization") token : String
@@ -70,5 +78,11 @@ interface SocialService {
     suspend fun EquipSKin (
         @Header("Authorization") token : String,
         @Path("skinId") skinId : Int
+    ) : Response<ApiResponse<String>>
+
+    @DELETE("/friends")
+    suspend fun DeleteFriend (
+        @Header("Authorization") token : String,
+        @Body nickName: String
     ) : Response<ApiResponse<String>>
 }

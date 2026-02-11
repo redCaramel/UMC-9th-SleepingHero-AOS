@@ -253,4 +253,52 @@ class SocialRepository(private val service : SocialService) {
         Result.failure(e)
     } as Result<String>
 
+    suspend fun ResponseRequest(
+        accessToken: String, status: String, nickName : String
+    ): Result<String> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.ResponseRequest(token, status, nickName)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Friend Response success.")
+                Result.success(data)
+            }
+        } else {
+            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<String>
+
+    suspend fun DeleteFriend(
+        accessToken: String, nickName : String
+    ): Result<String> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.DeleteFriend(token, nickName)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Friend Delete success.")
+                Result.success(data)
+            }
+        } else {
+            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<String>
+
 }

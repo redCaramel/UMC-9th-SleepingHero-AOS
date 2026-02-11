@@ -107,7 +107,7 @@ class GroupRequestFragment : Fragment() {
             result.onSuccess { data ->
                 friendList.clear()
                 data.forEach { hero ->
-                    socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickName)
+                    socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickname)
                 }
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"

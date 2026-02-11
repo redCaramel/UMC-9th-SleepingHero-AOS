@@ -41,6 +41,11 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
     val checkSkinResponse : LiveData<Result<CheckSkinResponse>> = _checkSkinResponse
     private val _equipSKinResponse = MutableLiveData<Result<String>>()
     val equipSKinResponse : LiveData<Result<String>> = _equipSKinResponse
+    private val _deleteFriendResponse = MutableLiveData<Result<String>>()
+    val deleteFriendResponse : LiveData<Result<String>> = _deleteFriendResponse
+
+    private val _responseRequestResponse = MutableLiveData<Result<String>>()
+    val responseRequestResponse : LiveData<Result<String>> = _responseRequestResponse
 
     fun charSearch(accessToken : String, name : String) {
         viewModelScope.launch {
@@ -104,6 +109,18 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
         viewModelScope.launch {
             val result = repository.EquipSkin(accessToken, skinId)
             _equipSKinResponse.postValue(result)
+        }
+    }
+    fun responseRequest(accessToken: String, status: String, nickName : String) {
+        viewModelScope.launch {
+            val result = repository.ResponseRequest(accessToken, status, nickName)
+            _responseRequestResponse.postValue(result)
+        }
+    }
+    fun deleteFriend(accessToken: String, nickName: String) {
+        viewModelScope.launch {
+            val result = repository.DeleteFriend(accessToken, nickName)
+            _deleteFriendResponse.postValue(result)
         }
     }
 }

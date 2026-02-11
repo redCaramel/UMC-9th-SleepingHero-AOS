@@ -45,8 +45,8 @@ data class ChangeNameResponse (
 )
 
 data class MyFriendResponse (
-    val nickName : String,
     val memberId : Long,
+    val nickname : String,
     val profilePicture : String
 )
 
@@ -67,4 +67,8 @@ data class SkinData (
 )
 data class CheckSkinResponse (
     val skins : List<SkinData>
+)
+
+data class DeleteFriendRequest (
+    val nickName : String
 )

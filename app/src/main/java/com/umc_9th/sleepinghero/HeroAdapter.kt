@@ -1,5 +1,6 @@
 package com.umc_9th.sleepinghero
 
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.Log
 import android.view.LayoutInflater
@@ -39,6 +40,19 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
         heroList.addAll(newList)
         notifyDataSetChanged()
     }
+    fun uploadList(newList : HeroData) {
+        this.heroList.add(newList)
+        notifyItemInserted(heroList.size-1)
+    }
+    fun removeItem(target : HeroData) {
+        val pos = heroList.indexOfFirst { it.name == target.name }
+        if(pos != -1) {
+            heroList.removeAt(pos)
+            notifyItemRemoved(pos)
+
+            notifyItemRangeChanged(pos, heroList.size)
+        }
+    }
     inner class HeroViewHolder(val binding : ItemFriendSearchBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : HeroData) {
@@ -67,8 +81,9 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
                     }
                     if(type == 2) {
                         binding.btnFriendInvite.setText("삭제")
+                        binding.btnFriendInvite.setTextSize(12f)
                         binding.btnFriendInvite.setTextColor(Color.parseColor("#FFFFFF"))
-                        binding.btnFriendInvite.setBackgroundColor(Color.parseColor("#CF2323"))
+                        binding.btnFriendInvite.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#CF2323"))
                         binding.btnFriendInvite.icon = null
                     }
                 }

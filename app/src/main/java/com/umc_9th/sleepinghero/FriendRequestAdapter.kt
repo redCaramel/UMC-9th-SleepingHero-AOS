@@ -36,6 +36,15 @@ class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
         this.heroList.add(newList)
         notifyItemInserted(heroList.size-1)
     }
+    fun removeItem(target : HeroData) {
+        val pos = heroList.indexOfFirst { it.name == target.name }
+        if(pos != -1) {
+            heroList.removeAt(pos)
+            notifyItemRemoved(pos)
+
+            notifyItemRangeChanged(pos, heroList.size)
+        }
+    }
     inner class HeroViewHolder(val binding : ItemFriendRequestBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : HeroData) {
