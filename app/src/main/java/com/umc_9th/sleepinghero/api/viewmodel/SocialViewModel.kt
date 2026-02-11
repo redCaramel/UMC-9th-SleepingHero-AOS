@@ -8,6 +8,7 @@ import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
 import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
+import com.umc_9th.sleepinghero.api.dto.CheckSkinResponse
 import com.umc_9th.sleepinghero.api.dto.FriendInviteRequest
 import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
 import com.umc_9th.sleepinghero.api.dto.MyCharResponse
@@ -36,6 +37,11 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
     val friendInviteResponse : LiveData<Result<String>> = _friendInviteResponse
     private val _requestCheckResponse = MutableLiveData<Result<List<RequestCheckResponse>>>()
     val requestCheckResponse : LiveData<Result<List<RequestCheckResponse>>> = _requestCheckResponse
+    private val _checkSkinResponse = MutableLiveData<Result<CheckSkinResponse>>()
+    val checkSkinResponse : LiveData<Result<CheckSkinResponse>> = _checkSkinResponse
+    private val _equipSKinResponse = MutableLiveData<Result<String>>()
+    val equipSKinResponse : LiveData<Result<String>> = _equipSKinResponse
+
     fun charSearch(accessToken : String, name : String) {
         viewModelScope.launch {
             val request = CharSearchRequest(name)
@@ -85,6 +91,19 @@ class SocialViewModel(private val repository: SocialRepository) : ViewModel()  {
         viewModelScope.launch {
             val result = repository.CheckRequest(accessToken)
             _requestCheckResponse.postValue(result)
+        }
+    }
+
+    fun checkSkin(accessToken: String) {
+        viewModelScope.launch {
+            val result = repository.CheckSkin(accessToken)
+            _checkSkinResponse.postValue(result)
+        }
+    }
+    fun equipSKin(accessToken: String, skinId : Int) {
+        viewModelScope.launch {
+            val result = repository.EquipSkin(accessToken, skinId)
+            _equipSKinResponse.postValue(result)
         }
     }
 }

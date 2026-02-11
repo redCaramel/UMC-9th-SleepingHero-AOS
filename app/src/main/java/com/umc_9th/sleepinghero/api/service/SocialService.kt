@@ -6,6 +6,7 @@ import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
 import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
 import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
 import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
+import com.umc_9th.sleepinghero.api.dto.CheckSkinResponse
 import com.umc_9th.sleepinghero.api.dto.FriendInviteRequest
 import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
 import com.umc_9th.sleepinghero.api.dto.MyCharResponse
@@ -17,6 +18,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface SocialService {
@@ -56,6 +58,17 @@ interface SocialService {
 
     @GET("/friends/requests")
     suspend fun CheckRequest(
-        @Header("Authorization") token : String,
+        @Header("Authorization") token : String
     ): Response<ApiResponse<List<RequestCheckResponse>>>
+
+    @GET("/wardrobe/me/skins")
+    suspend fun CheckSkin(
+        @Header("Authorization") token : String
+    ) : Response<ApiResponse<CheckSkinResponse>>
+
+    @POST("/wardrobe/me/skins/{skinId}/equip")
+    suspend fun EquipSKin (
+        @Header("Authorization") token : String,
+        @Path("skinId") skinId : Int
+    ) : Response<ApiResponse<String>>
 }

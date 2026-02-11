@@ -16,6 +16,9 @@
         android:theme="@style/Theme.SleepingHero"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".AvaterActivity"
+            android:exported="false" />
+        <activity
             android:name=".GroupInfoActivity"
             android:exported="false" />
         <activity

@@ -60,3 +60,11 @@ data class RequestCheckResponse (
     val nickname : String,
     val profilePicture : String
 )
+data class SkinData (
+    val skinId : Long,
+    val name : String,
+    val equipped : Boolean
+)
+data class CheckSkinResponse (
+    val skins : List<SkinData>
+)

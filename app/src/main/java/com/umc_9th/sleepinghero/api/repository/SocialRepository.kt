@@ -9,6 +9,7 @@ import com.umc_9th.sleepinghero.api.dto.MyCharResponse
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
 import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
 import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
+import com.umc_9th.sleepinghero.api.dto.CheckSkinResponse
 import com.umc_9th.sleepinghero.api.dto.FriendInviteRequest
 import com.umc_9th.sleepinghero.api.dto.MyFriendResponse
 import com.umc_9th.sleepinghero.api.dto.RequestCheckResponse
@@ -203,4 +204,53 @@ class SocialRepository(private val service : SocialService) {
     } catch (e: Exception) {
         Result.failure(e)
     } as Result<List<RequestCheckResponse>>
+
+    suspend fun CheckSkin(
+        accessToken: String
+    ): Result<CheckSkinResponse> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.CheckSkin(token)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Skin Check success.")
+                Result.success(data)
+            }
+        } else {
+            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<CheckSkinResponse>
+
+    suspend fun EquipSkin(
+        accessToken: String, skinId : Int
+    ): Result<String> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.EquipSKin(token, skinId)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Skin Equip success.")
+                Result.success(data)
+            }
+        } else {
+            val errMsg = response.body()?.message.toString() ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<String>
+
 }

@@ -20,7 +20,7 @@ import kotlin.getValue
 class FriendRequestFragment : Fragment() {
 
     private lateinit var binding: FragmentFriendRequestBinding
-    private lateinit var adapter : HeroAdapter
+    private lateinit var adapter : FriendRequestAdapter
     val requestList = mutableListOf<HeroData>()
     private val socialRepository by lazy {
         SocialRepository(ApiClient.socialService)
@@ -34,10 +34,13 @@ class FriendRequestFragment : Fragment() {
     ): View? {
         binding = FragmentFriendRequestBinding.inflate(inflater, container, false)
         observeRequest()
-        adapter = HeroAdapter(requestList,
-            clickEvent = {heroData ->
+        adapter = FriendRequestAdapter(requestList,
+            acceptEvent = {heroData ->
                 // TODO - 수락/거절
-            }, 3
+            },
+            rejectEvent = {heroData ->
+
+            }
         )
         return binding.root
     }
