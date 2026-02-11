@@ -504,12 +504,18 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-                    <!-- 그래프 placeholder: 나중에 ChartView로 교체 -->
-                    <FrameLayout
-                        android:id="@+id/chartContainer"
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/barChartWeekly"
                         android:layout_width="match_parent"
                         android:layout_height="240dp"
-                        android:background="#EEF1F4"/>
+                        android:background="#EEF1F4" />
+
+                    <com.github.mikephil.charting.charts.LineChart
+                        android:id="@+id/lineChartMonthly"
+                        android:layout_width="match_parent"
+                        android:layout_height="240dp"
+                        android:background="#EEF1F4"
+                        android:visibility="gone" />
 
                     <View
                         android:layout_width="match_parent"
