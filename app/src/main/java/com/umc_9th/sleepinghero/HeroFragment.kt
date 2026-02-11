@@ -87,13 +87,13 @@ class HeroFragment : Fragment() {
                         Triple("최상 컨디션", "연속적으로 숙면 중이에요!", 0)
 
                     nonSleepStreak == 1 ->
-                        Triple("컨디션 저하", "컨디션이 살짝 떨어졌어요.", 5)
+                        Triple("컨디션 저하", "어제의 기록이 비었어요.\n오늘 한 번에 회복해요!", 5)
 
                     nonSleepStreak == 2 ->
-                        Triple("무기력함", "무기력이 쌓이고 있어요.", 10)
+                        Triple("무기력함", "획득 경험치가 살짝 줄어들 수 있어요!", 10)
 
                     else ->
-                        Triple("감기", "컨디션이 많이 나빠요.", 20)
+                        Triple("감기", "감기 기운이 도네요.\n짧은 회복 퀘스트로 금방 나아요!", 20)
                 }
 
                 binding.tvCondition.text = statusText
@@ -121,18 +121,17 @@ class HeroFragment : Fragment() {
             val res = sleepRepository.getSleepSessions(token, page = 0, size = 10)
 
             if (!res.isSuccess || res.result == null) {
-                // TODO: 실패 처리(토스트/로그)
                 return@launch
             }
 
             val uiList = res.result.content.map { dto ->
                 val durationText = calcSleepDurationText(dto.sleptTime, dto.wokeTime)
-                val dateText = dto.sleptTime.take(10) // "YYYY-MM-DD" (일단 sleptTime 기준)
+                val dateText = dto.sleptTime.take(10)
 
                 SleepRecordUiModel(
                     date = dateText,
                     sleepTimeText = durationText,
-                    star = if (dto.isSuccess) 5 else 1, // ★ 임시 매핑 (리뷰 API 붙이면 교체)
+                    star = if (dto.isSuccess) 5 else 1, // TODO: 임시 매핑 (리뷰 API 붙이면 교체)
                     advice = if (dto.isSuccess) "용사의 조언: 잘 잤군! 오늘도 힘내자!" else "용사의 조언: 용사여… 휴식이 부족하군!"
                 )
             }

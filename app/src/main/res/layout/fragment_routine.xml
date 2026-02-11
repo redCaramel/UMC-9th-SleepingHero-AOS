@@ -457,7 +457,6 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- TODO - 수면 기록 (그래프) 넣기-->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardChart"
                 android:layout_width="match_parent"

@@ -53,14 +53,12 @@ class RoutineFragment : Fragment() {
     private val dateFmtWeekly = DateTimeFormatter.ofPattern("M/d", Locale.KOREA)
     private val dateFmtMonthly = DateTimeFormatter.ofPattern("M/d", Locale.KOREA)
 
-    // ✅ 화면 표시용 데이터 (API로 채움)
     private var weeklyLabels: List<String> = emptyList()
     private var weeklyHours: List<Float> = emptyList()
 
     private var monthlyLabels: List<String> = emptyList()
     private var monthlyHours: List<Float> = emptyList()
 
-    // 기록일 판정 기준(원하면 바꿔)
     private val recordedThresholdHours = 1f
 
     override fun onAttach(context: Context) {
@@ -82,11 +80,9 @@ class RoutineFragment : Fragment() {
         updateGoalSleep()
         fetchStreak()
 
-        // 차트 초기화
         initWeeklyBarChart(binding.barChartWeekly)
         initMonthlyLineChart(binding.lineChartMonthly)
 
-        // 토글 초기화
         applyReportMode(currentMode)
 
         binding.btnWeekly.setOnClickListener {
@@ -99,7 +95,6 @@ class RoutineFragment : Fragment() {
             applyReportMode(currentMode)
         }
 
-        // 취침/기상 시간 설정
         binding.bedContainer.setOnClickListener {
             showCustomTimeDialog("취침 시간 설정", binding.tvBedTime)
         }
@@ -107,13 +102,9 @@ class RoutineFragment : Fragment() {
             showCustomTimeDialog("기상 시간 설정", binding.tvWakeTime)
         }
 
-        // ✅ 수면 기록 API 연동 → 그래프/레포트 계산
         fetchSleepSessionsAndRender()
     }
 
-    // -----------------------------
-    // 홈 대시보드(연속 수면일)
-    // -----------------------------
     private fun fetchStreak() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
@@ -141,9 +132,6 @@ class RoutineFragment : Fragment() {
         }
     }
 
-    // -----------------------------
-    // ✅ 수면기록 API 호출
-    // -----------------------------
     private fun fetchSleepSessionsAndRender() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
@@ -155,7 +143,6 @@ class RoutineFragment : Fragment() {
 
             val token = "Bearer $raw"
 
-            // 일단 넉넉히(0페이지, size 크게). 데이터 많아지면 나중에 페이지 반복 호출로 확장.
             val res = sleepRepository.getSleepSessions(token, page = 0, size = 200)
 
             if (!res.isSuccess || res.result == null) {
@@ -172,7 +159,6 @@ class RoutineFragment : Fragment() {
             renderWeeklyFromPrepared()
             renderMonthlyFromPrepared()
 
-            // 현재 모드 기준 레포트 갱신/토글 유지
             applyReportMode(currentMode)
         }
     }
@@ -185,9 +171,6 @@ class RoutineFragment : Fragment() {
         applyReportMode(currentMode)
     }
 
-    // -----------------------------
-    // ✅ records → 주간 7일(오늘 포함) hours
-    // -----------------------------
     private fun buildWeeklyFromRecords(records: List<SleepSessionDto>) {
         val today = LocalDate.now()
         val start = today.minusDays(6)
@@ -195,7 +178,7 @@ class RoutineFragment : Fragment() {
         val minutesByDay = mutableMapOf<LocalDate, Int>()
 
         for (r in records) {
-            if (!r.isSuccess) continue // 성공기록만
+            if (!r.isSuccess) continue
             val sleptDate = parseLocalDate(r.sleptTime) ?: continue
             if (sleptDate.isBefore(start) || sleptDate.isAfter(today)) continue
 
@@ -215,9 +198,6 @@ class RoutineFragment : Fragment() {
         }
     }
 
-    // -----------------------------
-    // ✅ records → 월간(이번달 1일~말일) hours
-    // -----------------------------
     private fun buildMonthlyFromRecords(records: List<SleepSessionDto>) {
         val today = LocalDate.now()
         val ym = YearMonth.from(today)
@@ -267,9 +247,6 @@ class RoutineFragment : Fragment() {
         return Duration.between(s, w).toMinutes().toInt()
     }
 
-    // -----------------------------
-    // 토글 적용 + 레포트 갱신
-    // -----------------------------
     private fun applyReportMode(mode: ReportMode) {
         val selectedBg = R.drawable.bg_toggle_selected
         val unselectedBg = R.drawable.bg_toggle_unselected
@@ -307,9 +284,6 @@ class RoutineFragment : Fragment() {
         }
     }
 
-    // -----------------------------
-    // 주간 BarChart
-    // -----------------------------
     private fun initWeeklyBarChart(chart: BarChart) {
         chart.description.isEnabled = false
         chart.legend.isEnabled = false
@@ -362,9 +336,6 @@ class RoutineFragment : Fragment() {
         binding.barChartWeekly.invalidate()
     }
 
-    // -----------------------------
-    // 월간 LineChart
-    // -----------------------------
     private fun initMonthlyLineChart(chart: LineChart) {
         chart.description.isEnabled = false
         chart.legend.isEnabled = false
@@ -417,9 +388,6 @@ class RoutineFragment : Fragment() {
         binding.lineChartMonthly.invalidate()
     }
 
-    // -----------------------------
-    // 레포트 계산
-    // -----------------------------
     private fun updateReportFromHours(mode: ReportMode, hours: List<Float>) {
         val total = hours.sum().coerceAtLeast(0f)
         val denom = hours.size.coerceAtLeast(1)
@@ -434,9 +402,6 @@ class RoutineFragment : Fragment() {
         binding.tvStatus.text = if (isStable) "안정" else "불안정"
     }
 
-    // -----------------------------
-    // 이하 시간 설정 로직 그대로
-    // -----------------------------
     private fun showCustomTimeDialog(title: String, targetTextView: TextView) {
         val dialogBinding = ActivityTimeSettingBinding.inflate(layoutInflater)
 
