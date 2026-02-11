@@ -1,11 +1,11 @@
 package com.umc_9th.sleepinghero
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.umc_9th.sleepinghero.databinding.ItemFriendRequestBinding
-import okhttp3.internal.notify
 
 class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
                            private val acceptEvent: (HeroData) -> Unit,
@@ -32,19 +32,18 @@ class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
         return heroList.size
     }
 
-    fun updateList(newList : List<HeroData>) {
-        heroList.clear()
-        heroList.addAll(newList)
-        notifyDataSetChanged()
+    fun updateList(newList : HeroData) {
+        this.heroList.add(newList)
+        notifyItemInserted(heroList.size-1)
     }
     inner class HeroViewHolder(val binding : ItemFriendRequestBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : HeroData) {
                     binding.tvCharName.text = hero.name
-                    binding.imgCharProfile.setImageResource(hero.skinId)
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"
+                    Log.d("test", "skinID - ${hero.skinId}")
                     val skinImgList = arrayOf(
                         R.drawable.ic_hero_1,
                         R.drawable.ic_hero_2,
@@ -59,7 +58,13 @@ class FriendRequestAdapter(private var heroList : MutableList<HeroData>,
                         R.drawable.ic_hero_11,
                         R.drawable.ic_hero_12
                     )
-                    binding.imgCharProfile.setImageResource(skinImgList[hero.skinId-1])
+                    val index = hero.skinId - 1
+                    if (index in skinImgList.indices) {
+                        binding.imgCharProfile.setImageResource(skinImgList[index])
+                    } else {
+                        // 기본 이미지 설정 (인덱스 범위를 벗어날 경우 대비)
+                        binding.imgCharProfile.setImageResource(R.drawable.ic_hero_1)
+                    }
                     binding.btnAccept.setOnClickListener {
                         acceptEvent(hero)
                     }

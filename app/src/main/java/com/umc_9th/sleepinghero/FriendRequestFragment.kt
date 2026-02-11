@@ -1,6 +1,5 @@
 package com.umc_9th.sleepinghero
 
-import android.R
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -51,7 +50,6 @@ class FriendRequestFragment : Fragment() {
     private fun observeRequest() {
         socialViewModel.requestCheckResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-                requestList.clear()
                 data.forEach { hero ->
                     Log.d("test", "요청 감지 - ${hero.nickname}")
                     socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickname)
@@ -67,12 +65,12 @@ class FriendRequestFragment : Fragment() {
                 val info = HeroData(
                     data.heroName,
                     data.level,
-                    R.drawable.ic_delete,
+                    data.skinId,
                     data.continuousSleepDays,
                     data.totalSleepHour
                 )
-                requestList.add(info)
-                adapter.updateList(requestList)
+                adapter.updateList(info)
+                binding.textView36.text = "답변되지 않은 친구 요청 ${adapter.itemCount}건"
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "탐색 실패: $message")

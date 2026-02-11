@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.GroupRepository
@@ -51,11 +52,18 @@ class GroupRequestFragment : Fragment() {
         observeFriend()
         observeGroup()
         groupViewModel.groupRank(TokenManager.getAccessToken(requireContext()).toString(), groupName)
+        binding.btnBackRequest.setOnClickListener {
+            requireActivity().supportFragmentManager.beginTransaction()
+                .replace(com.umc_9th.sleepinghero.R.id.container_main, SocialFragment())
+                .commit()
+        }
         adapter = HeroAdapter(friendList,
             clickEvent = {heroData ->
                 //TODO - 그룹 초대 구현
             },
             1)
+        binding.rankingContainer.adapter = adapter
+        binding.rankingContainer.layoutManager = LinearLayoutManager(requireContext())
         return binding.root
     }
 
@@ -112,11 +120,10 @@ class GroupRequestFragment : Fragment() {
                 val info = HeroData(
                     data.heroName,
                     data.level,
-                    R.drawable.ic_delete,
+                    data.skinId,
                     data.continuousSleepDays,
                     data.totalSleepHour
                 )
-                friendList.add(info)
                 adapter.updateList(friendList)
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"

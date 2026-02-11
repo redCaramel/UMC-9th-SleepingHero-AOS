@@ -157,7 +157,6 @@ class SocialRepository(private val service : SocialService) {
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
         Log.d("test", token)
-        val test = FriendInviteRequest("UMC칼리")
         val response = service.FriendInvite(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -194,6 +193,7 @@ class SocialRepository(private val service : SocialService) {
             } else {
                 val data = response.body()?.result
                 Log.d("test", "Request Check success.")
+                if(data?.isEmpty() ?: false) Log.d("test", "noData")
                 Result.success(data)
             }
         } else {

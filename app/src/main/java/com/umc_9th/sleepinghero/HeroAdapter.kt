@@ -61,7 +61,7 @@ class HeroAdapter(private var heroList : MutableList<HeroData>,
                         R.drawable.ic_hero_12
                     )
                     Log.d("test", "${hero.skinId}")
-                    binding.imgCharProfile.setImageResource(skinImgList[hero.skinId])
+                    binding.imgCharProfile.setImageResource(skinImgList[hero.skinId-1])
                     binding.btnFriendInvite.setOnClickListener {
                         clickEvent(hero)
                     }
