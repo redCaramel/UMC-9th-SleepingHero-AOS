@@ -23,12 +23,18 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.umc_9th.sleepinghero.api.TokenManager
+import com.umc_9th.sleepinghero.api.dto.SleepSessionDto
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
+import com.umc_9th.sleepinghero.api.repository.SleepRepository
 import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
 import com.umc_9th.sleepinghero.databinding.FragmentRoutineBinding
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.time.YearMonth
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -39,22 +45,22 @@ class RoutineFragment : Fragment() {
     private lateinit var mainActivity: MainActivity
 
     private val homeRepository by lazy { HomeRepository() }
+    private val sleepRepository by lazy { SleepRepository() }
 
     private enum class ReportMode { WEEKLY, MONTHLY }
-    private var currentMode: ReportMode = ReportMode.WEEKLY // 기본값 주간
+    private var currentMode: ReportMode = ReportMode.WEEKLY
 
     private val dateFmtWeekly = DateTimeFormatter.ofPattern("M/d", Locale.KOREA)
     private val dateFmtMonthly = DateTimeFormatter.ofPattern("M/d", Locale.KOREA)
 
-    // ✅ 더미 데이터(현재 화면 표시용으로 보관)
+    // ✅ 화면 표시용 데이터 (API로 채움)
     private var weeklyLabels: List<String> = emptyList()
     private var weeklyHours: List<Float> = emptyList()
 
     private var monthlyLabels: List<String> = emptyList()
     private var monthlyHours: List<Float> = emptyList()
 
-    // 기록일 판정 기준 (너가 원하는대로 바꾸면 됨)
-    // 예: 0f이면 미기록, 1f 이상이면 기록으로 취급
+    // 기록일 판정 기준(원하면 바꿔)
     private val recordedThresholdHours = 1f
 
     override fun onAttach(context: Context) {
@@ -76,29 +82,11 @@ class RoutineFragment : Fragment() {
         updateGoalSleep()
         fetchStreak()
 
-        binding.bedContainer.setOnClickListener {
-            showCustomTimeDialog(
-                title = "취침 시간 설정",
-                targetTextView = binding.tvBedTime
-            )
-        }
-
-        binding.wakeContainer.setOnClickListener {
-            showCustomTimeDialog(
-                title = "기상 시간 설정",
-                targetTextView = binding.tvWakeTime
-            )
-        }
-
-        // ✅ 차트 초기 설정
+        // 차트 초기화
         initWeeklyBarChart(binding.barChartWeekly)
         initMonthlyLineChart(binding.lineChartMonthly)
 
-        // ✅ 더미 데이터 생성 + 차트/레포트 렌더
-        renderWeeklyDummy()
-        renderMonthlyDummy()
-
-        // ✅ 토글 초기화 + 클릭 리스너
+        // 토글 초기화
         applyReportMode(currentMode)
 
         binding.btnWeekly.setOnClickListener {
@@ -110,11 +98,24 @@ class RoutineFragment : Fragment() {
             currentMode = ReportMode.MONTHLY
             applyReportMode(currentMode)
         }
+
+        // 취침/기상 시간 설정
+        binding.bedContainer.setOnClickListener {
+            showCustomTimeDialog("취침 시간 설정", binding.tvBedTime)
+        }
+        binding.wakeContainer.setOnClickListener {
+            showCustomTimeDialog("기상 시간 설정", binding.tvWakeTime)
+        }
+
+        // ✅ 수면 기록 API 연동 → 그래프/레포트 계산
+        fetchSleepSessionsAndRender()
     }
 
+    // -----------------------------
+    // 홈 대시보드(연속 수면일)
+    // -----------------------------
     private fun fetchStreak() {
         viewLifecycleOwner.lifecycleScope.launch {
-
             val raw = TokenManager.getAccessToken(requireContext())
             if (raw.isNullOrEmpty()) {
                 Log.e("ROUTINE_TOKEN", "Token is null")
@@ -125,7 +126,6 @@ class RoutineFragment : Fragment() {
             val res = homeRepository.getDashboard(token)
 
             if (res.isSuccess && res.result != null) {
-
                 val streak = res.result.currentStreak
                 binding.tvStreakDays.text = "${streak}일"
 
@@ -135,13 +135,141 @@ class RoutineFragment : Fragment() {
                     streak in 3..6 -> "+3% EXP"
                     else -> "+5% EXP"
                 }
-
             } else {
                 Log.e("ROUTINE_ERROR", res.message)
             }
         }
     }
 
+    // -----------------------------
+    // ✅ 수면기록 API 호출
+    // -----------------------------
+    private fun fetchSleepSessionsAndRender() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val raw = TokenManager.getAccessToken(requireContext())
+            if (raw.isNullOrEmpty()) {
+                Log.e("ROUTINE_TOKEN", "Token is null")
+                seedEmptyThenRender()
+                return@launch
+            }
+
+            val token = "Bearer $raw"
+
+            // 일단 넉넉히(0페이지, size 크게). 데이터 많아지면 나중에 페이지 반복 호출로 확장.
+            val res = sleepRepository.getSleepSessions(token, page = 0, size = 200)
+
+            if (!res.isSuccess || res.result == null) {
+                Log.e("ROUTINE_SLEEP_ERR", res.message)
+                seedEmptyThenRender()
+                return@launch
+            }
+
+            val records = res.result.content
+
+            buildWeeklyFromRecords(records)
+            buildMonthlyFromRecords(records)
+
+            renderWeeklyFromPrepared()
+            renderMonthlyFromPrepared()
+
+            // 현재 모드 기준 레포트 갱신/토글 유지
+            applyReportMode(currentMode)
+        }
+    }
+
+    private fun seedEmptyThenRender() {
+        buildWeeklyFromRecords(emptyList())
+        buildMonthlyFromRecords(emptyList())
+        renderWeeklyFromPrepared()
+        renderMonthlyFromPrepared()
+        applyReportMode(currentMode)
+    }
+
+    // -----------------------------
+    // ✅ records → 주간 7일(오늘 포함) hours
+    // -----------------------------
+    private fun buildWeeklyFromRecords(records: List<SleepSessionDto>) {
+        val today = LocalDate.now()
+        val start = today.minusDays(6)
+
+        val minutesByDay = mutableMapOf<LocalDate, Int>()
+
+        for (r in records) {
+            if (!r.isSuccess) continue // 성공기록만
+            val sleptDate = parseLocalDate(r.sleptTime) ?: continue
+            if (sleptDate.isBefore(start) || sleptDate.isAfter(today)) continue
+
+            val mins = calcDurationMinutes(r.sleptTime, r.wokeTime) ?: continue
+            if (mins <= 0) continue
+
+            minutesByDay[sleptDate] = (minutesByDay[sleptDate] ?: 0) + mins
+        }
+
+        weeklyLabels = (0..6).map { i ->
+            start.plusDays(i.toLong()).format(dateFmtWeekly)
+        }
+
+        weeklyHours = (0..6).map { i ->
+            val d = start.plusDays(i.toLong())
+            (minutesByDay[d] ?: 0) / 60f
+        }
+    }
+
+    // -----------------------------
+    // ✅ records → 월간(이번달 1일~말일) hours
+    // -----------------------------
+    private fun buildMonthlyFromRecords(records: List<SleepSessionDto>) {
+        val today = LocalDate.now()
+        val ym = YearMonth.from(today)
+        val daysInMonth = ym.lengthOfMonth()
+        val firstDay = ym.atDay(1)
+        val lastDay = ym.atEndOfMonth()
+
+        val minutesByDay = mutableMapOf<LocalDate, Int>()
+
+        for (r in records) {
+            if (!r.isSuccess) continue
+            val sleptDate = parseLocalDate(r.sleptTime) ?: continue
+            if (sleptDate.isBefore(firstDay) || sleptDate.isAfter(lastDay)) continue
+
+            val mins = calcDurationMinutes(r.sleptTime, r.wokeTime) ?: continue
+            if (mins <= 0) continue
+
+            minutesByDay[sleptDate] = (minutesByDay[sleptDate] ?: 0) + mins
+        }
+
+        monthlyLabels = (0 until daysInMonth).map { i ->
+            firstDay.plusDays(i.toLong()).format(dateFmtMonthly)
+        }
+
+        monthlyHours = (0 until daysInMonth).map { i ->
+            val d = firstDay.plusDays(i.toLong())
+            (minutesByDay[d] ?: 0) / 60f
+        }
+    }
+
+    private fun parseLocalDate(iso: String): LocalDate? = try {
+        OffsetDateTime.parse(iso).toLocalDate()
+    } catch (_: Exception) {
+        try { LocalDateTime.parse(iso).toLocalDate() } catch (_: Exception) { null }
+    }
+
+
+    private fun calcDurationMinutes(sleptIso: String, wokeIso: String): Int? {
+        fun parseAny(str: String) = try {
+            OffsetDateTime.parse(str).toInstant()
+        } catch (_: Exception) {
+            try { LocalDateTime.parse(str).atZone(ZoneId.systemDefault()).toInstant() } catch (_: Exception) { null }
+        }
+
+        val s = parseAny(sleptIso) ?: return null
+        val w = parseAny(wokeIso) ?: return null
+        return Duration.between(s, w).toMinutes().toInt()
+    }
+
+    // -----------------------------
+    // 토글 적용 + 레포트 갱신
+    // -----------------------------
     private fun applyReportMode(mode: ReportMode) {
         val selectedBg = R.drawable.bg_toggle_selected
         val unselectedBg = R.drawable.bg_toggle_unselected
@@ -158,13 +286,8 @@ class RoutineFragment : Fragment() {
 
                 binding.barChartWeekly.visibility = View.VISIBLE
                 binding.lineChartMonthly.visibility = View.GONE
-                binding.barChartWeekly.invalidate()
 
-                // ✅ 레포트(총시간/일평균/기록일) 갱신
-                updateReportFromHours(
-                    mode = ReportMode.WEEKLY,
-                    hours = weeklyHours
-                )
+                updateReportFromHours(mode, weeklyHours)
             }
 
             ReportMode.MONTHLY -> {
@@ -178,29 +301,22 @@ class RoutineFragment : Fragment() {
 
                 binding.barChartWeekly.visibility = View.GONE
                 binding.lineChartMonthly.visibility = View.VISIBLE
-                binding.lineChartMonthly.invalidate()
 
-                // ✅ 레포트(총시간/일평균/기록일) 갱신
-                updateReportFromHours(
-                    mode = ReportMode.MONTHLY,
-                    hours = monthlyHours
-                )
+                updateReportFromHours(mode, monthlyHours)
             }
         }
     }
 
     // -----------------------------
-    // 1) 주간 막대 차트
+    // 주간 BarChart
     // -----------------------------
     private fun initWeeklyBarChart(chart: BarChart) {
         chart.description.isEnabled = false
         chart.legend.isEnabled = false
-
         chart.setDrawGridBackground(false)
         chart.setDrawBarShadow(false)
         chart.setPinchZoom(false)
         chart.setScaleEnabled(false)
-
         chart.axisRight.isEnabled = false
 
         val left = chart.axisLeft
@@ -217,27 +333,17 @@ class RoutineFragment : Fragment() {
         x.textColor = Color.parseColor("#6B7280")
     }
 
-    private fun renderWeeklyDummy() {
-        val today = LocalDate.now()
-
-        weeklyLabels = (6 downTo 0).map { d ->
-            today.minusDays(d.toLong()).format(dateFmtWeekly)
-        }
-
-        // 더미 수면시간(시간)
-        weeklyHours = listOf(6.7f, 8.9f, 7.0f, 5.4f, 7.8f, 6.5f, 5.8f)
-
+    private fun renderWeeklyFromPrepared() {
         val entries = weeklyHours.mapIndexed { i, h -> BarEntry(i.toFloat(), h) }
 
         val dataSet = BarDataSet(entries, "")
         dataSet.setDrawValues(false)
 
-        // Bar마다 색 다르게
         val colors = weeklyHours.map { h ->
             when {
-                h < 6f -> Color.parseColor("#E74C3C")   // red
-                h < 7f -> Color.parseColor("#2E86DE")   // blue
-                else -> Color.parseColor("#27AE60")     // green
+                h < 6f -> Color.parseColor("#E74C3C")
+                h < 7f -> Color.parseColor("#2E86DE")
+                else -> Color.parseColor("#27AE60")
             }
         }
         dataSet.colors = colors
@@ -257,16 +363,14 @@ class RoutineFragment : Fragment() {
     }
 
     // -----------------------------
-    // 2) 월간 꺾은선 차트 (이번 달 1일~말일)
+    // 월간 LineChart
     // -----------------------------
     private fun initMonthlyLineChart(chart: LineChart) {
         chart.description.isEnabled = false
         chart.legend.isEnabled = false
-
         chart.setDrawGridBackground(false)
         chart.setPinchZoom(false)
         chart.setScaleEnabled(false)
-
         chart.axisRight.isEnabled = false
 
         val left = chart.axisLeft
@@ -283,27 +387,7 @@ class RoutineFragment : Fragment() {
         x.textColor = Color.parseColor("#6B7280")
     }
 
-    private fun renderMonthlyDummy() {
-        val today = LocalDate.now()
-        val ym = YearMonth.from(today)
-        val daysInMonth = ym.lengthOfMonth()
-
-        val firstDay = ym.atDay(1)
-
-        monthlyLabels = (0 until daysInMonth).map { i ->
-            firstDay.plusDays(i.toLong()).format(dateFmtMonthly)
-        }
-
-        // 더미: 이번 달 전체 일수만큼 만들기
-        // 스샷 느낌처럼 초반은 거의 0에 가깝다가 중간부터 값 생기게
-        monthlyHours = MutableList(daysInMonth) { 0.0f }.apply {
-            val startIdx = (daysInMonth * 0.55f).toInt().coerceIn(0, daysInMonth - 1)
-            for (i in startIdx until daysInMonth) {
-                val sample = listOf(7.8f, 9.1f, 7.2f, 8.7f, 6.9f, 9.6f, 8.1f, 5.7f, 8.4f, 7.9f)
-                this[i] = sample[(i - startIdx) % sample.size]
-            }
-        }
-
+    private fun renderMonthlyFromPrepared() {
         val entries = monthlyHours.mapIndexed { i, h -> Entry(i.toFloat(), h) }
 
         val dataSet = LineDataSet(entries, "")
@@ -325,8 +409,6 @@ class RoutineFragment : Fragment() {
             override fun getAxisLabel(value: Float, axis: AxisBase?): String {
                 val idx = value.roundToInt()
                 if (idx !in 0 until monthlyLabels.size) return ""
-
-                // 5일 간격 + 마지막날
                 return if (idx % 5 == 0 || idx == monthlyLabels.lastIndex) monthlyLabels[idx] else ""
             }
         }
@@ -336,33 +418,21 @@ class RoutineFragment : Fragment() {
     }
 
     // -----------------------------
-    // ✅ 레포트 계산 로직 (총시간 / 일평균 / 기록일)
+    // 레포트 계산
     // -----------------------------
     private fun updateReportFromHours(mode: ReportMode, hours: List<Float>) {
-        if (hours.isEmpty()) {
-            binding.tvTotalHours.text = "0h"
-            binding.tvDailyAvg.text = "0.0h"
-            binding.tvRecordedDays.text = when (mode) {
-                ReportMode.WEEKLY -> "0/7"
-                ReportMode.MONTHLY -> "0/30"
-            }
-            return
-        }
-
         val total = hours.sum().coerceAtLeast(0f)
-        val avg = total / hours.size
-
-        // 기록일: threshold 이상인 날만 카운트 (0값/극소값은 미기록 처리)
+        val denom = hours.size.coerceAtLeast(1)
+        val avg = total / denom
         val recorded = hours.count { it >= recordedThresholdHours }
-        val denom = hours.size
 
-        binding.tvTotalHours.text = "${total.toInt()}h"          // 예: 52h
-        binding.tvDailyAvg.text = String.format(Locale.KOREA, "%.1fh", avg) // 예: 7.4h
-        binding.tvRecordedDays.text = "${recorded}/${denom}"
+        binding.tvTotalHours.text = "${total.toInt()}h"
+        binding.tvDailyAvg.text = String.format(Locale.KOREA, "%.1fh", avg)
+        binding.tvRecordedDays.text = "${recorded}/${hours.size}"
     }
 
     // -----------------------------
-    // 이하: 기존 시간 설정 로직 그대로
+    // 이하 시간 설정 로직 그대로
     // -----------------------------
     private fun showCustomTimeDialog(title: String, targetTextView: TextView) {
         val dialogBinding = ActivityTimeSettingBinding.inflate(layoutInflater)
@@ -435,10 +505,7 @@ class RoutineFragment : Fragment() {
             dialog.dismiss()
         }
 
-        dialogBinding.btnTimesetCancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
+        dialogBinding.btnTimesetCancel.setOnClickListener { dialog.dismiss() }
         dialog.show()
     }
 
@@ -448,19 +515,16 @@ class RoutineFragment : Fragment() {
 
         val bedMin = timeStringToMinutesSafe(bedStr)
         val wakeMin = timeStringToMinutesSafe(wakeStr)
-
         if (bedMin == null || wakeMin == null) return
 
         var diff = wakeMin - bedMin
         if (diff < 0) diff += 24 * 60
-
         binding.tvGoalValue.text = minutesToKoreanHourMin(diff)
     }
 
     private fun minutesToKoreanHourMin(totalMin: Int): String {
         val h = totalMin / 60
         val m = totalMin % 60
-
         return if (m == 0) "${h}시간" else "${h}시간 ${m}분"
     }
 
