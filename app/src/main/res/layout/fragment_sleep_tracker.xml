@@ -67,6 +67,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingRight="50dp"
+                android:paddingLeft="50dp"
                 android:src="@drawable/home_sleep_time" />
 
             <TextView
@@ -76,9 +80,11 @@
                 android:layout_gravity="center"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
+                android:layout_marginTop="-8dp"
                 android:text="@string/sleep_tracker_time_range"
+                android:textStyle="bold"
                 android:textColor="@color/gray_900"
-                android:textSize="11sp" />
+                android:textSize="18sp" />
         </FrameLayout>
 
         <!-- 하단 준비 완료 텍스트 -->
