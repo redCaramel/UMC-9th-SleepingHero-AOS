@@ -64,8 +64,10 @@
         <ScrollView
             android:id="@+id/scrollView4"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="300dp"
             android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_group_info">
 
             <LinearLayout
@@ -79,7 +81,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:clipToPadding="false"
-                    android:scrollbars="vertical" />
+                    android:scrollbars="vertical"
+                    tools:listitem="@layout/item_group_ranking" />
             </LinearLayout>
         </ScrollView>
 
@@ -184,6 +187,7 @@
             android:text="그룹 나가기"
             android:textColor="@color/error"
             android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_group_member" />
 

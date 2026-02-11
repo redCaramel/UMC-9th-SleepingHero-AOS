@@ -84,8 +84,15 @@ class GroupFragment : Fragment() {
                 dialog.show()
             },
             inviteEvent =  { groupData ->
-                //TODO - 그룹 초대
-
+                val fragment = GroupRequestFragment()
+                val bundle = Bundle().apply {
+                    putString("name",groupData.groupName)
+                }
+                fragment.arguments = bundle
+                requireActivity().supportFragmentManager.beginTransaction()
+                    .replace(R.id.container_main, fragment)
+                    .addToBackStack(null)
+                    .commit()
             })
         binding.groupContainer.adapter = adapter
         binding.groupContainer.layoutManager = LinearLayoutManager(requireContext())

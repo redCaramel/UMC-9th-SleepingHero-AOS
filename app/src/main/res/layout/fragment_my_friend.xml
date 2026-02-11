@@ -66,6 +66,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:clipToPadding="false"
+                tools:listitem="@layout/item_friend_search"
                 android:scrollbars="vertical" />
 
         </LinearLayout>
