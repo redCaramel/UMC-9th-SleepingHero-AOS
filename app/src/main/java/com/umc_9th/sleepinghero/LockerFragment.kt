@@ -24,8 +24,10 @@ class LockerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // TODO: 화면 잠금 기능 구현
-        // 예: 화면 밝기 최소화, 터치 비활성화 등
+        // 🔓 화면 잠금 해제 → SleepTrackerFragment로 복귀
+        binding.btnUnlock.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 
     override fun onDestroyView() {

@@ -71,7 +71,7 @@ class ClearFragment : Fragment() {
         binding.tvExpGained.text = "+${gainedExp} EXP"
         binding.tvLevelValue.text = if (currentLevel > 0) "Lv. $currentLevel" else "Lv. -"
 
-        // 목표 수면 시간 (Routine 담당이라 일단 더미로 고정)
+        // TODO: 목표 수면 시간 동기화
         binding.tvTargetSleepValue.text = "07 H 30 M"
 
         // 실제 수면 시간

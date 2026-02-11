@@ -301,6 +301,7 @@ class HomeFragment : Fragment() {
      * ISO 8601 시간 → AM/PM 형식 변환
      * "2026-02-11T23:00:00.000Z" → "11:00 PM"
      */
+    //TODO: 목표 수면 시간 설정 동기화
     private fun formatTimeToAMPM(isoTime: String): String {
         return try {
             // ISO 8601 파싱
