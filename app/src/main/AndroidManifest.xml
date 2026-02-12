@@ -30,6 +30,15 @@
             android:turnScreenOn="true" />
 
         <activity
+            android:name=".AvaterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GroupInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateHeroActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateGroupActivity"
             android:exported="false" />
         <activity
@@ -54,11 +63,11 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".StartActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -68,12 +77,12 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <!-- Redirect URI: "kakao${NATIVE_APP_KEY}://oauth" -->
                 <data
                     android:host="oauth"
                     android:scheme="kakao${KAKAO_NATIVE_KEY}" />
             </intent-filter>
         </activity>
+
     </application>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 </manifest>

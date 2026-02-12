@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/heroRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#F1F1F1">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/heroScroll"
@@ -17,336 +16,198 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/content"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/headerBar"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:background="@drawable/bg_round_header"
-                android:paddingStart="16dp"
-                android:paddingEnd="12dp"
-                android:layout_marginHorizontal="5dp"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
-
-                <TextView
-                    android:id="@+id/tvLevel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LV.17"
-                    android:textSize="28sp"
-                    android:textColor="#2B2B2B"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <TextView
-                    android:id="@+id/tvHeroName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="김용사"
-                    android:textSize="40sp"
-                    android:textColor="#2B2B2B"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-                <ImageButton
-                    android:id="@+id/btnEditName"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="닉네임 수정"
-                    android:src="@drawable/ic_edit_nickname"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"/>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:id="@+id/diseaseIconColumn"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/headerBar"
-                app:layout_constraintStart_toStartOf="parent">
-
-                <ImageButton
-                    android:id="@+id/btnDisease1"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginBottom="10dp"
-                    android:src="@drawable/ic_disease"
-                    android:contentDescription="질병1" />
-
-                <ImageButton
-                    android:id="@+id/btnDisease2"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="질병2"
-                    android:background="@android:color/transparent"
-                    android:src="@drawable/ic_disease2" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/btnWardrobe"
+            <TextView
+                android:id="@+id/tvHeroTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="옷장"
+                android:layout_marginTop="30dp"
+                android:text="용사"
+                android:textColor="#111827"
                 android:textSize="26sp"
-                android:textColor="#2B2B2B"
-                android:background="@drawable/bg_round_outline"
-                android:layout_marginTop="16dp"
-                app:layout_constraintTop_toBottomOf="@id/headerBar"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/imgHero"
-                android:layout_width="0dp"
-                android:layout_height="260dp"
-                android:layout_marginTop="8dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/img_hero"
-                app:layout_constraintTop_toBottomOf="@id/headerBar"
-                app:layout_constraintStart_toEndOf="@id/diseaseIconColumn"
-                app:layout_constraintEnd_toStartOf="@id/btnWardrobe"
-                app:layout_constraintHorizontal_bias="0.5"/>
-
-            <LinearLayout
-                android:id="@+id/panel"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/tvHeroSubtitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="#D9D9D9"
-                android:padding="8dp"
-                android:layout_marginTop="12dp"
-                app:layout_constraintTop_toBottomOf="@id/imgHero"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                android:layout_marginTop="6dp"
+                android:text="연속수면을 하지 않으면, 경험치가 감소해요"
+                android:textColor="#8A8A8A"
+                android:textSize="13sp" />
 
-                <TextView
-                    android:id="@+id/tvStatTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="스탯"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="10dp"/>
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardHero"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:layout_marginHorizontal="2dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:background="#50DEDEDE"
+                    android:orientation="vertical"
+                    android:padding="14dp">
 
-                    <androidx.constraintlayout.widget.ConstraintLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
+                        android:layout_height="180dp" >
 
-                        <TextView
-                            android:id="@+id/tvStr"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="힘 STR : 20"
-                            android:textSize="14sp"
-                            android:textColor="#1C1C1C"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent">
-
-                            <ImageButton
-                                android:id="@+id/btnSTRPlus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:contentDescription="STR -"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_add"
-                                android:layout_marginEnd="10dp"/>
-
-                            <ImageButton
-                                android:id="@+id/btnSTRMinus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:contentDescription="STR -"
-                                android:src="@drawable/ic_remove" />
-
-                        </LinearLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-
-                        <TextView
-                            android:id="@+id/tvInt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="지능 INT : 5"
-                            android:textSize="14sp"
-                            android:textColor="#1C1C1C"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent">
-
-                            <ImageButton
-                                android:id="@+id/btnINTPlus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_add"
-                                android:contentDescription="INT -"
-                                android:layout_marginEnd="10dp"/>
-
-                            <ImageButton
-                                android:id="@+id/btnINTMinus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:src="@drawable/ic_remove"
-                                android:contentDescription="INT -" />
-                        </LinearLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:id="@+id/tvDex"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="민첩 DEX : 15"
-                            android:textSize="14sp"
-                            android:textColor="#1C1C1C"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent">
-
-                            <ImageButton
-                                android:id="@+id/btnDEXPlus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:scaleType="centerCrop"
-                                android:src="@drawable/ic_add"
-                                android:contentDescription="DEX -"
-                                android:layout_marginEnd="10dp"/>
-
-                            <ImageButton
-                                android:id="@+id/btnDEXMinus"
-                                android:layout_width="30dp"
-                                android:layout_height="30dp"
-                                android:src="@drawable/ic_remove"
-                                android:contentDescription="DEX -" />
-                        </LinearLayout>
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </LinearLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="14dp">
+                        <ImageView
+                            android:id="@+id/ivHero"
+                            android:layout_width="140dp"
+                            android:layout_height="140dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/img_hero" />
+                    </FrameLayout>
 
                     <TextView
-                        android:id="@+id/tvRemaining"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCondition"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="남은 스탯 : 7"
-                        android:textSize="14sp"
-                        android:textColor="#1C1C1C"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:text="최상 컨디션"
+                        android:textColor="#404040"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutConditionDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvNonSleepStreak"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="연속 무기록 : 1일"
+                            android:textColor="#404040"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvExpPenalty"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="효과 : -5 % exp"
+                            android:textColor="#404040"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressExp"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="0dp"
+                        android:layout_height="10dp"
+                        android:layout_marginTop="10dp"
+                        android:progress="55"
+                        android:max="100"
+                        android:progressTint="#2FA4A9"
+                        android:backgroundTint="#D1D5DB"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
-
-                    <Button
-                        android:id="@+id/btnConfirmStats"
-                        android:layout_width="72dp"
-                        android:layout_height="40dp"
-                        android:text="확인"
-                        android:textSize="13sp"
-                        android:textColor="#1C1C1C"
-                        android:background="@drawable/bg_round_outline"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"/>
+                        app:layout_constraintTop_toTopOf="parent" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <TextView
-                    android:id="@+id/tvDiseaseTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="질병"
-                    android:textStyle="bold"
-                    android:textSize="16sp"
-                    android:textColor="#1C1C1C"
-                    android:layout_marginBottom="8dp"/>
+                        <TextView
+                            android:id="@+id/tvLevelLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Level 12"
+                            android:textColor="#1B4E81"
+                            android:textSize="12sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/progressExp" />
 
-                <TextView
-                    android:id="@+id/tvDiseaseDesc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="감기 : 획득 경험치 25% 감소 (1일 후 회복)\n\n골절 : 스탯 10% 감소 (1일 후 회복)"
-                    android:textSize="14sp"
-                    android:textColor="#1C1C1C"
-                    android:lineSpacingExtra="4dp"/>
+                        <TextView
+                            android:id="@+id/tvExpLeft"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="570 EXP"
+                            android:textColor="#404040"
+                            android:textSize="10sp"
+                            app:layout_constraintStart_toStartOf="@id/tvLevelLeft"
+                            app:layout_constraintTop_toBottomOf="@id/tvLevelLeft" />
 
-            </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvLevelRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Level 13"
+                            android:textColor="#404040"
+                            android:textSize="12sp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/progressExp" />
+                        <TextView
+                            android:id="@+id/tvExpRight"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="780 EXP"
+                            android:textColor="#404040"
+                            android:textSize="10sp"
+                            app:layout_constraintEnd_toEndOf="@id/tvLevelRight"
+                            app:layout_constraintTop_toBottomOf="@id/tvLevelRight" />
 
-            <FrameLayout
-                android:id="@+id/wardrobeContainer"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:visibility="gone"
-                android:background="#D9D9D9"
-                app:layout_constraintTop_toTopOf="@id/panel"
-                app:layout_constraintBottom_toBottomOf="@id/panel"
-                app:layout_constraintStart_toStartOf="@id/panel"
-                app:layout_constraintEnd_toEndOf="@id/panel"/>
+                            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <TextView
+                        android:id="@+id/tvHeroMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:text="연속적으로 숙면 중이에요!"
+                        android:textColor="#404040"
+                        android:textSize="16sp" />
 
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/tvRecentTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="최근 수면 기록"
+                android:textColor="#404040"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentSleep"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/item_sleep_record" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="12dp" />
+
+        </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

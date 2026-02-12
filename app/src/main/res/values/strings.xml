@@ -61,6 +61,8 @@
     <string name="sleep_tracker_stop">수면 종료</string>
     <string name="sleep_tracker_ready">수면 달성 시 200 포인트 획득!</string>
     <string name="sleep_tracker_screen_lock"><u>화면 잠금 설정</u></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>
