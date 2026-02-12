@@ -30,6 +30,9 @@
             android:turnScreenOn="true" />
 
         <activity
+            android:name=".TutorialActivity"
+            android:exported="false" />
+        <activity
             android:name=".AvaterActivity"
             android:exported="false" />
         <activity
@@ -82,7 +85,6 @@
                     android:scheme="kakao${KAKAO_NATIVE_KEY}" />
             </intent-filter>
         </activity>
-
     </application>
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
 </manifest>

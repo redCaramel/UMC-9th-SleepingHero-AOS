@@ -25,6 +25,7 @@ class ClearFragment : Fragment() {
 
     private var selectedStar: Int = 0
 
+
     // endSleep로 채워질 값들
     private var recordId: Int = 0
     private var durationMinutes: Int = 0
