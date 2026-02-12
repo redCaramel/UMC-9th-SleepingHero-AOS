@@ -63,7 +63,7 @@ class FriendFragment : Fragment() {
                 val query = data.heroName
                 val newList = mutableListOf<HeroData>()
                 if (query.isNotEmpty()) {
-                    newList.add(HeroData(query, data.level, data.skinId, data.continuousSleepDays, data.totalSleepHour)) //TODO - 용사 아이콘 적용
+                    newList.add(HeroData(query, data.level, data.skinId, data.continuousSleepDays, data.totalSleepHour))
                 }
                 adapter.updateList(newList)
                 binding.viewNoHero.visibility = View.GONE

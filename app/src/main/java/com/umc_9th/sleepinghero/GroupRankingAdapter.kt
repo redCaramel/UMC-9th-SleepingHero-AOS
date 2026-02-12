@@ -38,11 +38,22 @@ class GroupRankingAdapter(private var heroList : MutableList<GroupRankingData>
         heroList.addAll(newList)
         notifyDataSetChanged()
     }
+    fun uploadList(newList : GroupRankingData) {
+        this.heroList.add(newList)
+        notifyItemInserted(heroList.size-1)
+    }
+    fun removeItem(target : GroupRankingData) {
+        val pos = heroList.indexOfFirst { it.name == target.name }
+        if(pos != -1) {
+            heroList.removeAt(pos)
+            notifyItemRemoved(pos)
+            notifyItemRangeChanged(pos, heroList.size)
+        }
+    }
     inner class HeroViewHolder(val binding : ItemGroupRankingBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : GroupRankingData) {
                     binding.tvCharName.text = hero.name
-                    binding.imgCharProfile.setImageResource(hero.skinId)
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"

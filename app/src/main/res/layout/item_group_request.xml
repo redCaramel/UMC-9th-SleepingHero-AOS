@@ -176,22 +176,23 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_group_info" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_group_detail"
+            android:id="@+id/btn_group_reject"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_marginStart="24dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="24dp"
             android:background="@drawable/bg_card_rec"
-            android:backgroundTint="@color/gray_500"
-            android:text="상세보기"
+            android:backgroundTint="@color/error"
+            android:text="거절"
             android:textColor="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/guideline7"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_group_invite"
+            android:id="@+id/btn_group_accept"
             android:layout_width="0dp"
             android:layout_height="46dp"
             android:layout_marginStart="24dp"
@@ -199,10 +200,8 @@
             android:layout_marginEnd="24dp"
             android:background="@drawable/bg_card_rec"
             app:backgroundTint="@color/primary_500"
-            app:icon="@drawable/ic_group_invite"
-            app:iconGravity="textStart"
             android:drawablePadding="4dp"
-            android:text="초대"
+            android:text="수락"
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline7"

@@ -1,20 +1,25 @@
 package com.umc_9th.sleepinghero
 
+import android.app.AlertDialog
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.dto.CharacterInfoResponse
+import com.umc_9th.sleepinghero.api.dto.SleepSessionItem
 import com.umc_9th.sleepinghero.api.dto.DashBoardResponse
 import com.umc_9th.sleepinghero.api.repository.CharacterRepository
 import com.umc_9th.sleepinghero.api.repository.FriendRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.FriendViewModel
@@ -23,6 +28,9 @@ import com.umc_9th.sleepinghero.api.viewmodel.HomeViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.HomeViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModelFactory
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
+import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
 import com.umc_9th.sleepinghero.databinding.FragmentHomeBinding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -31,44 +39,36 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // Home Repository & ViewModel
-    private val homeRepository by lazy {
-        HomeRepository(ApiClient.homeService)
-    }
+    // ✅ 기기 내부 시간 설정 저장/불러오기
+    private lateinit var settingManager: SettingManager
 
-    private val homeViewModel: HomeViewModel by viewModels {
-        HomeViewModelFactory(homeRepository)
-    }
+    // Home Repository & ViewModel
+    private val homeRepository by lazy { HomeRepository(ApiClient.homeService) }
+    private val homeViewModel: HomeViewModel by viewModels { HomeViewModelFactory(homeRepository) }
 
     // Character Repository & ViewModel
-    private val characterRepository by lazy {
-        CharacterRepository(ApiClient.characterService)
-    }
-
-    private val characterViewModel: CharacterViewModel by viewModels {
-        CharacterViewModelFactory(characterRepository)
-    }
+    private val characterRepository by lazy { CharacterRepository(ApiClient.characterService) }
+    private val characterViewModel: CharacterViewModel by viewModels { CharacterViewModelFactory(characterRepository) }
 
     // Friend Repository & ViewModel
-    private val friendRepository by lazy {
-        FriendRepository(ApiClient.friendService)
-    }
+    private val friendRepository by lazy { FriendRepository(ApiClient.friendService) }
+    private val friendViewModel: FriendViewModel by viewModels { FriendViewModelFactory(friendRepository) }
 
-    private val friendViewModel: FriendViewModel by viewModels {
-        FriendViewModelFactory(friendRepository)
-    }
+    // Sleep Repository & ViewModel (홈 통계/기록 조회는 유지)
+    private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
+    private val sleepViewModel: SleepViewModel by viewModels { SleepViewModelFactory(sleepRepository) }
 
-    // Sleep Repository & ViewModel
-    private val sleepRepository by lazy {
-        SleepRepository(ApiClient.sleepService)
+    private val socialRepository by lazy {
+        SocialRepository(ApiClient.socialService)
     }
+    private val socialViewModel : SocialViewModel by viewModels(
+        factoryProducer = { SocialViewModelFactory(socialRepository) }
+    )
 
-    private val sleepViewModel: SleepViewModel by viewModels {
-        SleepViewModelFactory(sleepRepository)
-    }
 
     // 데이터 캐시
     private var characterInfo: CharacterInfoResponse? = null
@@ -82,31 +82,41 @@ class HomeFragment : Fragment() {
     ): View {
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
+        // ✅ SettingManager 초기화 + 기본값 세팅 + 홈 표시
+        settingManager = SettingManager(requireContext())
+        if (settingManager.getSleepTime() == "null") settingManager.setSleepTime("11:00 PM")
+        if (settingManager.getAwakeTime() == "null") settingManager.setAwakeTime("07:00 AM")
+
+        binding.tvBedtimeValue.text = settingManager.getSleepTime()
+        binding.tvWakeupValue.text = settingManager.getAwakeTime()
+
         setupButtons()
         observeData()
+        observeSocial()
+        socialViewModel.myCharacter(TokenManager.getAccessToken(requireContext()).toString())
         loadAllData()
 
         return binding.root
     }
 
     private fun setupButtons() {
-        // 컨디션 버튼
         binding.btnDiary.setOnClickListener {
             Toast.makeText(requireContext(), "컨디션 화면 준비중", Toast.LENGTH_SHORT).show()
         }
 
-        // 수면 시작하기 버튼
+        // ✅ 수면 시작하기 버튼: 서버 호출 없이 바로 SleepTracker로 이동 (기기 내부 시간 기준)
         binding.btnStartSleep.setOnClickListener {
-            val auth = TokenManager.getAuthHeader(requireContext())
-            if (auth != null) {
-                sleepViewModel.startSleep(auth)
-            } else {
-                Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
-            }
+            val sleepTime = settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
+            val awakeTime = settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
+
+            val frag = SleepTrackerFragment.newInstance(sleepTime, awakeTime)
+
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container_main, frag)
+                .addToBackStack(null)
+                .commit()
         }
 
-
-        // 맵 확대 버튼
         binding.btnZoomIn.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container_main, MapFragment())
@@ -114,160 +124,115 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        // 취침 시간 설정 (현재는 조회만)
+        // ✅ 취침 시간 설정 (기기 내 저장)
         binding.bedtimeContainer.setOnClickListener {
-            Toast.makeText(requireContext(), "최근 수면 기록에서 가져온 시간입니다", Toast.LENGTH_SHORT).show()
+            showTimePickerDialog(
+                title = "취침 시간 설정",
+                initialTime = binding.tvBedtimeValue.text.toString(),
+                onConfirm = { finalStr ->
+                    binding.tvBedtimeValue.text = finalStr
+                    settingManager.setSleepTime(finalStr)
+                }
+            )
         }
 
-        // 기상 시간 설정 (현재는 조회만)
+        // ✅ 기상 시간 설정 (기기 내 저장)
         binding.wakeupContainer.setOnClickListener {
-            Toast.makeText(requireContext(), "최근 수면 기록에서 가져온 시간입니다", Toast.LENGTH_SHORT).show()
+            showTimePickerDialog(
+                title = "기상 시간 설정",
+                initialTime = binding.tvWakeupValue.text.toString(),
+                onConfirm = { finalStr ->
+                    binding.tvWakeupValue.text = finalStr
+                    settingManager.setAwakeTime(finalStr)
+                }
+            )
         }
     }
 
     private fun observeData() {
-        // Character 정보 관찰
         characterViewModel.characterInfo.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 characterInfo = data
                 updateCharacterUI()
             }.onFailure { error ->
-                Toast.makeText(
-                    requireContext(),
-                    "캐릭터 정보 로드 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
 
-        // Dashboard 정보 관찰
         homeViewModel.homeDashboard.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 dashboardData = data
                 updateDashboardUI()
             }.onFailure { error ->
-                Toast.makeText(
-                    requireContext(),
-                    "대시보드 로드 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
 
-        // Friend 랭킹 관찰
         friendViewModel.friendRanking.observe(viewLifecycleOwner) { result ->
             result.onSuccess { rankings ->
                 val myNickname = characterInfo?.name
                 myRanking = rankings.find { it.nickname == myNickname }?.rank
                 updateRankingUI()
             }.onFailure { error ->
-                Toast.makeText(
-                    requireContext(),
-                    "친구 랭킹 로드 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
             }
         }
 
-        // 수면 시작 결과 관찰
-        sleepViewModel.sleepStartResult.observe(viewLifecycleOwner) { result ->
-            result.onSuccess {
-                Toast.makeText(
-                    requireContext(),
-                    "수면을 시작했습니다",
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container_main, SleepTrackerFragment())
-                    .addToBackStack(null)
-                    .commit()
-            }.onFailure { error ->
-                Toast.makeText(
-                    requireContext(),
-                    "수면 시작 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-        }
-
-        // 수면 기록 목록 관찰 (총 수면 시간 + 최근 취침/기상 시간)
+        // ✅ 홈의 취침/기상 시간은 '설정값' 유지 (서버 기록으로 덮어쓰지 않음)
         sleepViewModel.sleepSessions.observe(viewLifecycleOwner) { result ->
             result.onSuccess { sessions ->
+                binding.tvBedtimeValue.text =
+                    settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
+                binding.tvWakeupValue.text =
+                    settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
+
                 if (sessions.content.isNotEmpty()) {
-                    // 가장 최근 수면 기록
                     val latestSession = sessions.content.first()
+                    binding.tvSleepGoalValue.text = calculateDurationText(latestSession.sleptTime, latestSession.wokeTime)
 
-                    // ✅ 취침 시간 (sleptTime)
-                    binding.tvBedtimeValue.text = formatTimeToAMPM(latestSession.sleptTime)
-
-                    // ✅ 기상 시간 (wokeTime)
-                    binding.tvWakeupValue.text = formatTimeToAMPM(latestSession.wokeTime)
-
-                    // ✅ 목표 수면 시간 (실제 수면 시간으로 계산)
-                    val durationHours = calculateDurationHours(
-                        latestSession.sleptTime,
-                        latestSession.wokeTime
-                    )
-                    binding.tvSleepGoalValue.text = "${durationHours}시간"
-
-                    // 총 수면 시간 (전체 기록 합산)
                     val totalHours = calculateTotalSleepHours(sessions.content)
                     binding.tvClockValue.text = "${totalHours}시간"
                 } else {
-                    // 기록이 없을 때 더미 데이터
-                    binding.tvBedtimeValue.text = "11:00 PM"
-                    binding.tvWakeupValue.text = "07:00 AM"
                     binding.tvSleepGoalValue.text = "8시간"
                     binding.tvClockValue.text = "0시간"
                 }
             }.onFailure {
-                // 실패 시 더미 데이터
-                binding.tvBedtimeValue.text = "11:00 PM"
-                binding.tvWakeupValue.text = "07:00 AM"
+                binding.tvBedtimeValue.text =
+                    settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
+                binding.tvWakeupValue.text =
+                    settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
                 binding.tvSleepGoalValue.text = "8시간"
-                binding.tvClockValue.text = "70시간"
+                binding.tvClockValue.text = "0시간"
             }
         }
     }
 
     private fun loadAllData() {
-        val auth = TokenManager.getAuthHeader(requireContext())
-
-        if (auth != null) {
-            characterViewModel.loadCharacterInfo(auth)
-            homeViewModel.loadHomeDashboard(auth)
-            friendViewModel.loadFriendRanking(auth)
-            sleepViewModel.loadSleepSessions(auth, page = 0, size = 30)
+        val token = TokenManager.getAccessToken(requireContext())
+        if (token != null) {
+            characterViewModel.loadCharacterInfo(token)
+            homeViewModel.loadHomeDashboard(token)
+            friendViewModel.loadFriendRanking(token)
+            sleepViewModel.loadSleepSessions(token, page = 0, size = 30)
         } else {
             Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
         }
     }
 
-
     private fun updateCharacterUI() {
         val character = characterInfo ?: return
 
-        // 레벨 및 이름
         binding.tvUserLevelName.text = "LV.${character.currentLevel} ${character.name} 님"
 
-        // 다음 레벨까지 EXP
         val expRemaining = character.needExp - character.currentExp
         binding.tvExpRemaining.text = "-$expRemaining EXP"
 
-        // EXP 프로그레스 바
         val expPercentage = if (character.needExp > 0) {
             ((character.currentExp.toFloat() / character.needExp) * 100).toInt()
-        } else {
-            0
-        }
+        } else 0
+
         updateExpBar(expPercentage)
     }
 
     private fun updateDashboardUI() {
         val data = dashboardData ?: return
-
-        // 연속 수면일
         binding.tvCalendarValue.text = "${data.currentStreak}일"
     }
 
@@ -288,23 +253,15 @@ class HomeFragment : Fragment() {
                 binding.progressExp.layoutParams = layoutParams
             }
         }
-
         binding.tvExpPercentage.text = "$percentage%"
     }
 
-    /**
-     * ISO 8601 시간 → AM/PM 형식 변환
-     * "2026-02-11T23:00:00.000Z" → "11:00 PM"
-     */
-    //TODO: 목표 수면 시간 설정 동기화
     private fun formatTimeToAMPM(isoTime: String): String {
         return try {
-            // ISO 8601 파싱
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
             val date = inputFormat.parse(isoTime)
 
-            // AM/PM 형식으로 변환 (로컬 시간)
             val outputFormat = SimpleDateFormat("hh:mm a", Locale.ENGLISH)
             outputFormat.timeZone = TimeZone.getDefault()
             outputFormat.format(date ?: Date()).uppercase(Locale.ENGLISH)
@@ -313,10 +270,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    /**
-     * 두 시간 사이의 시간 차이 계산 (시간 단위)
-     */
-    private fun calculateDurationHours(sleptTime: String, wokeTime: String): String {
+    private fun calculateDurationText(sleptTime: String, wokeTime: String): String {
         return try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
@@ -329,46 +283,181 @@ class HomeFragment : Fragment() {
                 val hours = TimeUnit.MILLISECONDS.toHours(diffMillis)
                 val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMillis) % 60
 
-                if (minutes > 0) {
-                    "${hours}시간 ${minutes}분"
-                } else {
-                    "${hours}시간"
-                }
-            } else {
-                "8시간"
-            }
+                if (minutes > 0) "${hours}시간 ${minutes}분" else "${hours}시간"
+            } else "8시간"
         } catch (e: Exception) {
             "8시간"
         }
     }
 
-    /**
-     * 수면 기록 목록에서 총 수면 시간 계산
-     */
-    private fun calculateTotalSleepHours(sessions: List<com.umc_9th.sleepinghero.api.dto.SleepSessionItem>): Int {
+    private fun calculateTotalSleepHours(sessions: List<SleepSessionItem>): Int {
         return try {
             val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             var totalMillis = 0L
-
             for (session in sessions) {
                 val sleptDate = inputFormat.parse(session.sleptTime)
                 val wokeDate = inputFormat.parse(session.wokeTime)
-
                 if (sleptDate != null && wokeDate != null) {
                     totalMillis += (wokeDate.time - sleptDate.time)
                 }
             }
-
             TimeUnit.MILLISECONDS.toHours(totalMillis).toInt()
         } catch (e: Exception) {
-            70 // 실패 시 더미 값
+            0
+        }
+    }
+
+    // -------------------------
+    // ✅ 시간 설정 다이얼로그 (SettingFragment에서 필요한 부분만 추출)
+    // -------------------------
+    private fun showTimePickerDialog(
+        title: String,
+        initialTime: String,
+        onConfirm: (String) -> Unit
+    ) {
+        val dialogBinding = ActivityTimeSettingBinding.inflate(layoutInflater)
+
+        val time = parseTimeString(initialTime.ifBlank { "11:00 PM" })
+        var hour = time.first
+        var min = time.second
+        var ampm = time.third
+
+        dialogBinding.tvTimesetHour.text = makeTimeString(hour, 0)
+        dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
+        dialogBinding.tvTimesetAmpm.text = makeTimeString(ampm, 1)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogBinding.root)
+            .setTitle(title)
+            .create()
+
+        dialogBinding.btnTimesetHourup.setOnClickListener {
+            if (hour == 11) {
+                hour = 12
+                ampm = 1 - ampm
+            } else if (hour == 12) {
+                hour = 1
+            } else {
+                hour++
+            }
+            dialogBinding.tvTimesetHour.text = makeTimeString(hour, 0)
+            dialogBinding.tvTimesetAmpm.text = makeTimeString(ampm, 1)
+        }
+
+        dialogBinding.btnTimesetHourdown.setOnClickListener {
+            if (hour == 12) {
+                hour = 11
+            } else if (hour == 1) {
+                hour = 12
+                ampm = 1 - ampm
+            } else {
+                hour--
+            }
+            dialogBinding.tvTimesetHour.text = makeTimeString(hour, 0)
+            dialogBinding.tvTimesetAmpm.text = makeTimeString(ampm, 1)
+        }
+
+        dialogBinding.btnTimesetMinup.setOnClickListener {
+            min = if (min == 50) 0 else min + 10
+            dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
+        }
+
+        dialogBinding.btnTimesetMindown.setOnClickListener {
+            min = if (min == 0) 50 else min - 10
+            dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
+        }
+
+        dialogBinding.btnTimesetAmpmA.setOnClickListener {
+            ampm = 1 - ampm
+            dialogBinding.tvTimesetAmpm.text = makeTimeString(ampm, 1)
+        }
+        dialogBinding.btnTimesetAmpmB.setOnClickListener {
+            ampm = 1 - ampm
+            dialogBinding.tvTimesetAmpm.text = makeTimeString(ampm, 1)
+        }
+
+        dialogBinding.btnTimesetConfirm.setOnClickListener {
+            val finalStr = "${makeTimeString(hour, 0)}:${makeTimeString(min, 0)} ${makeTimeString(ampm, 1)}"
+            onConfirm(finalStr)
+            dialog.dismiss()
+        }
+        dialogBinding.btnTimesetCancel.setOnClickListener { dialog.dismiss() }
+
+        dialog.show()
+    }
+
+    private fun parseTimeString(timeStr: String): Triple<Int, Int, Int> {
+        return try {
+            val parts = timeStr.trim().split(" ")
+            val time = parts.getOrNull(0) ?: "11:00"
+            val ampmStr = parts.getOrNull(1) ?: "PM"
+
+            val hm = time.split(":")
+            val hour = hm.getOrNull(0)?.toIntOrNull() ?: 11
+            val minute = hm.getOrNull(1)?.toIntOrNull() ?: 0
+            val ampmFlag = if (ampmStr.equals("PM", ignoreCase = true)) 1 else 0
+
+            Triple(hour, minute, ampmFlag)
+        } catch (e: Exception) {
+            Triple(11, 0, 1)
+        }
+    }
+
+    private fun makeTimeString(time: Int, type: Int): String {
+        return if (type == 1) {
+            if (time == 0) "AM" else "PM"
+        } else {
+            if (time < 10) "0$time" else time.toString()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun observeSocial() {
+        socialViewModel.myCharResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                binding.tvExpRemaining.text = "-${data.needExp - data.currentExp} EXP"
+                var per: Int = (data.currentExp.toFloat() / data.needExp.toFloat() * 100).toInt()
+                binding.tvExpPercentage.text = "$per%"
+                val progress = data.currentExp.toFloat() / data.needExp.toFloat()
+                val params = binding.progressExp.layoutParams as ConstraintLayout.LayoutParams
+                // OR more directly:
+                params.matchConstraintPercentWidth = progress.coerceIn(0f, 1f)
+                binding.progressExp.layoutParams = params
+                socialViewModel.charSearch(
+                    TokenManager.getAccessToken(requireContext()).toString(),
+                    data.name
+                )
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+
+            }
+        }
+        socialViewModel.charSearchResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                binding.tvUserLevelName.text = "LV. ${data.level} ${data.heroName} 님"
+                binding.tvName.text = data.heroName
+                binding.tvCalendarValue.text = "${data.continuousSleepDays}일"
+                binding.tvClockValue.text = "${data.totalSleepHour}시간"
+                socialViewModel.loadFriendRanking(TokenManager.getAccessToken(requireContext()).toString())
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+            }
+        }
+        socialViewModel.friendRankingResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                val rank = data.indexOfFirst { it.nickName == binding.tvName.text } + 1
+                binding.tvTrophyValue.text = "${rank}등"
+            }.onFailure { error->
+                Log.d("test", "친구 불러오기 실패")
+            }
+        }
     }
 }

@@ -23,7 +23,8 @@ class RelationFragment : Fragment() {
         TabLayoutMediator(binding.tblFriendMenu, binding.vpFriendMenu) {tab, position ->
             tab.text = when(position) {
                 0 -> "내 친구"
-                1 -> "친구 요청"
+                1 -> "받은 친구 요청"
+                2 -> "받은 그룹 초대"
                 else -> ""
             }
         }.attach()

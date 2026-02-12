@@ -21,17 +21,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <EditText
-                android:id="@+id/et_hero_search"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:background="@drawable/bg_card"
-                android:layout_margin="10dp"
-                android:drawableLeft="@drawable/ic_find"
-                android:drawablePadding="10dp"
-                android:inputType="text"
-                android:hint="탐색" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/view_no_hero"

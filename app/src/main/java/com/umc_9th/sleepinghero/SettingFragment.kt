@@ -76,6 +76,16 @@ class SettingFragment : Fragment() {
                 binding.cardNodistractSetting.visibility=View.GONE
             }
         }
+        // 개인정보 처리방침
+        binding.settingPrivacy.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://infrequent-cicada-dac.notion.site/305f5f98fd2f803ab447f6b44fb9840e"))
+            startActivity(intent)
+        }
+        // 서비스 이용 약관
+        binding.settingUseDocs.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://infrequent-cicada-dac.notion.site/305f5f98fd2f80d18987cc652586a82e"))
+            startActivity(intent)
+        }
         binding.layoutSleep.setOnClickListener {
             val dialogBinding = ActivityTimeSettingBinding.inflate(layoutInflater)
 
