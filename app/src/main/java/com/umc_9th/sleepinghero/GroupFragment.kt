@@ -77,10 +77,16 @@ class GroupFragment : Fragment() {
                 dialogBinding.tvGroupTotal.text = "${groupData.totalTime}시간"
                 dialogBinding.tvGroupStreak.text = "${groupData.streak}일"
                 dialogBinding.tvGroupMember.text = "멤버 (${groupData.totalMembers})"
-
-                grAdapter = GroupRankingAdapter(GroupMemberList)
-                dialogBinding.heroContainer.adapter = grAdapter
-                dialogBinding.heroContainer.layoutManager = LinearLayoutManager(requireContext())
+                val currentGroupMembers = mutableListOf<GroupRankingData>()
+                groupData.members.forEach { user->
+                    currentGroupMembers.add(GroupRankingData(user.memberName, user.level.toInt(), 1, user.consecutiveSleepDays.toInt(), user.totalSleepTime.toInt(), user.rank.toInt(), user.groupRole))
+                    // TODO - 스킨id 적용
+                }
+                grAdapter = GroupRankingAdapter(currentGroupMembers)
+                dialogBinding.heroContainer.apply {
+                    adapter = grAdapter
+                    layoutManager = LinearLayoutManager(requireContext())
+                }
                 dialog.show()
             },
             inviteEvent =  { groupData ->
@@ -194,7 +200,8 @@ class GroupFragment : Fragment() {
                     data.totalGroupSleepTime,
                     data.averageConsecutiveDays,
                     data.groupMasterNickname,
-                    data.groupImageId.toLong()
+                    data.groupImageId.toLong(),
+                    data.memberRankings
                 )
                 GroupList.add(group)
                 adapter.updateList(GroupList.toList())

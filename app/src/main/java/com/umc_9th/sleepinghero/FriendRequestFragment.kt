@@ -37,7 +37,6 @@ class FriendRequestFragment : Fragment() {
         observeRequest()
         adapter = FriendRequestAdapter(requestList,
             acceptEvent = {heroData ->
-                // TODO - 수락/거절
                 socialViewModel.responseRequest(TokenManager.getAccessToken(requireContext()).toString(), "APPROVE", heroData.name)
                 adapter.removeItem(heroData)
             },
@@ -84,6 +83,7 @@ class FriendRequestFragment : Fragment() {
         socialViewModel.responseRequestResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 Toast.makeText(requireContext(), "친구 요청을 처리하였습니다!", Toast.LENGTH_SHORT).show()
+                binding.textView36.text = "답변되지 않은 친구 요청 ${adapter.itemCount}건"
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "탐색 실패: $message")

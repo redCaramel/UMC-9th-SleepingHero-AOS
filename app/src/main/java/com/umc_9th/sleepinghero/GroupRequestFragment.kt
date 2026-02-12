@@ -52,6 +52,7 @@ class GroupRequestFragment : Fragment() {
         observeFriend()
         observeGroup()
         groupViewModel.groupRank(TokenManager.getAccessToken(requireContext()).toString(), groupName)
+        socialViewModel.myFriend(TokenManager.getAccessToken(requireContext()).toString())
         binding.btnBackRequest.setOnClickListener {
             requireActivity().supportFragmentManager.beginTransaction()
                 .replace(com.umc_9th.sleepinghero.R.id.container_main, SocialFragment())
@@ -59,7 +60,7 @@ class GroupRequestFragment : Fragment() {
         }
         adapter = HeroAdapter(friendList,
             clickEvent = {heroData ->
-                //TODO - 그룹 초대 구현
+                groupViewModel.groupInvite(TokenManager.getAccessToken(requireContext()).toString(), groupName, heroData.name)
             },
             1)
         binding.rankingContainer.adapter = adapter
@@ -101,12 +102,29 @@ class GroupRequestFragment : Fragment() {
                 ).show()
             }
         }
+        groupViewModel.groupInviteResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                Toast.makeText(
+                    requireContext(),
+                    "초대장을 전달했습니다!",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }.onFailure { error ->
+                Toast.makeText(
+                    requireContext(),
+                    "${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
     private fun observeFriend() {
         socialViewModel.myFriendResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 friendList.clear()
+                Log.d("test", "친구탐색 시작")
                 data.forEach { hero ->
+                    Log.d("test", "요청 대기 : ${hero.nickname}")
                     socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), hero.nickname)
                 }
             }.onFailure { error ->
@@ -124,11 +142,10 @@ class GroupRequestFragment : Fragment() {
                     data.continuousSleepDays,
                     data.totalSleepHour
                 )
-                adapter.updateList(friendList)
+                adapter.uploadList(info)
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "탐색 실패: $message")
-
             }
         }
     }

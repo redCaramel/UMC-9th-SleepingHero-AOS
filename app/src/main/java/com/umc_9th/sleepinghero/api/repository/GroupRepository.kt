@@ -4,8 +4,12 @@ import android.util.Log
 import com.umc_9th.sleepinghero.api.ApiClient.retrofit
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
 import com.umc_9th.sleepinghero.api.dto.GroupCreateRequest
+import com.umc_9th.sleepinghero.api.dto.GroupInviteRequest
 import com.umc_9th.sleepinghero.api.dto.GroupRankingInsideResponse
+import com.umc_9th.sleepinghero.api.dto.GroupRankingRequest
 import com.umc_9th.sleepinghero.api.dto.GroupRankingResponse
+import com.umc_9th.sleepinghero.api.dto.GroupRequestCheckResponse
+import com.umc_9th.sleepinghero.api.dto.GroupRequestRequest
 import com.umc_9th.sleepinghero.api.service.GroupService
 
 class GroupRepository(private val service : GroupService) {
@@ -66,6 +70,7 @@ class GroupRepository(private val service : GroupService) {
     ): Result<GroupRankingInsideResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
         Log.d("test", token)
+        val requestBody = GroupRankingRequest(req)
         val response = service.GroupRanking(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -88,4 +93,88 @@ class GroupRepository(private val service : GroupService) {
     } catch (e: Exception) {
         Result.failure(e)
     } as Result<GroupRankingInsideResponse>
+
+    suspend fun GroupInvite(
+        accessToken: String, req: GroupInviteRequest
+    ): Result<String> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.GroupInvite(token, req)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Group Invite Success.")
+                Result.success(data)
+            }
+        } else {
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+                ApiResponse::class.java,
+                arrayOfNulls<Annotation>(0)
+            )
+            val errMsg = adapter.convert(response.errorBody())?.message ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<String>
+
+    suspend fun GroupRequestCheck(
+        accessToken: String
+    ): Result<List<GroupRequestCheckResponse>> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.GroupRequestCheck(token)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Group Request Check Success.")
+                Result.success(data)
+            }
+        } else {
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+                ApiResponse::class.java,
+                arrayOfNulls<Annotation>(0)
+            )
+            val errMsg = adapter.convert(response.errorBody())?.message ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<List<GroupRequestCheckResponse>>
+
+    suspend fun GroupRequest(
+        accessToken: String, status : String, req: GroupRequestRequest
+    ): Result<String> = try {
+        val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+        Log.d("test", token)
+        val response = service.GroupRequest(token, status, req)
+        if (response.isSuccessful) {
+            if (response.body() == null) {
+                Log.d("test", "Response body is null")
+                Result.failure(RuntimeException("Response body is null"))
+            } else {
+                val data = response.body()?.result
+                Log.d("test", "Group Request Success.")
+                Result.success(data)
+            }
+        } else {
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+                ApiResponse::class.java,
+                arrayOfNulls<Annotation>(0)
+            )
+            val errMsg = adapter.convert(response.errorBody())?.message ?: "Unknown error"
+            Log.d("test", "error ${response.code()} : $errMsg")
+            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+        }
+    } catch (e: Exception) {
+        Result.failure(e)
+    } as Result<String>
 }

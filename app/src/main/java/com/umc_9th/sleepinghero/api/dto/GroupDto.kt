@@ -35,3 +35,19 @@ data class GroupMemberRanking (
     val totalSleepTime : Long,
     val level : Long
 )
+
+data class GroupRankingRequest (
+    val groupName : String
+)
+
+data class GroupInviteRequest (
+    val groupName : String,
+    val nickName : String
+)
+
+data class GroupRequestCheckResponse(
+    val groupName : String
+)
+data class GroupRequestRequest(
+    val groupName : String
+)
