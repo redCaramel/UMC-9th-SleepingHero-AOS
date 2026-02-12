@@ -22,8 +22,9 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
+import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
-import com.umc_9th.sleepinghero.api.dto.SleepSessionDto
+import com.umc_9th.sleepinghero.api.dto.SleepSessionItem
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
 import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
@@ -44,8 +45,8 @@ class RoutineFragment : Fragment() {
     private lateinit var binding: FragmentRoutineBinding
     private lateinit var mainActivity: MainActivity
 
-    private val homeRepository by lazy { HomeRepository() }
-    private val sleepRepository by lazy { SleepRepository() }
+    private val homeRepository by lazy { HomeRepository(ApiClient.homeService) }
+    private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
 
     private enum class ReportMode { WEEKLY, MONTHLY }
     private var currentMode: ReportMode = ReportMode.WEEKLY
@@ -113,11 +114,10 @@ class RoutineFragment : Fragment() {
                 return@launch
             }
 
-            val token = "Bearer $raw"
-            val res = homeRepository.getDashboard(token)
+            val result = homeRepository.getDashboard(raw)
 
-            if (res.isSuccess && res.result != null) {
-                val streak = res.result.currentStreak
+            result.onSuccess { data ->
+                val streak = data.currentStreak
                 binding.tvStreakDays.text = "${streak}일"
 
                 binding.tvBonus.text = when {
@@ -126,8 +126,8 @@ class RoutineFragment : Fragment() {
                     streak in 3..6 -> "+3% EXP"
                     else -> "+5% EXP"
                 }
-            } else {
-                Log.e("ROUTINE_ERROR", res.message)
+            }.onFailure { e ->
+                Log.e("ROUTINE_ERROR", e.message ?: "unknown error")
             }
         }
     }
@@ -141,27 +141,26 @@ class RoutineFragment : Fragment() {
                 return@launch
             }
 
-            val token = "Bearer $raw"
 
-            val res = sleepRepository.getSleepSessions(token, page = 0, size = 200)
+            val result = sleepRepository.getSleepSessions(raw, page = 0, size = 200)
 
-            if (!res.isSuccess || res.result == null) {
-                Log.e("ROUTINE_SLEEP_ERR", res.message)
+            result.onSuccess { page ->
+                val records = page.content
+
+                buildWeeklyFromRecords(records)
+                buildMonthlyFromRecords(records)
+
+                renderWeeklyFromPrepared()
+                renderMonthlyFromPrepared()
+
+                applyReportMode(currentMode)
+            }.onFailure { e ->
+                Log.e("ROUTINE_SLEEP_ERR", e.message ?: "unknown error")
                 seedEmptyThenRender()
-                return@launch
             }
-
-            val records = res.result.content
-
-            buildWeeklyFromRecords(records)
-            buildMonthlyFromRecords(records)
-
-            renderWeeklyFromPrepared()
-            renderMonthlyFromPrepared()
-
-            applyReportMode(currentMode)
         }
     }
+
 
     private fun seedEmptyThenRender() {
         buildWeeklyFromRecords(emptyList())
@@ -171,7 +170,7 @@ class RoutineFragment : Fragment() {
         applyReportMode(currentMode)
     }
 
-    private fun buildWeeklyFromRecords(records: List<SleepSessionDto>) {
+    private fun buildWeeklyFromRecords(records: List<SleepSessionItem>) {
         val today = LocalDate.now()
         val start = today.minusDays(6)
 
@@ -198,7 +197,7 @@ class RoutineFragment : Fragment() {
         }
     }
 
-    private fun buildMonthlyFromRecords(records: List<SleepSessionDto>) {
+    private fun buildMonthlyFromRecords(records: List<SleepSessionItem>) {
         val today = LocalDate.now()
         val ym = YearMonth.from(today)
         val daysInMonth = ym.lengthOfMonth()

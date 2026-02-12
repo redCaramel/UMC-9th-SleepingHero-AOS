@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.R
 import com.umc_9th.sleepinghero.SleepRecordAdapter
 import com.umc_9th.sleepinghero.SleepRecordUiModel
+import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.HeroRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
@@ -25,8 +26,8 @@ class HeroFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val heroRepository by lazy { HeroRepository() }
-    private val homeRepository by lazy { HomeRepository() }
-    private val sleepRepository by lazy { SleepRepository() }
+    private val homeRepository by lazy { HomeRepository(ApiClient.homeService) }
+    private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
     private val sleepAdapter by lazy { SleepRecordAdapter() }
     private val skinRepository by lazy { SkinRepository() }
 
@@ -76,11 +77,10 @@ class HeroFragment : Fragment() {
             val raw = TokenManager.getAccessToken(requireContext())
             if (raw.isNullOrEmpty()) return@launch
 
-            val token = "Bearer $raw"
-            val res = homeRepository.getDashboard(token)
+            val result = homeRepository.getDashboard(raw)
 
-            if (res.isSuccess && res.result != null) {
-                val nonSleepStreak = res.result.nonSleepStreak
+            result.onSuccess { data ->
+                val nonSleepStreak = data.nonSleepStreak
 
                 val (statusText, messageText, penaltyPercent) = when {
                     nonSleepStreak <= 0 ->
@@ -106,8 +106,8 @@ class HeroFragment : Fragment() {
                     binding.tvNonSleepStreak.text = "연속 무기록 : ${nonSleepStreak}일"
                     binding.tvExpPenalty.text = "효과 : -${penaltyPercent} % exp"
                 }
-            } else {
-                Log.e("DASHBOARD_ERROR", res.message)
+            }.onFailure { e ->
+                Log.e("DASHBOARD_ERROR", e.message ?: "unknown error")
             }
         }
     }
@@ -116,29 +116,33 @@ class HeroFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
             if (raw.isNullOrEmpty()) return@launch
-            val token = "Bearer $raw"
 
-            val res = sleepRepository.getSleepSessions(token, page = 0, size = 10)
+            val result = sleepRepository.getSleepSessions(raw, page = 0, size = 10)
 
-            if (!res.isSuccess || res.result == null) {
-                return@launch
+            result.onSuccess { data ->
+
+                val uiList = data.content.map { dto ->
+                    val durationText = calcSleepDurationText(dto.sleptTime, dto.wokeTime)
+                    val dateText = dto.sleptTime.take(10)
+
+                    SleepRecordUiModel(
+                        date = dateText,
+                        sleepTimeText = durationText,
+                        star = if (dto.isSuccess) 5 else 1, // TODO: API 붙으면 교체
+                        advice = if (dto.isSuccess)
+                            "용사의 조언: 잘 잤군! 오늘도 힘내자!"
+                        else
+                            "용사의 조언: 용사여… 휴식이 부족하군!"
+                    )
+                }
+
+                sleepAdapter.submitList(uiList)
+            }.onFailure { e ->
+                Log.e("SLEEP_ERROR", e.message ?: "unknown error")
             }
-
-            val uiList = res.result.content.map { dto ->
-                val durationText = calcSleepDurationText(dto.sleptTime, dto.wokeTime)
-                val dateText = dto.sleptTime.take(10)
-
-                SleepRecordUiModel(
-                    date = dateText,
-                    sleepTimeText = durationText,
-                    star = if (dto.isSuccess) 5 else 1, // TODO: 임시 매핑 (리뷰 API 붙이면 교체)
-                    advice = if (dto.isSuccess) "용사의 조언: 잘 잤군! 오늘도 힘내자!" else "용사의 조언: 용사여… 휴식이 부족하군!"
-                )
-            }
-
-            sleepAdapter.submitList(uiList)
         }
     }
+
 
     private fun calcSleepDurationText(sleptTime: String, wokeTime: String): String {
         return try {
