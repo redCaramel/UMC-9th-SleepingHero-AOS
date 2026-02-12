@@ -14,6 +14,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -129,8 +130,12 @@ class SleepTrackerFragment : Fragment() {
         // ✅ 수면 종료 버튼: 누르면 즉시 endSleep 호출 -> 성공 시 ClearFragment 이동
         // home_sleep_stopbutton이 이 버튼이라면 binding.btnStop만 실제 바인딩명으로 맞춰주면 됨.
         binding.btnStop.setOnClickListener {
-            val token = TokenManager.getAccessToken(requireContext()) ?: return@setOnClickListener
-            sleepViewModel.endSleep(token)
+            val raw = TokenManager.getAccessToken(requireContext())
+            if (raw == null) {
+                Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val auth = if (raw.startsWith("Bearer ")) raw else "Bearer $raw"
         }
 
         // ✅ 화면 잠금

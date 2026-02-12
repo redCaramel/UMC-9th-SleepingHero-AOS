@@ -53,4 +53,10 @@ object TokenManager {
     fun clearAll(context: Context) {
         getPrefs(context).edit().clear().apply()
     }
+
+    fun getAuthHeader(context: Context): String? {
+        val raw = getAccessToken(context)?.trim() ?: return null
+        return if (raw.startsWith("Bearer ")) raw else "Bearer $raw"
+    }
+
 }
