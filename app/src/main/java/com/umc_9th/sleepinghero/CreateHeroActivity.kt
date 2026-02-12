@@ -56,7 +56,7 @@ class CreateHeroActivity : AppCompatActivity() {
         changeViewModel.changeNameResponse.observe(this) { result ->
             result.onSuccess { data ->
                 Log.d("test", "사용자 이름 설정 성공 - ${data.name}")
-                var intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, TutorialActivity::class.java)
                 startActivity(intent)
                 finish()
             }.onFailure { error ->

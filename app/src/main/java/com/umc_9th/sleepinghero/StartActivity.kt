@@ -62,6 +62,7 @@ class StartActivity : AppCompatActivity() {
         }
         //naver
         NaverIdLoginSDK.logout()
+
         checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
@@ -156,8 +157,13 @@ class StartActivity : AppCompatActivity() {
         socialViewModel.myCharResponse.observe(this) { result ->
             result.onSuccess { data ->
                 Log.d("test", "사용자 인식 성공 - ${data.name}")
-                var intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+
+                if (!TutorialActivity.isTutorialDone(this)) {
+                    startActivity(Intent(this, TutorialActivity::class.java))
+                } else {
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
+
                 finish()
             }.onFailure { error ->
                 if(error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {

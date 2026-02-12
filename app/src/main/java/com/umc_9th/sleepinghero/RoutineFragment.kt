@@ -119,13 +119,6 @@ class RoutineFragment : Fragment() {
             result.onSuccess { data ->
                 val streak = data.currentStreak
                 binding.tvStreakDays.text = "${streak}일"
-
-                binding.tvBonus.text = when {
-                    streak <= 0 -> "없음"
-                    streak in 1..2 -> "+1% EXP"
-                    streak in 3..6 -> "+3% EXP"
-                    else -> "+5% EXP"
-                }
             }.onFailure { e ->
                 Log.e("ROUTINE_ERROR", e.message ?: "unknown error")
             }
@@ -177,7 +170,6 @@ class RoutineFragment : Fragment() {
         val minutesByDay = mutableMapOf<LocalDate, Int>()
 
         for (r in records) {
-            if (!r.isSuccess) continue
             val sleptDate = parseLocalDate(r.sleptTime) ?: continue
             if (sleptDate.isBefore(start) || sleptDate.isAfter(today)) continue
 
@@ -207,7 +199,6 @@ class RoutineFragment : Fragment() {
         val minutesByDay = mutableMapOf<LocalDate, Int>()
 
         for (r in records) {
-            if (!r.isSuccess) continue
             val sleptDate = parseLocalDate(r.sleptTime) ?: continue
             if (sleptDate.isBefore(firstDay) || sleptDate.isAfter(lastDay)) continue
 
@@ -262,6 +253,7 @@ class RoutineFragment : Fragment() {
 
                 binding.barChartWeekly.visibility = View.VISIBLE
                 binding.lineChartMonthly.visibility = View.GONE
+                binding.layoutWeeklyLegend.visibility = View.VISIBLE
 
                 updateReportFromHours(mode, weeklyHours)
             }
@@ -277,6 +269,7 @@ class RoutineFragment : Fragment() {
 
                 binding.barChartWeekly.visibility = View.GONE
                 binding.lineChartMonthly.visibility = View.VISIBLE
+                binding.layoutWeeklyLegend.visibility = View.GONE
 
                 updateReportFromHours(mode, monthlyHours)
             }

@@ -90,8 +90,10 @@ data class SleepSessionsResponse(
 )
 
 data class SleepSessionItem(
-    val recordId: Int,
+    val recordId: Long,
+    val star: Int,
     val sleptTime: String,
     val wokeTime: String,
-    val isSuccess: Boolean
+    val totalMinutes: Int,
+    val summary: String
 )
