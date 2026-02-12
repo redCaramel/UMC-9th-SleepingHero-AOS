@@ -1,7 +1,10 @@
 package com.umc_9th.sleepinghero
 
 import android.Manifest
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -11,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
@@ -47,17 +49,21 @@ class SleepTrackerFragment : Fragment() {
     private val prefsName = "sleep_tracker_prefs"
     private val keyNotiEnabled = "noti_enabled"
 
+    // (보조) 프래그먼트가 살아있는 동안 목표 알림 중복 방지
+    private var goalNotifiedInUi: Boolean = false
+
     private val requestPostNotiPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (granted) {
                 setNotiEnabled(true)
                 applyNotiUi(true)
                 showTrackingNotification()
-                Toast.makeText(requireContext(), "알림 ON", Toast.LENGTH_SHORT).show()
+                scheduleGoalAlarm()
             } else {
                 setNotiEnabled(false)
                 applyNotiUi(false)
-                Toast.makeText(requireContext(), "알림 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+                cancelTrackingNotification()
+                cancelGoalAlarm()
             }
         }
 
@@ -65,27 +71,29 @@ class SleepTrackerFragment : Fragment() {
         override fun run() {
             val elapsed = System.currentTimeMillis() - startMillis
 
-            // 00 : 00 : 01
             binding.tvTimer.text = formatElapsed(elapsed)
 
-            // 0.0 / 8.5 시간, 0%
             val elapsedHours = elapsed / 1000.0 / 60.0 / 60.0
             val ratio = (elapsedHours / goalHours).coerceIn(0.0, 1.0)
             val percent = (ratio * 100.0).roundToInt()
 
             binding.tvProgressInfo.text = String.format("%.1f / %.1f 시간", elapsedHours, goalHours)
             binding.tvPercent.text = "${percent}%"
-
-            // 원형 진행률(리소스가 원형 기준이면 회전으로 대충 표현 가능)
             binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
+
+            // 알림은 "설정 시간"에 AlarmManager로 울리지만,
+            // 프래그먼트가 화면에 떠있는 상태에서라도 목표를 넘겼으면 1회는 보장(보조)
+            if (!goalNotifiedInUi && isNotiEnabled() && elapsedHours >= goalHours) {
+                goalNotifiedInUi = true
+                triggerGoalReachedNotificationNow()
+            }
 
             handler.postDelayed(this, 1000L)
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSleepTrackerBinding.inflate(inflater, container, false)
@@ -99,9 +107,6 @@ class SleepTrackerFragment : Fragment() {
         startMillis = System.currentTimeMillis()
         handler.post(tickRunnable)
 
-        // SleepStopDialog 결과 리스너(중단/계속)
-        observeStopDialogResult()
-
         // end API 결과 관찰(성공 시 ClearFragment 이동)
         observeEndResult()
 
@@ -112,19 +117,23 @@ class SleepTrackerFragment : Fragment() {
         val enabled = isNotiEnabled()
         applyNotiUi(enabled)
         if (enabled) {
-            ensureNotificationChannel()
+            ensureTrackingNotificationChannel()
             showTrackingNotification()
+            scheduleGoalAlarm()
+        } else {
+            cancelGoalAlarm()
         }
     }
 
     private fun setupClicks() {
-        // ✅ 수면 종료 버튼: 바로 종료 X -> SleepStopFragment(오버레이) 띄우기
+        // ✅ 수면 종료 버튼: 누르면 즉시 endSleep 호출 -> 성공 시 ClearFragment 이동
+        // home_sleep_stopbutton이 이 버튼이라면 binding.btnStop만 실제 바인딩명으로 맞춰주면 됨.
         binding.btnStop.setOnClickListener {
-            // SleepStopFragment는 DialogFragment로 구현돼 있어야 함
-            SleepStopFragment().show(childFragmentManager, "SleepStopDialog")
+            val token = TokenManager.getAccessToken(requireContext()) ?: return@setOnClickListener
+            sleepViewModel.endSleep(token)
         }
 
-        // ✅ 화면 잠금 설정 -> fragment_locker로 이동
+        // ✅ 화면 잠금
         binding.tvScreenLock.setOnClickListener {
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container_main, LockerFragment())
@@ -132,7 +141,7 @@ class SleepTrackerFragment : Fragment() {
                 .commit()
         }
 
-        // ✅ 알림 설정 ON/OFF (로컬 저장 + 실제 알림 표시/해제)
+        // ✅ 알림 설정 ON/OFF (추적 알림 + 목표 알림 스케줄)
         binding.btnAlarm.setOnClickListener {
             val next = !isNotiEnabled()
 
@@ -144,64 +153,24 @@ class SleepTrackerFragment : Fragment() {
                 setNotiEnabled(true)
                 applyNotiUi(true)
                 showTrackingNotification()
-                Toast.makeText(requireContext(), "알림 ON", Toast.LENGTH_SHORT).show()
+                scheduleGoalAlarm()
             } else {
                 setNotiEnabled(false)
                 applyNotiUi(false)
                 cancelTrackingNotification()
-                Toast.makeText(requireContext(), "알림 OFF", Toast.LENGTH_SHORT).show()
+                cancelGoalAlarm()
             }
         }
     }
 
-    /**
-     * SleepStopFragment(Dialog)에서:
-     * - "계속" 누르면 dismiss만
-     * - "중단" 누르면 end API 호출 -> 성공 시 ClearFragment 이동
-     *
-     * SleepStopFragment는 setFragmentResult로 결과를 넘겨야 함.
-     * (키/액션 값은 아래와 맞춰야 함)
-     */
-    private fun observeStopDialogResult() {
-        childFragmentManager.setFragmentResultListener(
-            SleepStopFragment.REQ_KEY,
-            viewLifecycleOwner
-        ) { _, bundle ->
-            when (bundle.getString("action")) {
-                "resume" -> {
-                    // 아무 것도 안 함 (그냥 계속)
-                }
-
-                "stop" -> {
-                    val token = TokenManager.getAccessToken(requireContext())
-                    if (token == null) {
-                        Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
-                        return@setFragmentResultListener
-                    }
-
-                    // 중복 클릭 방지
-                    binding.btnStop.isEnabled = false
-                    Toast.makeText(requireContext(), "수면 종료 중...", Toast.LENGTH_SHORT).show()
-
-                    // ✅ end API 호출
-                    sleepViewModel.endSleep(token)
-                }
-            }
-        }
-    }
-
-    /**
-     * end API 성공 -> fragment_clear(ClearFragment)로 이동해서 결과 표시
-     */
     private fun observeEndResult() {
         sleepViewModel.sleepEndResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-                // 추적 알림 끄기
+                // 종료 시 알림/알람 정리
                 setNotiEnabled(false)
-                applyNotiUi(false)
                 cancelTrackingNotification()
+                cancelGoalAlarm()
 
-                // ✅ 개선된 방식: ClearFragment.newInstance() 사용
                 val clearFragment = ClearFragment.newInstance(
                     recordId = data.recordId,
                     durationMinutes = data.durationMinutes,
@@ -215,15 +184,12 @@ class SleepTrackerFragment : Fragment() {
                     .replace(R.id.container_main, clearFragment)
                     .addToBackStack(null)
                     .commit()
-            }.onFailure { e ->
-                binding.btnStop.isEnabled = true
-                Toast.makeText(requireContext(), "수면 종료 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     // -------------------------
-    // Notification ON/OFF
+    // Tracking Notification
     // -------------------------
     private fun isNotiEnabled(): Boolean {
         return requireContext()
@@ -240,7 +206,6 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun applyNotiUi(enabled: Boolean) {
-        // btn_alarm(FrameLayout) 안 TextView(알람 설정 텍스트)를 찾아 텍스트만 바꿈
         findInnerTextView(binding.btnAlarm)?.text = if (enabled) "알림 ON" else "알림 OFF"
         binding.btnAlarm.alpha = if (enabled) 1.0f else 0.75f
     }
@@ -262,10 +227,10 @@ class SleepTrackerFragment : Fragment() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun ensureNotificationChannel() {
+    private fun ensureTrackingNotificationChannel() {
         val nm = NotificationManagerCompat.from(requireContext())
         val channel = NotificationChannelCompat.Builder(
-            NOTI_CHANNEL_ID,
+            TRACKING_NOTI_CHANNEL_ID,
             NotificationManagerCompat.IMPORTANCE_LOW
         )
             .setName("Sleep Tracker")
@@ -275,10 +240,10 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun showTrackingNotification() {
-        ensureNotificationChannel()
+        ensureTrackingNotificationChannel()
         if (needsPostNotiPermission() && !hasPostNotiPermission()) return
 
-        val noti = NotificationCompat.Builder(requireContext(), NOTI_CHANNEL_ID)
+        val noti = NotificationCompat.Builder(requireContext(), TRACKING_NOTI_CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
             .setContentTitle("수면 추적 중")
             .setContentText("수면 추적이 진행 중입니다.")
@@ -286,11 +251,55 @@ class SleepTrackerFragment : Fragment() {
             .setOnlyAlertOnce(true)
             .build()
 
-        NotificationManagerCompat.from(requireContext()).notify(NOTI_ID, noti)
+        NotificationManagerCompat.from(requireContext()).notify(TRACKING_NOTI_ID, noti)
     }
 
     private fun cancelTrackingNotification() {
-        NotificationManagerCompat.from(requireContext()).cancel(NOTI_ID)
+        NotificationManagerCompat.from(requireContext()).cancel(TRACKING_NOTI_ID)
+    }
+
+    // -------------------------
+    // Goal Alarm: 설정 시간( start + goalHours )에 알림 울리기
+    // -------------------------
+    private fun scheduleGoalAlarm() {
+        if (!isNotiEnabled()) return
+        if (needsPostNotiPermission() && !hasPostNotiPermission()) return
+
+        val triggerAt = startMillis + (goalHours * 60 * 60 * 1000).toLong()
+
+        val pi = PendingIntent.getBroadcast(
+            requireContext(),
+            GOAL_ALARM_REQUEST_CODE,
+            Intent(requireContext(), SleepGoalReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or pendingIntentImmutableFlag()
+        )
+
+        val am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+        } else {
+            am.setExact(AlarmManager.RTC_WAKEUP, triggerAt, pi)
+        }
+    }
+
+    private fun cancelGoalAlarm() {
+        val pi = PendingIntent.getBroadcast(
+            requireContext(),
+            GOAL_ALARM_REQUEST_CODE,
+            Intent(requireContext(), SleepGoalReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or pendingIntentImmutableFlag()
+        )
+        val am = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        am.cancel(pi)
+    }
+
+    private fun pendingIntentImmutableFlag(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
+    }
+
+    private fun triggerGoalReachedNotificationNow() {
+        if (needsPostNotiPermission() && !hasPostNotiPermission()) return
+        SleepGoalReceiver.showGoalReachedNotification(requireContext())
     }
 
     // -------------------------
@@ -311,7 +320,12 @@ class SleepTrackerFragment : Fragment() {
     }
 
     companion object {
-        private const val NOTI_CHANNEL_ID = "sleep_tracker_channel"
-        private const val NOTI_ID = 91001
+        private const val TRACKING_NOTI_CHANNEL_ID = "sleep_tracker_channel"
+        private const val TRACKING_NOTI_ID = 91001
+
+        const val GOAL_NOTI_CHANNEL_ID = "sleep_goal_channel"
+        const val GOAL_NOTI_ID = 91002
+
+        private const val GOAL_ALARM_REQUEST_CODE = 92001
     }
 }
