@@ -17,7 +17,6 @@ class GroupRepository(private val service : GroupService) {
         accessToken: String, req: GroupCreateRequest
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.CreateGroup(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -41,7 +40,6 @@ class GroupRepository(private val service : GroupService) {
         accessToken: String
     ): Result<List<GroupRankingResponse>> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.CheckGroup(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -98,7 +96,6 @@ class GroupRepository(private val service : GroupService) {
         accessToken: String, req: GroupInviteRequest
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.GroupInvite(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -126,7 +123,6 @@ class GroupRepository(private val service : GroupService) {
         accessToken: String
     ): Result<List<GroupRequestCheckResponse>> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.GroupRequestCheck(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -154,7 +150,6 @@ class GroupRepository(private val service : GroupService) {
         accessToken: String, status : String, req: GroupRequestRequest
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.GroupRequest(token, status, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
