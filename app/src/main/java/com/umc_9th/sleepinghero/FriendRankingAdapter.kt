@@ -37,11 +37,14 @@ class FriendRankingAdapter(private var heroList : MutableList<FriendRankingData>
         heroList.addAll(newList)
         notifyDataSetChanged()
     }
+    fun uploadList(newList : FriendRankingData) {
+        this.heroList.add(newList)
+        notifyItemInserted(heroList.size-1)
+    }
     inner class HeroViewHolder(val binding : ItemRankingBinding) :
             RecyclerView.ViewHolder(binding.root) {
                 fun bind(hero : FriendRankingData) {
                     binding.tvCharName.text = hero.nickName
-                    binding.imgCharProfile.setImageResource(hero.skinId)
                     binding.tvCharLevel.text = "Lv. ${hero.level}"
                     binding.tvCharStreak.text = "${hero.streak}일 연속 달성"
                     binding.tvCharTotal.text = "${hero.total}시간"

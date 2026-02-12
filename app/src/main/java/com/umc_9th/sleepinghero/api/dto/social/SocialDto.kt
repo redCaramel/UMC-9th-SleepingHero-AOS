@@ -72,3 +72,7 @@ data class CheckSkinResponse (
 data class DeleteFriendRequest (
     val nickName : String
 )
+
+data class FriendRequestStatusUpdate(
+    val nickName: String
+)

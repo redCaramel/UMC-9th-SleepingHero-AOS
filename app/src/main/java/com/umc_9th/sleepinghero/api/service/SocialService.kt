@@ -5,8 +5,10 @@ import com.umc_9th.sleepinghero.api.dto.social.ChangeNameRequest
 import com.umc_9th.sleepinghero.api.dto.social.ChangeNameResponse
 import com.umc_9th.sleepinghero.api.dto.social.CharSearchResponse
 import com.umc_9th.sleepinghero.api.dto.social.CheckSkinResponse
+import com.umc_9th.sleepinghero.api.dto.social.DeleteFriendRequest
 import com.umc_9th.sleepinghero.api.dto.social.FriendInviteRequest
 import com.umc_9th.sleepinghero.api.dto.social.FriendRankingResponse
+import com.umc_9th.sleepinghero.api.dto.social.FriendRequestStatusUpdate
 import com.umc_9th.sleepinghero.api.dto.social.MyCharResponse
 import com.umc_9th.sleepinghero.api.dto.social.MyFriendResponse
 import com.umc_9th.sleepinghero.api.dto.social.RequestCheckResponse
@@ -61,11 +63,11 @@ interface SocialService {
     ): Response<ApiResponse<List<RequestCheckResponse>>>
 
     @PATCH("friends/requests/{status}")
-    suspend fun ResponseRequest(
-        @Header("Authorization") token : String,
-        @Path("status") status : String,
-        @Body nickName : String
-    ) : Response<ApiResponse<String>>
+    suspend fun updateFriendRequest(
+        @Header("Authorization") token: String,
+        @Path("status") status: String,
+        @Body body: FriendRequestStatusUpdate
+    ): Response<ApiResponse<String>>
 
     @GET("/wardrobe/me/skins")
     suspend fun CheckSkin(
@@ -81,6 +83,6 @@ interface SocialService {
     @DELETE("/friends")
     suspend fun DeleteFriend (
         @Header("Authorization") token : String,
-        @Body nickName: String
+        @Query("nickName") nickName: DeleteFriendRequest
     ) : Response<ApiResponse<String>>
 }

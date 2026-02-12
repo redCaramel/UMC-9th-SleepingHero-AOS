@@ -158,7 +158,7 @@ class SocialFragment : Fragment() {
                 binding.tvSocialStreak.text = "${data.continuousSleepDays}일"
                 binding.tvSocialTotal.text = "${data.totalSleepHour}시간"
                 socialViewModel.checkSkin(TokenManager.getAccessToken(requireContext()).toString())
-                // TODO - 친구 인원수 구현
+                socialViewModel.myFriend(TokenManager.getAccessToken(requireContext()).toString())
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
@@ -170,6 +170,11 @@ class SocialFragment : Fragment() {
                     if(skin.equipped) binding.imgSocialIcon.setImageResource(skinImgList[skin.skinId.toInt()-1])
                 }
 
+            }
+        }
+        socialViewModel.myFriendResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data->
+                binding.tvSocialFriend.text = "${data.size}명"
             }
         }
     }

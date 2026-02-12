@@ -19,6 +19,7 @@ import kotlin.getValue
 class RankingFragment : Fragment() {
     private lateinit var binding: FragmentRankingBinding
     private lateinit var adapter : FriendRankingAdapter
+    private var count = 1
     private val socialRepository by lazy {
         SocialRepository(ApiClient.socialService)
     }
@@ -41,18 +42,26 @@ class RankingFragment : Fragment() {
     private fun observeRanking() {
         socialViewModel.friendRankingResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-                val newList = mutableListOf<FriendRankingData>()
+                data.forEach { q->
+                    Log.d("test", "${q.nickName}")
+                }
+
                 for(item in data) {
-                    val timeTotal : Int
-                    if(item.totalSleepTime[1] == ':') timeTotal = item.totalSleepTime[0].toInt()
-                    else timeTotal = item.totalSleepTime[1].toInt() * 10 + item.totalSleepTime[0].toInt()
-                    newList.add(FriendRankingData(item.nickName, R.drawable.home_clear_hero, 1, 1, timeTotal, item.rank))
+                    socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), item.nickName)
+
                 }
 
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "불러오기 실패 : $message")
 
+            }
+        }
+        socialViewModel.charSearchResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data->
+                val item = FriendRankingData(data.heroName, data.skinId, data.level, data.continuousSleepDays, data.totalSleepHour, count)
+                count++
+                adapter.uploadList(item)
             }
         }
     }
