@@ -11,7 +11,7 @@ class CharacterRepository(private val characterService: CharacterService) {
      */
     suspend fun getCharacterInfo(token: String): Result<CharacterInfoResponse> {
         return try {
-            val response = characterService.getCharacterInfo("Bearer $token")
+            val response = characterService.getCharacterInfo(token)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)
