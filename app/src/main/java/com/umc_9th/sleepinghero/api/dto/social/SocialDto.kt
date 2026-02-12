@@ -1,4 +1,4 @@
-package com.umc_9th.sleepinghero.api.dto
+package com.umc_9th.sleepinghero.api.dto.social
 
 import com.google.gson.annotations.SerializedName
 

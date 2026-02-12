@@ -4,16 +4,16 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.umc_9th.sleepinghero.api.dto.ChangeNameRequest
-import com.umc_9th.sleepinghero.api.dto.ChangeNameResponse
-import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
-import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
-import com.umc_9th.sleepinghero.api.dto.CheckSkinResponse
-import com.umc_9th.sleepinghero.api.dto.FriendInviteRequest
-import com.umc_9th.sleepinghero.api.dto.FriendRankingResponse
-import com.umc_9th.sleepinghero.api.dto.MyCharResponse
-import com.umc_9th.sleepinghero.api.dto.MyFriendResponse
-import com.umc_9th.sleepinghero.api.dto.RequestCheckResponse
+import com.umc_9th.sleepinghero.api.dto.social.ChangeNameRequest
+import com.umc_9th.sleepinghero.api.dto.social.ChangeNameResponse
+import com.umc_9th.sleepinghero.api.dto.social.CharSearchRequest
+import com.umc_9th.sleepinghero.api.dto.social.CharSearchResponse
+import com.umc_9th.sleepinghero.api.dto.social.CheckSkinResponse
+import com.umc_9th.sleepinghero.api.dto.social.FriendInviteRequest
+import com.umc_9th.sleepinghero.api.dto.social.FriendRankingResponse
+import com.umc_9th.sleepinghero.api.dto.social.MyCharResponse
+import com.umc_9th.sleepinghero.api.dto.social.MyFriendResponse
+import com.umc_9th.sleepinghero.api.dto.social.RequestCheckResponse
 import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import kotlinx.coroutines.launch
 

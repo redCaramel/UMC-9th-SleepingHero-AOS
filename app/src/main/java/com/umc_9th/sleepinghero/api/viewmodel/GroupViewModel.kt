@@ -4,12 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
 import com.umc_9th.sleepinghero.api.dto.GroupCreateRequest
 import com.umc_9th.sleepinghero.api.dto.GroupRankingInsideResponse
 import com.umc_9th.sleepinghero.api.dto.GroupRankingResponse
 import com.umc_9th.sleepinghero.api.repository.GroupRepository
-import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import kotlinx.coroutines.launch
 
 class GroupViewModel(private val repository: GroupRepository) : ViewModel() {

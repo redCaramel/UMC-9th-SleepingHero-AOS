@@ -3,8 +3,6 @@ package com.umc_9th.sleepinghero.api.repository
 import android.util.Log
 import com.umc_9th.sleepinghero.api.ApiClient.retrofit
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
-import com.umc_9th.sleepinghero.api.dto.CharSearchRequest
-import com.umc_9th.sleepinghero.api.dto.CharSearchResponse
 import com.umc_9th.sleepinghero.api.dto.GroupCreateRequest
 import com.umc_9th.sleepinghero.api.dto.GroupRankingInsideResponse
 import com.umc_9th.sleepinghero.api.dto.GroupRankingResponse
