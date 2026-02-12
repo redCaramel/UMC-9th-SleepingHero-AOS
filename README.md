@@ -1,5 +1,7 @@
-# 프로젝트 이름
+# [UMC 9기 숙면용사]
 숙면에 재미를 더하다, 숙면용사
+<img width="1598" height="820" alt="Container (4)" src="https://github.com/user-attachments/assets/25d3ac57-f06d-4972-a4fe-db6a07fecabb" />
+
 ## 프로젝트 설명
 숙면용사는 **재미있는 경험을 통해 수면시간을 자연스럽게 늘리는 게임형 수면 코치 앱** 입니다.
 
@@ -15,8 +17,11 @@
 - SpringBoot - 제로/박준영, 짭상혁/김상혁, 이안/유용선, 루이/최종건
 ## 라이브러리 및 기술 스택 (미완)
 ### 1. 공통
- - MVVM, NavGraph, XML Design
-...
+ - MVVM, Gradle, NavGraph, XML Design
+### 2. API 연동
+ - Retrofit2, OkHttp
+### 3. 추가 라이브러리 및 스택
+ - EncryptedSharedPreferences, MPAndroidChart, Lock Task Mode, App Pinning
 
 ## 이슈 컨벤션
  - 제목은 이슈 내용대로 적습니다. EX) ~~~파트 버그 수정 / ***파트 토큰 재발급 필요
