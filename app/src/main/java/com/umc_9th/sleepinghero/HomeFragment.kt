@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.dto.CharacterInfoResponse
-import com.umc_9th.sleepinghero.api.dto.HomeDashboardResponse
+import com.umc_9th.sleepinghero.api.dto.DashBoardResponse
 import com.umc_9th.sleepinghero.api.repository.CharacterRepository
 import com.umc_9th.sleepinghero.api.repository.FriendRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
@@ -72,7 +72,7 @@ class HomeFragment : Fragment() {
 
     // 데이터 캐시
     private var characterInfo: CharacterInfoResponse? = null
-    private var dashboardData: HomeDashboardResponse? = null
+    private var dashboardData: DashBoardResponse? = null
     private var myRanking: Int? = null
 
     override fun onCreateView(

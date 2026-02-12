@@ -1,5 +1,6 @@
 package com.umc_9th.sleepinghero.api.dto
 
+/*
 data class SleepSessionsPageDto(
     val content: List<SleepSessionDto>
 )
@@ -11,8 +12,7 @@ data class SleepSessionDto(
     val isSuccess: Boolean
 )
 
-// TODO: 위에 Ber 밑에 Theo 중복 있어서 조정 필요
-
+*/
 /**
  * GET /sleep-sessions/{sleepRecordId} - 수면 기록 상세 조회
  */

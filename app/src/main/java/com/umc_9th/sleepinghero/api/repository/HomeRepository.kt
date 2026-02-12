@@ -15,20 +15,23 @@ class HomeRepository {
 }
 */
 import android.util.Log
-import com.umc_9th.sleepinghero.api.dto.HomeDashboardResponse
+import com.umc_9th.sleepinghero.api.dto.DashBoardResponse
 import com.umc_9th.sleepinghero.api.service.HomeService
 
 class HomeRepository(private val service: HomeService) {
 
-    suspend fun getHomeDashboard(token: String): Result<HomeDashboardResponse> = try {
-        val response = service.getHomeDashboard(token)
+    private fun asBearer(token: String): String =
+        if (token.startsWith("Bearer ")) token else "Bearer $token"
+
+    suspend fun getDashboard(token: String): Result<DashBoardResponse> = try {
+        val response = service.getDashboard(asBearer(token))
 
         if (response.isSuccess) {
             if (response.result == null) {
                 Log.d("HomeRepository", "Response body is null")
                 Result.failure(RuntimeException("Response body is null"))
             } else {
-                Log.d("HomeRepository", "Home Dashboard Success")
+                Log.d("HomeRepository", "Dashboard Success")
                 Result.success(response.result)
             }
         } else {
