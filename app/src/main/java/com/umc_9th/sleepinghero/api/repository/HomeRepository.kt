@@ -20,8 +20,11 @@ import com.umc_9th.sleepinghero.api.service.HomeService
 
 class HomeRepository(private val service: HomeService) {
 
+    private fun asBearer(token: String): String =
+        if (token.startsWith("Bearer ")) token else "Bearer $token"
+
     suspend fun getDashboard(token: String): Result<DashBoardResponse> = try {
-        val response = service.getDashboard("Bearer $token")
+        val response = service.getDashboard(asBearer(token))
 
         if (response.isSuccess) {
             if (response.result == null) {
