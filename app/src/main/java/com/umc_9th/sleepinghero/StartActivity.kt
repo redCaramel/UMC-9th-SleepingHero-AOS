@@ -50,6 +50,7 @@ class StartActivity : AppCompatActivity() {
         observeLogin()
         observeCheck()
 
+
         checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
