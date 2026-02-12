@@ -11,7 +11,6 @@ import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.dto.CharacterInfoResponse
-import com.umc_9th.sleepinghero.api.dto.HomeDashboardResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionItem
 import com.umc_9th.sleepinghero.api.dto.DashBoardResponse
 import com.umc_9th.sleepinghero.api.repository.CharacterRepository

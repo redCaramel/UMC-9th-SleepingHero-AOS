@@ -156,18 +156,9 @@ class SleepTrackerFragment : Fragment() {
 
             val elapsedMinutes = ((System.currentTimeMillis() - startMillis) / 1000 / 60).toInt()
 
-            // 서버 안 쓰는 요구라서, ClearFragment는 임시값으로 넘김(리뷰/recordId는 서버 없으면 의미 없음)
-            val clearFragment = ClearFragment.newInstance(
-                recordId = 0,
-                durationMinutes = elapsedMinutes,
-                gainedExp = 0,
-                currentLevel = 0,
-                currentExp = 0,
-                needExp = 0
-            )
 
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, clearFragment)
+                .replace(R.id.container_main, ClearFragment())
                 .addToBackStack(null)
                 .commit()
         }

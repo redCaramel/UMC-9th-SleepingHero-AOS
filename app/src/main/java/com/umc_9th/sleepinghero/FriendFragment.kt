@@ -51,6 +51,9 @@ class FriendFragment : Fragment() {
 
         binding.heroContainer.adapter = adapter
         binding.heroContainer.layoutManager = LinearLayoutManager(requireContext())
+        binding.etHeroSearch.addTextChangedListener { text ->
+            socialViewModel.charSearch(TokenManager.getAccessToken(requireContext()).toString(), text.toString())
+        }
         return binding.root
     }
     private fun observeSearch() {
