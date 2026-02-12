@@ -56,4 +56,8 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textColor">@color/black</item>
     </style>
+    <style name="Theme.TransparentActivity" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>

@@ -16,6 +16,15 @@
         android:theme="@style/Theme.SleepingHero"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".AvaterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GroupInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateHeroActivity"
+            android:exported="false" />
+        <activity
             android:name=".CreateGroupActivity"
             android:exported="false" />
         <activity
@@ -27,6 +36,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver
+            android:name=".SleepGoalReceiver"
+            android:exported="false" />
+
         <activity
             android:name=".TimeSettingActivity"
             android:exported="false" />
@@ -35,11 +48,11 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".StartActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true" />
         <activity
             android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
             android:exported="true">
@@ -56,5 +69,5 @@
         </activity>
 
     </application>
-
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 </manifest>
