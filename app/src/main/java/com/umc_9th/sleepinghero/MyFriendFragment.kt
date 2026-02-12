@@ -81,7 +81,7 @@ class MyFriendFragment : Fragment() {
                 Toast.makeText(requireContext(), "친구가 삭제되었습니다.", Toast.LENGTH_SHORT).show()
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
-                Log.d("test", "탐색 실패: $message")
+                Log.d("test", "삭제 실패: $message")
 
             }
         }

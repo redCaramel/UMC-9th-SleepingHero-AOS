@@ -2,22 +2,24 @@ package com.umc_9th.sleepinghero
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.dto.CharacterInfoResponse
-import com.umc_9th.sleepinghero.api.dto.HomeDashboardResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionItem
 import com.umc_9th.sleepinghero.api.dto.DashBoardResponse
 import com.umc_9th.sleepinghero.api.repository.CharacterRepository
 import com.umc_9th.sleepinghero.api.repository.FriendRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.FriendViewModel
@@ -26,6 +28,8 @@ import com.umc_9th.sleepinghero.api.viewmodel.HomeViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.HomeViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModelFactory
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
 import com.umc_9th.sleepinghero.databinding.ActivityTimeSettingBinding
 import com.umc_9th.sleepinghero.databinding.FragmentHomeBinding
 import java.text.SimpleDateFormat
@@ -58,6 +62,14 @@ class HomeFragment : Fragment() {
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
     private val sleepViewModel: SleepViewModel by viewModels { SleepViewModelFactory(sleepRepository) }
 
+    private val socialRepository by lazy {
+        SocialRepository(ApiClient.socialService)
+    }
+    private val socialViewModel : SocialViewModel by viewModels(
+        factoryProducer = { SocialViewModelFactory(socialRepository) }
+    )
+
+
     // 데이터 캐시
     private var characterInfo: CharacterInfoResponse? = null
     private var dashboardData: DashBoardResponse? = null
@@ -80,6 +92,8 @@ class HomeFragment : Fragment() {
 
         setupButtons()
         observeData()
+        observeSocial()
+        socialViewModel.myCharacter(TokenManager.getAccessToken(requireContext()).toString())
         loadAllData()
 
         return binding.root
@@ -141,7 +155,6 @@ class HomeFragment : Fragment() {
                 characterInfo = data
                 updateCharacterUI()
             }.onFailure { error ->
-                Toast.makeText(requireContext(), "캐릭터 정보 로드 실패: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -150,7 +163,6 @@ class HomeFragment : Fragment() {
                 dashboardData = data
                 updateDashboardUI()
             }.onFailure { error ->
-                Toast.makeText(requireContext(), "대시보드 로드 실패: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -160,7 +172,6 @@ class HomeFragment : Fragment() {
                 myRanking = rankings.find { it.nickname == myNickname }?.rank
                 updateRankingUI()
             }.onFailure { error ->
-                Toast.makeText(requireContext(), "친구 랭킹 로드 실패: ${error.message}", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -405,5 +416,48 @@ class HomeFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun observeSocial() {
+        socialViewModel.myCharResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                binding.tvExpRemaining.text = "-${data.needExp - data.currentExp} EXP"
+                var per: Int = (data.currentExp.toFloat() / data.needExp.toFloat() * 100).toInt()
+                binding.tvExpPercentage.text = "$per%"
+                val progress = data.currentExp.toFloat() / data.needExp.toFloat()
+                val params = binding.progressExp.layoutParams as ConstraintLayout.LayoutParams
+                // OR more directly:
+                params.matchConstraintPercentWidth = progress.coerceIn(0f, 1f)
+                binding.progressExp.layoutParams = params
+                socialViewModel.charSearch(
+                    TokenManager.getAccessToken(requireContext()).toString(),
+                    data.name
+                )
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+
+            }
+        }
+        socialViewModel.charSearchResponse.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                binding.tvUserLevelName.text = "LV. ${data.level} ${data.heroName} 님"
+                binding.tvName.text = data.heroName
+                binding.tvCalendarValue.text = "${data.continuousSleepDays}일"
+                binding.tvClockValue.text = "${data.totalSleepHour}시간"
+                socialViewModel.loadFriendRanking(TokenManager.getAccessToken(requireContext()).toString())
+            }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("test", "불러오기 실패 : $message")
+            }
+        }
+        socialViewModel.friendRankingResponse.observe(viewLifecycleOwner) {result ->
+            result.onSuccess { data ->
+                val rank = data.indexOfFirst { it.nickName == binding.tvName.text } + 1
+                binding.tvTrophyValue.text = "${rank}등"
+            }.onFailure { error->
+                Log.d("test", "친구 불러오기 실패")
+            }
+        }
     }
 }
