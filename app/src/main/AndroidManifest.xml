@@ -2,7 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Android 12+에서 정확 알람 필요할 수 있음(권장) -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <application
+        android:name=".GlobalApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -10,14 +16,73 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SleepingHero">
+        android:theme="@style/Theme.SleepingHero"
+        android:usesCleartextTraffic="true">
+
+        <receiver
+            android:name=".WakeAlarmReceiver"
+            android:exported="false" />
+
         <activity
-            android:name=".MainActivity"
+            android:name=".AlarmLockActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true" />
+
+        <activity
+            android:name=".TutorialActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AvaterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".GroupInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateHeroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateGroupActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <receiver
+            android:name=".SleepGoalReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name=".TimeSettingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoadingActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".StartActivity"
+            android:exported="true" />
+        <activity
+            android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="oauth"
+                    android:scheme="kakao${KAKAO_NATIVE_KEY}" />
             </intent-filter>
         </activity>
     </application>

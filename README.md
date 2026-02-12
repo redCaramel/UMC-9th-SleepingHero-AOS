@@ -1,5 +1,7 @@
-# 프로젝트 이름
+# [UMC 9기 숙면용사]
 숙면에 재미를 더하다, 숙면용사
+<img width="1598" height="820" alt="Container (4)" src="https://github.com/user-attachments/assets/25d3ac57-f06d-4972-a4fe-db6a07fecabb" />
+
 ## 프로젝트 설명
 숙면용사는 **재미있는 경험을 통해 수면시간을 자연스럽게 늘리는 게임형 수면 코치 앱** 입니다.
 
@@ -15,11 +17,26 @@
 - SpringBoot - 제로/박준영, 짭상혁/김상혁, 이안/유용선, 루이/최종건
 ## 라이브러리 및 기술 스택 (미완)
 ### 1. 공통
- - MVVM, NavGraph, XML Design
-...
+ - MVVM, Gradle, NavGraph, XML Design
+### 2. API 연동
+ - Retrofit2, OkHttp
+### 3. 추가 라이브러리 및 스택
+ - EncryptedSharedPreferences, MPAndroidChart, Lock Task Mode, App Pinning
 
 ## 이슈 컨벤션
- - 제목 형식: [이름/타입] 구현내용
+ - 제목은 이슈 내용대로 적습니다. EX) ~~~파트 버그 수정 / ***파트 토큰 재발급 필요
+ - 내용은 이슈 사항을 이해 가능하도록 간결하게 작성합니다. 만약 필요하다면, 이미지나 영상 자료를 첨부합니다.
+
+## PR 컨벤션
+ | Message  | 설명                                              |
+| :------: | :------------------------------------------------ |
+|   feat   | 새로운 기능 추가                            |
+|  fix   | 버그 수정 |
+|  docs  | 문서 수정 |
+| refactor | 코드 리팩토링                                     |
+ - pr 규칙 : [Message] : [내용]
+ - EX) Docs : README.md 수정
+ - 개인 브랜치에서 develop 브랜치에 pr, 코드 리뷰 이후 merge합니다.
 
 ## 브랜치 전략
 

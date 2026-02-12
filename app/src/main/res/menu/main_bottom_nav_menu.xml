@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/Home"
+        android:icon="@drawable/ic_bottomnav_home"
+        android:title="홈" />
+    <item
+        android:id="@+id/Hero"
+        android:icon="@drawable/ic_bottomnav_hero"
+        android:title="용사" />
+    <item
+        android:id="@+id/Routine"
+        android:icon="@drawable/ic_bottomnav_routine"
+        android:title="루틴" />
+    <item
+        android:id="@+id/Social"
+         android:icon="@drawable/ic_bottomnav_social"
+        android:title="소셜" />
+    <item
+        android:id="@+id/Settings"
+        android:icon="@drawable/ic_bottomnav_setting"
+        android:title="설정" />
+</menu>

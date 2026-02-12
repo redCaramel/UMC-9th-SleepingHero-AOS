@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_50"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- 제목 -->
+        <TextView
+            android:id="@+id/tv_clear_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="수면 기록 완료!"
+            android:textColor="@color/gray_900"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 수면 시간 -->
+        <TextView
+            android:id="@+id/tv_sleep_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="5시간 32분 수면"
+            android:textColor="@color/gray_700"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_clear_title" />
+
+        <!-- 캐릭터 이미지 -->
+        <ImageView
+            android:id="@+id/iv_clear_character"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/home_clear_hero"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_sleep_duration" />
+
+        <!-- 정보 카드 -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/info_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@android:color/white"
+            android:elevation="2dp"
+            android:padding="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/iv_clear_character">
+
+            <!-- 획득 경험치 라벨 -->
+            <TextView
+                android:id="@+id/label_exp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="획득 경험치"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 획득 경험치 값 -->
+            <TextView
+                android:id="@+id/tv_exp_gained"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+80 EXP"
+                android:textColor="@color/primary_700"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_exp" />
+
+            <!-- 구분선 (세로) -->
+            <View
+                android:id="@+id/divider_vertical"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:background="@color/black"
+                app:layout_constraintBottom_toBottomOf="@id/tv_level_value"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/label_exp" />
+
+            <!-- 현재 레벨 라벨 -->
+            <TextView
+                android:id="@+id/label_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="현재 레벨"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <!-- 현재 레벨 값 -->
+            <TextView
+                android:id="@+id/tv_level_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lv. 11"
+                android:textColor="@color/primary_700"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_level" />
+
+            <!-- 목표 수면 시간 라벨 -->
+            <TextView
+                android:id="@+id/label_target_sleep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="목표 수면 시간"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_exp_gained" />
+
+            <!-- 목표 수면 시간 값 -->
+            <TextView
+                android:id="@+id/tv_target_sleep_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="07 H 30 M"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/label_target_sleep" />
+
+            <!-- 수면 시간 라벨 -->
+            <TextView
+                android:id="@+id/label_actual_sleep"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="수면 시간"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_target_sleep" />
+
+            <!-- 수면 시간 값 -->
+            <TextView
+                android:id="@+id/tv_actual_sleep_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="05 H 32 M"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/label_actual_sleep" />
+
+            <!-- 다음 레벨까지 라벨 -->
+            <TextView
+                android:id="@+id/label_next_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="다음 레벨까지"
+                android:textColor="@color/gray_700"
+                android:textSize="13sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/label_actual_sleep" />
+
+            <!-- 다음 레벨까지 값 -->
+            <TextView
+                android:id="@+id/tv_next_level_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="248/300exp"
+                android:textColor="@color/gray_900"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/label_next_level" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <!-- 오늘의 수면은 어떠셨나요? -->
+        <TextView
+            android:id="@+id/tv_rating_question"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="오늘의 수면은 어떠셨나요?"
+            android:textColor="@color/gray_700"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/info_card" />
+
+        <!-- 별점 -->
+        <LinearLayout
+            android:id="@+id/rating_stars"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_rating_question">
+
+            <ImageView
+                android:id="@+id/star_1"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/home_clear_staricon" />
+
+            <ImageView
+                android:id="@+id/star_2"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/home_clear_staricon" />
+
+            <ImageView
+                android:id="@+id/star_3"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/home_clear_staricon" />
+
+            <ImageView
+                android:id="@+id/star_4"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/home_clear_staricon" />
+
+            <ImageView
+                android:id="@+id/star_5"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/home_clear_staremptyicon" />
+
+        </LinearLayout>
+
+        <!-- 특이사항 기록 (AI 조언용) -->
+        <TextView
+            android:id="@+id/tv_memo_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="특이사항 기록 (AI 조언용)"
+            android:textColor="@color/gray_700"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rating_stars" />
+
+        <!-- 메모 입력 필드 -->
+        <FrameLayout
+            android:id="@+id/memo_container"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/home_clear_textbutton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_memo_label">
+
+            <EditText
+                android:id="@+id/et_memo"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:gravity="start|top"
+                android:hint="오늘 수면에 대한 특이사항을 기록해주세요"
+                android:inputType="textMultiLine"
+                android:padding="16dp"
+                android:textColor="@color/gray_900"
+                android:textColorHint="@color/gray_500"
+                android:textSize="13sp" />
+
+        </FrameLayout>
+
+        <!-- 완료 버튼 -->
+        <FrameLayout
+            android:id="@+id/btn_complete"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/memo_container">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:src="@drawable/home_clear_bluebutton" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="AI 조언 듣기 &amp; 기록 저장"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:ignore="HardcodedText" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,3 +1,68 @@
 <resources>
     <string name="app_name">SleepingHero</string>
+
+    <!-- Home Fragment -->
+    <string name="home_user_name">김민주 님</string>
+    <string name="home_user_level_name">LV.11 김민주 님</string>
+    <string name="home_sleep_days">12일째 숙면 중</string>
+    <string name="home_diary_button">전투 일지</string>
+    <string name="home_condition_button">최상 컨디션</string>
+    <string name="home_next_level_exp">다음 레벨까지      -80 EXP</string>
+
+    <string name="home_consecutive_sleep">연속 수면</string>
+    <string name="home_consecutive_value">61일</string>
+    <string name="home_total_sleep">총 수면</string>
+    <string name="home_total_value">70시간</string>
+    <string name="home_friend_rank">친구 순위</string>
+    <string name="home_rank_value">8등</string>
+
+    <string name="home_exp_progress">EXP Progress</string>
+    <string name="home_exp_percentage">94%</string>
+
+    <string name="home_level_label">레벨</string>
+    <string name="home_level_value">12</string>
+
+    <string name="home_point_label">포인트</string>
+    <string name="home_point_value">2450</string>
+
+    <string name="home_achievement_label">연속성공</string>
+    <string name="home_achievement_value">7일</string>
+
+    <string name="home_badge_label">뱃지</string>
+    <string name="home_badge_value">15</string>
+
+    <string name="home_sleep_goal">수면 목표 시간</string>
+    <string name="home_sleep_time_label">수면시간</string>
+    <string name="home_sleep_hours">8시간</string>
+    <string name="home_time_display">23 : 30 ~ 7 : 00</string>
+
+    <string name="home_start_button">수면 시작하기</string>
+
+    <!-- ContentDescription -->
+    <string name="character_image">캐릭터 이미지</string>
+    <string name="check_icon">체크 아이콘</string>
+    <string name="calendar_icon">달력 아이콘</string>
+    <string name="clock_icon">시계 아이콘</string>
+    <string name="trophy_icon">트로피 아이콘</string>
+    <string name="condition_button_bg">컨디션 버튼 배경</string>
+    <string name="start_button_bg">시작 버튼 배경</string>
+
+    <!-- Map Fragment -->
+    <string name="map_path_description">수면 경로 맵</string>
+    <string name="minimize_button">최소화 버튼</string>
+    <string name="zoom_in_button">확대 버튼</string>
+
+    <!-- Sleep Tracker Fragment -->
+    <string name="sleep_tracker_timer">00 : 00 : 01</string>
+    <string name="sleep_tracker_progress">0.0 / 8.5 시간</string>
+    <string name="sleep_tracker_time_range">23 : 30 - 7 : 00</string>
+    <string name="sleep_tracker_percent">0%</string>
+    <string name="sleep_tracker_alarm">알람 설정</string>
+    <string name="sleep_tracker_stop">수면 종료</string>
+    <string name="sleep_tracker_ready">수면 달성 시 200 포인트 획득!</string>
+    <string name="sleep_tracker_screen_lock"><u>화면 잠금 설정</u></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
 </resources>
