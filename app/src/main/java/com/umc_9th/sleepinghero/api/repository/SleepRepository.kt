@@ -19,7 +19,7 @@ class SleepRepository(private val sleepService: SleepService) {
         sleepRecordId: Int
     ): Result<SleepRecordDetailResponse> {
         return try {
-            val response = sleepService.getSleepRecordDetail("Bearer $token", sleepRecordId)
+            val response = sleepService.getSleepRecordDetail(token, sleepRecordId)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)
@@ -37,7 +37,7 @@ class SleepRepository(private val sleepService: SleepService) {
      */
     suspend fun startSleep(token: String): Result<SleepStartResponse> {
         return try {
-            val response = sleepService.startSleep("Bearer $token")
+            val response = sleepService.startSleep(token)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)
@@ -65,7 +65,7 @@ class SleepRepository(private val sleepService: SleepService) {
                 star = star,
                 comment = comment
             )
-            val response = sleepService.createSleepReview("Bearer $token", request)
+            val response = sleepService.createSleepReview(token, request)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)
@@ -83,7 +83,7 @@ class SleepRepository(private val sleepService: SleepService) {
      */
     suspend fun endSleep(token: String): Result<SleepEndResponse> {
         return try {
-            val response = sleepService.endSleep("Bearer $token")
+            val response = sleepService.endSleep(token)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)
@@ -105,7 +105,7 @@ class SleepRepository(private val sleepService: SleepService) {
         size: Int = 10
     ): Result<SleepSessionsResponse> {
         return try {
-            val response = sleepService.getSleepSessions("Bearer $token", page, size)
+            val response = sleepService.getSleepSessions(token, page, size)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)

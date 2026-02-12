@@ -97,13 +97,14 @@ class HomeFragment : Fragment() {
 
         // 수면 시작하기 버튼
         binding.btnStartSleep.setOnClickListener {
-            val token = TokenManager.getAccessToken(requireContext())
-            if (token != null) {
-                sleepViewModel.startSleep(token)
+            val auth = TokenManager.getAuthHeader(requireContext())
+            if (auth != null) {
+                sleepViewModel.startSleep(auth)
             } else {
                 Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
             }
         }
+
 
         // 맵 확대 버튼
         binding.btnZoomIn.setOnClickListener {
@@ -231,24 +232,18 @@ class HomeFragment : Fragment() {
     }
 
     private fun loadAllData() {
-        val token = TokenManager.getAccessToken(requireContext())
+        val auth = TokenManager.getAuthHeader(requireContext())
 
-        if (token != null) {
-            // Character 정보 로드
-            characterViewModel.loadCharacterInfo(token)
-
-            // Dashboard 정보 로드
-            homeViewModel.loadHomeDashboard(token)
-
-            // Friend 랭킹 로드
-            friendViewModel.loadFriendRanking(token)
-
-            // 수면 기록 목록 로드 (최근 30개)
-            sleepViewModel.loadSleepSessions(token, page = 0, size = 30)
+        if (auth != null) {
+            characterViewModel.loadCharacterInfo(auth)
+            homeViewModel.loadHomeDashboard(auth)
+            friendViewModel.loadFriendRanking(auth)
+            sleepViewModel.loadSleepSessions(auth, page = 0, size = 30)
         } else {
             Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun updateCharacterUI() {
         val character = characterInfo ?: return

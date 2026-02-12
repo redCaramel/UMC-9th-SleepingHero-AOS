@@ -7,7 +7,7 @@ import com.umc_9th.sleepinghero.api.service.HomeService
 class HomeRepository(private val service: HomeService) {
 
     suspend fun getHomeDashboard(token: String): Result<HomeDashboardResponse> = try {
-        val response = service.getHomeDashboard("Bearer $token")
+        val response = service.getHomeDashboard(token)
 
         if (response.isSuccess) {
             if (response.result == null) {

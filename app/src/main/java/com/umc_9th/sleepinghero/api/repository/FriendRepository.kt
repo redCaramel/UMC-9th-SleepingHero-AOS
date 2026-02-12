@@ -15,7 +15,7 @@ class FriendRepository(private val friendService: FriendService) {
      */
     suspend fun getFriendRequests(token: String): Result<List<FriendRequestItem>> {
         return try {
-            val response = friendService.getFriendRequests("Bearer $token")
+            val response = friendService.getFriendRequests(token)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: emptyList())
@@ -33,7 +33,7 @@ class FriendRepository(private val friendService: FriendService) {
      */
     suspend fun getFriendsList(token: String): Result<List<FriendItem>> {
         return try {
-            val response = friendService.getFriendsList("Bearer $token")
+            val response = friendService.getFriendsList(token)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: emptyList())
@@ -51,7 +51,7 @@ class FriendRepository(private val friendService: FriendService) {
      */
     suspend fun getFriendRanking(token: String): Result<List<FriendRankingItem>> {
         return try {
-            val response = friendService.getFriendRanking("Bearer $token")
+            val response = friendService.getFriendRanking(token)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: emptyList())
@@ -70,7 +70,7 @@ class FriendRepository(private val friendService: FriendService) {
     suspend fun approveFriendRequest(token: String, nickname: String): Result<String> {
         return try {
             val request = FriendRequestStatusRequest(nickname = nickname)
-            val response = friendService.updateFriendRequestStatus("Bearer $token", "APPROVE", request)
+            val response = friendService.updateFriendRequestStatus(token, "APPROVE", request)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: "친구 요청 승인됨")
@@ -89,7 +89,7 @@ class FriendRepository(private val friendService: FriendService) {
     suspend fun rejectFriendRequest(token: String, nickname: String): Result<String> {
         return try {
             val request = FriendRequestStatusRequest(nickname = nickname)
-            val response = friendService.updateFriendRequestStatus("Bearer $token", "REJECTED", request)
+            val response = friendService.updateFriendRequestStatus(token, "REJECTED", request)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: "친구 요청 거절됨")
@@ -108,7 +108,7 @@ class FriendRepository(private val friendService: FriendService) {
     suspend fun sendFriendRequest(token: String, nickname: String): Result<String> {
         return try {
             val request = SendFriendRequestRequest(nickname = nickname)
-            val response = friendService.sendFriendRequest("Bearer $token", request)
+            val response = friendService.sendFriendRequest(token, request)
 
             if (response.isSuccess) {
                 Result.success(response.result ?: "친구 요청 전송됨")
