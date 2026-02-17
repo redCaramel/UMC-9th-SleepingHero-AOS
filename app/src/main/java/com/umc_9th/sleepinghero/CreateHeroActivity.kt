@@ -47,7 +47,6 @@ class CreateHeroActivity : AppCompatActivity() {
     private fun observeCreate() {
         createViewModel.heroCreateResult.observe(this) { result ->
             result.onSuccess { data ->
-                Log.d("test", "사용자 생성 성공 - ${data.name}")
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
                 Log.d("test", "생성 실패 : $message")
@@ -55,8 +54,7 @@ class CreateHeroActivity : AppCompatActivity() {
         }
         changeViewModel.changeNameResponse.observe(this) { result ->
             result.onSuccess { data ->
-                Log.d("test", "사용자 이름 설정 성공 - ${data.name}")
-                var intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, TutorialActivity::class.java)
                 startActivity(intent)
                 finish()
             }.onFailure { error ->

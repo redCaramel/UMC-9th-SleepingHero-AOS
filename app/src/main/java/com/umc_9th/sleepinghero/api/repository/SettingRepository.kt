@@ -11,7 +11,6 @@ class SettingRepository(private val service : SettingService) {
         accessToken: String, req : FAQRequest
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.FAQUrl(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {

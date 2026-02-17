@@ -33,7 +33,6 @@ class CreateGroupActivity : AppCompatActivity() {
             binding.imgGroupIconL
         )
         iconList.forEach { icon ->
-            Log.d("tests", "${icon.isSelected}")
             icon.setOnClickListener {
                 updateSelection(icon)
             }

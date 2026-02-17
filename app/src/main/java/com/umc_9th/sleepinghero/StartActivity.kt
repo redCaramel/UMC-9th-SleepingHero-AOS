@@ -49,19 +49,8 @@ class StartActivity : AppCompatActivity() {
         setContentView(binding.root)
         observeLogin()
         observeCheck()
-        TokenManager.clearAll(this)
 
-        //kakao
-        UserApiClient.instance.logout { error ->
-            if(error != null) {
-                Log.e("test", "로그아웃 실패, SDK에서 토큰 폐기됨", error)
-            }
-            else {
-                Log.i("test", "로그아웃 성공")
-            }
-        }
-        //naver
-        NaverIdLoginSDK.logout()
+
         checkLogin()
         binding.btnLoginNaver.setOnClickListener {
             NaverIdLoginSDK.authenticate(this, naverLoginCallback)
@@ -130,9 +119,7 @@ class StartActivity : AppCompatActivity() {
         authViewModel.kakaoLoginResult.observe(this) { result ->
             //Result -> status, code 등이 있고 이 안 data에 값이 존재
             result.onSuccess { data ->
-                Toast.makeText(this, "로그인 성공! 회원 ID: ${data.memberId}", Toast.LENGTH_LONG).show()
                 accessService(data.accessToken)
-                Log.d("test", "카카오 로그인 - ${data.accessToken} / ${data.memberId} / ${data.nickName}")
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류가 발생했습니다."
                 Log.d("tag", "로그인 실패: $message")
@@ -142,9 +129,7 @@ class StartActivity : AppCompatActivity() {
         authViewModel.naverLoginResult.observe(this) { result ->
             //Result -> status, code 등이 있고 이 안 data에 값이 존재
             result.onSuccess { data ->
-                Toast.makeText(this, "로그인 성공! 회원 ID: ${data.memberId}", Toast.LENGTH_LONG).show()
                 accessService(data.accessToken)
-                Log.d("test", "네이버 로그인 - ${data.accessToken} / ${data.memberId} / ${data.nickName}")
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류가 발생했습니다."
                 Log.d("tag", "로그인 실패: $message")
@@ -156,8 +141,13 @@ class StartActivity : AppCompatActivity() {
         socialViewModel.myCharResponse.observe(this) { result ->
             result.onSuccess { data ->
                 Log.d("test", "사용자 인식 성공 - ${data.name}")
-                var intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+
+                if (!TutorialActivity.isTutorialDone(this)) {
+                    startActivity(Intent(this, TutorialActivity::class.java))
+                } else {
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
+
                 finish()
             }.onFailure { error ->
                 if(error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {

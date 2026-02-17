@@ -244,41 +244,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:layout_marginBottom="10dp"
                         android:text="0일"
                         android:textColor="#1B4E81"
                         android:textSize="34sp" />
-
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:cardBackgroundColor="#F1F5F9"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:padding="12dp">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="현재 보너스"
-                                android:textColor="#16426E"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/tvBonus"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="2dp"
-                                android:text="없음"
-                                android:textColor="#404040"
-                                android:textSize="14sp" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -523,6 +491,7 @@
                         android:background="#314158"/>
 
                     <LinearLayout
+                        android:id="@+id/layoutWeeklyLegend"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"

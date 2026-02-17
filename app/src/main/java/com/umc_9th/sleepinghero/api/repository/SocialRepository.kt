@@ -22,7 +22,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String, req: CharSearchRequest
     ): Result<CharSearchResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.CharacterSearch(token, req.name)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -46,7 +45,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String
     ): Result<MyCharResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.MyCharacter(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -74,7 +72,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String
     ): Result<List<FriendRankingResponse>> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.FriendRanking(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -102,7 +99,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String, req: ChangeNameRequest
     ): Result<ChangeNameResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.ChangeName(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -130,7 +126,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String
     ): Result<List<MyFriendResponse>> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.MyFriends(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -158,7 +153,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String, req: FriendInviteRequest
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.FriendInvite(token, req)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -186,7 +180,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String
     ): Result<List<RequestCheckResponse>> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.CheckRequest(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -211,7 +204,7 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String
     ): Result<CheckSkinResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
+
         val response = service.CheckSkin(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -235,7 +228,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String, skinId : Int
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.EquipSKin(token, skinId)
         if (response.isSuccessful) {
             if (response.body() == null) {
@@ -287,7 +279,6 @@ class SocialRepository(private val service : SocialService) {
         accessToken: String, nickName : String
     ): Result<String> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val req = DeleteFriendRequest(nickName)
         val response = service.DeleteFriend(token, req)
         if (response.isSuccessful) {
@@ -300,9 +291,15 @@ class SocialRepository(private val service : SocialService) {
                 Result.success(data)
             }
         } else {
-            val errMsg = response.body()?.message.toString() ?: "Unknown error"
-            Log.d("test", "error ${response.code()} : $errMsg")
-            Result.failure(java.lang.RuntimeException("HTTP ${response.code()} : $errMsg"))
+            val adapter = retrofit.responseBodyConverter<ApiResponse<Any>>(
+                ApiResponse::class.java,
+                arrayOfNulls<Annotation>(0)
+            )
+            val errorResponse = adapter.convert(response.errorBody())
+            val errMsg = errorResponse?.message ?: "Unknown error"
+
+            Log.e("test", "error ${response.code()} : $errMsg")
+            Result.failure(RuntimeException("HTTP ${response.code()} : $errMsg"))
         }
     } catch (e: Exception) {
         Result.failure(e)

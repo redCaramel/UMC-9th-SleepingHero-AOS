@@ -11,7 +11,6 @@ class CreateRepository(private val service : CreateService) {
         accessToken: String
     ): Result<CreateHeroResponse> = try {
         val token = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
-        Log.d("test", token)
         val response = service.CreateHero(token)
         if (response.isSuccessful) {
             if (response.body() == null) {
