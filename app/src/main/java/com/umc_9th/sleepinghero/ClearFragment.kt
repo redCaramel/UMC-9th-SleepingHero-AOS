@@ -11,6 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
+import com.umc_9th.sleepinghero.api.repository.SocialRepository
 import com.umc_9th.sleepinghero.databinding.FragmentClearBinding
 import com.umc_9th.sleepinghero.ui.hero.HeroFragment
 import kotlinx.coroutines.launch
@@ -21,17 +22,34 @@ class ClearFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
+    private val socialRepository by lazy { SocialRepository(ApiClient.socialService) }
 
     private var selectedStar: Int = 0
 
 
-    // endSleep로 채워질 값들
+    // endSleep로 채워질 값들 (arguments에서 초기화 가능)
     private var recordId: Int = 0
     private var durationMinutes: Int = 0
     private var gainedExp: Int = 0
     private var currentLevel: Int = 0
     private var currentExp: Int = 0
     private var needExp: Int = 0
+    private var sleepTimeStr: String = "11:00 PM"
+    private var awakeTimeStr: String = "07:00 AM"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let { args ->
+            recordId = args.getInt(ARG_RECORD_ID, 0)
+            durationMinutes = args.getInt(ARG_DURATION_MINUTES, 0)
+            gainedExp = args.getInt(ARG_GAINED_EXP, 0)
+            currentLevel = args.getInt(ARG_CURRENT_LEVEL, 0)
+            currentExp = args.getInt(ARG_CURRENT_EXP, 0)
+            needExp = args.getInt(ARG_NEED_EXP, 0)
+            sleepTimeStr = args.getString(ARG_SLEEP_TIME_STR) ?: "11:00 PM"
+            awakeTimeStr = args.getString(ARG_AWAKE_TIME_STR) ?: "07:00 AM"
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +66,11 @@ class ClearFragment : Fragment() {
         setupStars()
         setupCompleteButton()
 
+        loadUserInfoAndUpdateTitle()
+        // arguments로 값이 넘어온 경우(예: SleepTracker에서 수면 종료) 먼저 UI 반영
+        if (arguments?.containsKey(ARG_DURATION_MINUTES) == true) {
+            bindResultUi()
+        }
         requestEndSleepAndBind()
     }
 
@@ -107,8 +130,8 @@ class ClearFragment : Fragment() {
         binding.tvExpGained.text = "+${gainedExp} EXP"
         binding.tvLevelValue.text = if (currentLevel > 0) "Lv. $currentLevel" else "Lv. -"
 
-        // 목표 수면 시간(일단 고정)
-        binding.tvTargetSleepValue.text = "07 H 30 M"
+        // 목표 수면 시간: 설정한 취침~기상 시간 (예: 08 H 00 M)
+        binding.tvTargetSleepValue.text = formatGoalTimeForDisplay(sleepTimeStr, awakeTimeStr)
 
         // 실제 수면 시간
         binding.tvActualSleepValue.text = String.format("%02d H %02d M", h, m)
@@ -195,8 +218,87 @@ class ClearFragment : Fragment() {
         return h to mm
     }
 
+    /** 취침/기상 문자열으로 목표 수면 시간 "HH H MM M" 형식 반환 */
+    private fun formatGoalTimeForDisplay(sleepStr: String, awakeStr: String): String {
+        val (sh, sm, spm) = parseTimeForGoal(sleepStr)
+        val (ah, am, apm) = parseTimeForGoal(awakeStr)
+        fun toMinutes(h12: Int, m: Int, pm: Int): Int {
+            var h24 = h12 % 12
+            if (pm == 1) h24 += 12
+            return h24 * 60 + m
+        }
+        val sleepMin = toMinutes(sh, sm, spm)
+        val awakeMin = toMinutes(ah, am, apm)
+        val totalMin = if (awakeMin > sleepMin) awakeMin - sleepMin else (24 * 60 - sleepMin) + awakeMin
+        val h = totalMin / 60
+        val mm = totalMin % 60
+        return String.format("%02d H %02d M", h, mm)
+    }
+
+    private fun parseTimeForGoal(timeStr: String): Triple<Int, Int, Int> {
+        return try {
+            val parts = timeStr.trim().split(" ")
+            val time = parts.getOrNull(0) ?: "11:00"
+            val ampmStr = parts.getOrNull(1) ?: "PM"
+            val hm = time.split(":")
+            val hour = hm.getOrNull(0)?.toIntOrNull() ?: 11
+            val minute = hm.getOrNull(1)?.toIntOrNull() ?: 0
+            val ampmFlag = if (ampmStr.equals("PM", ignoreCase = true)) 1 else 0
+            Triple(hour, minute, ampmFlag)
+        } catch (e: Exception) {
+            Triple(11, 0, 1)
+        }
+    }
+
+    private fun loadUserInfoAndUpdateTitle() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = TokenManager.getAccessToken(requireContext())
+            if (token.isNullOrEmpty()) return@launch
+            val result = socialRepository.MyCharacterCheck(token)
+            result.onSuccess { data ->
+                binding.tvClearTitle.text = "${data.name}님, 수면 기록 완료!"
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        private const val ARG_RECORD_ID = "arg_record_id"
+        private const val ARG_DURATION_MINUTES = "arg_duration_minutes"
+        private const val ARG_GAINED_EXP = "arg_gained_exp"
+        private const val ARG_CURRENT_LEVEL = "arg_current_level"
+        private const val ARG_CURRENT_EXP = "arg_current_exp"
+        private const val ARG_NEED_EXP = "arg_need_exp"
+
+        private const val ARG_SLEEP_TIME_STR = "arg_sleep_time_str"
+        private const val ARG_AWAKE_TIME_STR = "arg_awake_time_str"
+
+        fun newInstance(
+            recordId: Int,
+            durationMinutes: Int,
+            gainedExp: Int,
+            currentLevel: Int,
+            currentExp: Int,
+            needExp: Int,
+            sleepTimeStr: String = "11:00 PM",
+            awakeTimeStr: String = "07:00 AM"
+        ): ClearFragment {
+            return ClearFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_RECORD_ID, recordId)
+                    putInt(ARG_DURATION_MINUTES, durationMinutes)
+                    putInt(ARG_GAINED_EXP, gainedExp)
+                    putInt(ARG_CURRENT_LEVEL, currentLevel)
+                    putInt(ARG_CURRENT_EXP, currentExp)
+                    putInt(ARG_NEED_EXP, needExp)
+                    putString(ARG_SLEEP_TIME_STR, sleepTimeStr)
+                    putString(ARG_AWAKE_TIME_STR, awakeTimeStr)
+                }
+            }
+        }
     }
 }

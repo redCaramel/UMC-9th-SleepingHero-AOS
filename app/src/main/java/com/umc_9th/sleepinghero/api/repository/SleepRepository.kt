@@ -21,6 +21,7 @@ import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionsResponse
+import com.umc_9th.sleepinghero.api.dto.SleepStartRequest
 import com.umc_9th.sleepinghero.api.dto.SleepStartResponse
 import com.umc_9th.sleepinghero.api.service.SleepService
 
@@ -38,9 +39,10 @@ class SleepRepository(private val sleepService: SleepService) {
             Result.failure(e)
         }
 
-    suspend fun startSleep(token: String): Result<SleepStartResponse> =
+    suspend fun startSleep(token: String, sleepTime: String, wakeTime: String): Result<SleepStartResponse> =
         try {
-            val response = sleepService.startSleep(withBearer(token))
+            val request = SleepStartRequest(sleepTime = sleepTime, wakeTime = wakeTime)
+            val response = sleepService.startSleep(withBearer(token), request)
             if (response.isSuccess && response.result != null) Result.success(response.result)
             else Result.failure(Exception(response.message ?: "수면 시작 실패"))
         } catch (e: Exception) {

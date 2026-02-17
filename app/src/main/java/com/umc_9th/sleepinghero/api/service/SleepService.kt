@@ -9,6 +9,7 @@ import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionsResponse
+import com.umc_9th.sleepinghero.api.dto.SleepStartRequest
 import com.umc_9th.sleepinghero.api.dto.SleepStartResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -33,11 +34,12 @@ interface SleepService {
     /**
      * 수면 시작
      * POST /sleep-sessions/start
-     * 파라미터 없음
+     * 목표 수면 시간과 동일한 sleepTime, wakeTime 전달 필요 (서버 검증)
      */
     @POST("/sleep-sessions/start")
     suspend fun startSleep(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Body request: SleepStartRequest
     ): ApiResponse<SleepStartResponse>
 
     /**

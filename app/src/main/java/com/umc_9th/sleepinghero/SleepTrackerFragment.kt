@@ -69,6 +69,9 @@ class SleepTrackerFragment : Fragment() {
     // 다음 기상 알람 시각(ms)
     private var nextWakeAtMillis: Long = 0L
 
+    // 수면 시작 API에서 받은 recordId (ClearFragment 리뷰용)
+    private var currentRecordId: Int = 0
+
     // 알림 토글 저장(추적 알림 UI용)
     private val prefsName = "sleep_tracker_prefs"
     private val keyNotiEnabled = "noti_enabled"
@@ -137,12 +140,12 @@ class SleepTrackerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // API 연동: 목표 수면 시간 설정
-        requestSetSleepGoal()
+        // HomeFragment에서 넘긴 취침/기상 시간 UI에 표시
+        binding.tvTimeRange.text = "$sleepTimeStr - $awakeTimeStr"
 
-        // API 연동: 수면 시작 API 호출
+        // API 연동: 목표 설정 성공 후 수면 시작 (순서 보장으로 서버 400 방지)
         observeSleepStartResult()
-        requestStartSleep()
+        requestSetSleepGoalThenStart()
 
         // 타이머 시작 시간 복원 또는 새로 시작
         val savedStartMillis = getSavedStartMillis()
@@ -175,25 +178,25 @@ class SleepTrackerFragment : Fragment() {
     }
 
     // -------------------------
-    // API 연동: 목표 수면 시간 설정
+    // API 연동: 목표 수면 시간 설정 후 수면 시작 (순차 호출로 서버 검증 통과)
     // -------------------------
-    private fun requestSetSleepGoal() {
+    private fun requestSetSleepGoalThenStart() {
         viewLifecycleOwner.lifecycleScope.launch {
             val token = TokenManager.getAccessToken(requireContext())
             if (token.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
                 return@launch
             }
 
-            // "11:00 PM" -> "23:00" 형식으로 변환
             val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
             val wakeTime24 = convertTo24HourFormat(awakeTimeStr)
 
-            val result = sleepRepository.setSleepGoal(token, sleepTime24, wakeTime24)
-
-            result.onSuccess { response ->
-                // 목표 시간 설정 성공 (로그만 남기고 UI는 변경하지 않음)
-            }.onFailure { error ->
-                // 실패해도 수면 추적은 계속 진행
+            val goalResult = sleepRepository.setSleepGoal(token, sleepTime24, wakeTime24)
+            goalResult.onSuccess {
+                sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
+            }.onFailure {
+                // 목표 설정 실패해도 수면 시작 시도 (이미 서버에 목표가 있을 수 있음)
+                sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
             }
         }
     }
@@ -214,7 +217,7 @@ class SleepTrackerFragment : Fragment() {
     }
 
     // -------------------------
-    // API 연동: 수면 시작
+    // API 연동: 수면 시작 (목표와 동일한 시간 전달 - 서버 검증)
     // -------------------------
     private fun requestStartSleep() {
         val token = TokenManager.getAccessToken(requireContext())
@@ -222,14 +225,15 @@ class SleepTrackerFragment : Fragment() {
             Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
             return
         }
-        sleepViewModel.startSleep(token)
+        val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
+        val wakeTime24 = convertTo24HourFormat(awakeTimeStr)
+        sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
     }
 
     private fun observeSleepStartResult() {
         sleepViewModel.sleepStartResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-                // 수면 시작 성공 - recordId는 나중에 종료 시 필요할 수 있으니 저장 가능
-                // 현재는 타이머만 시작하면 되므로 성공만 확인
+                currentRecordId = data.recordId
             }.onFailure { error ->
                 Toast.makeText(
                     requireContext(),
@@ -254,18 +258,19 @@ class SleepTrackerFragment : Fragment() {
 
             val elapsedMinutes = ((System.currentTimeMillis() - startMillis) / 1000 / 60).toInt()
 
-            // 서버 안 쓰는 요구라서, ClearFragment는 임시값으로 넘김(리뷰/recordId는 서버 없으면 의미 없음)
             val clearFragment = ClearFragment.newInstance(
-                recordId = 0,
+                recordId = currentRecordId,
                 durationMinutes = elapsedMinutes,
                 gainedExp = 0,
                 currentLevel = 0,
                 currentExp = 0,
-                needExp = 0
+                needExp = 0,
+                sleepTimeStr = sleepTimeStr,
+                awakeTimeStr = awakeTimeStr
             )
 
             parentFragmentManager.beginTransaction()
-                .replace(R.id.container_main, ClearFragment())
+                .replace(R.id.container_main, clearFragment)
                 .addToBackStack(null)
                 .commit()
         }

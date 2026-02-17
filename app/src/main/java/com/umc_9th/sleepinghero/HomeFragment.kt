@@ -92,6 +92,7 @@ class HomeFragment : Fragment() {
 
         binding.tvBedtimeValue.text = settingManager.getSleepTime()
         binding.tvWakeupValue.text = settingManager.getAwakeTime()
+        updateSleepGoalValueFromSettings()
 
         setupButtons()
         observeData()
@@ -141,7 +142,7 @@ class HomeFragment : Fragment() {
                 onConfirm = { finalStr ->
                     binding.tvBedtimeValue.text = finalStr
                     settingManager.setSleepTime(finalStr)
-                    // API 연동: 목표 수면 시간 설정
+                    updateSleepGoalValueFromSettings()
                     requestSetSleepGoal()
                 }
             )
@@ -155,7 +156,7 @@ class HomeFragment : Fragment() {
                 onConfirm = { finalStr ->
                     binding.tvWakeupValue.text = finalStr
                     settingManager.setAwakeTime(finalStr)
-                    // API 연동: 목표 수면 시간 설정
+                    updateSleepGoalValueFromSettings()
                     requestSetSleepGoal()
                 }
             )
@@ -194,30 +195,25 @@ class HomeFragment : Fragment() {
             }
         }
 
-        // ✅ 홈의 취침/기상 시간은 '설정값' 유지 (서버 기록으로 덮어쓰지 않음)
+        // ✅ 목표 수면 시간 = 설정한 취침~기상 시간. 총 수면 시간만 세션에서.
         sleepViewModel.sleepSessions.observe(viewLifecycleOwner) { result ->
             result.onSuccess { sessions ->
                 binding.tvBedtimeValue.text =
                     settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
                 binding.tvWakeupValue.text =
                     settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
+                updateSleepGoalValueFromSettings()
 
-                if (sessions.content.isNotEmpty()) {
-                    val latestSession = sessions.content.first()
-                    binding.tvSleepGoalValue.text = calculateDurationText(latestSession.sleptTime, latestSession.wokeTime)
-
-                    val totalHours = calculateTotalSleepHours(sessions.content)
-                    binding.tvClockValue.text = "${totalHours}시간"
-                } else {
-                    binding.tvSleepGoalValue.text = "8시간"
-                    binding.tvClockValue.text = "0시간"
-                }
+                val totalHours = if (sessions.content.isNotEmpty()) {
+                    calculateTotalSleepHours(sessions.content)
+                } else 0
+                binding.tvClockValue.text = "${totalHours}시간"
             }.onFailure {
                 binding.tvBedtimeValue.text =
                     settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
                 binding.tvWakeupValue.text =
                     settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
-                binding.tvSleepGoalValue.text = "8시간"
+                updateSleepGoalValueFromSettings()
                 binding.tvClockValue.text = "0시간"
             }
         }
@@ -287,6 +283,33 @@ class HomeFragment : Fragment() {
         } catch (e: Exception) {
             "00:00 AM"
         }
+    }
+
+    /** 설정한 취침~기상 시간으로 목표 수면 시간 문자열 반환 (예: "8시간", "7시간 30분") */
+    private fun updateSleepGoalValueFromSettings() {
+        val sleepTime = settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
+        val awakeTime = settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
+        binding.tvSleepGoalValue.text = computeGoalDurationText(sleepTime, awakeTime)
+    }
+
+    private fun computeGoalDurationText(sleepTime: String, awakeTime: String): String {
+        val (sh, sm, spm) = parseTimeString(sleepTime)
+        val (ah, am, apm) = parseTimeString(awakeTime)
+        fun toMinutes(h12: Int, m: Int, pm: Int): Int {
+            var h24 = h12 % 12
+            if (pm == 1) h24 += 12
+            return h24 * 60 + m
+        }
+        val sleepMin = toMinutes(sh, sm, spm)
+        val awakeMin = toMinutes(ah, am, apm)
+        val totalMin = if (awakeMin > sleepMin) {
+            awakeMin - sleepMin  // 같은 날
+        } else {
+            (24 * 60 - sleepMin) + awakeMin  // 다음 날 기상 (예: 23:00 ~ 07:00 = 8시간)
+        }
+        val h = totalMin / 60
+        val m = totalMin % 60
+        return if (m > 0) "${h}시간 ${m}분" else "${h}시간"
     }
 
     private fun calculateDurationText(sleptTime: String, wokeTime: String): String {
