@@ -1,19 +1,19 @@
 package com.umc_9th.sleepinghero
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
-import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModel
-import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModelFactory
 import com.umc_9th.sleepinghero.databinding.FragmentClearBinding
 import com.umc_9th.sleepinghero.ui.hero.HeroFragment
+import kotlinx.coroutines.launch
 
 class ClearFragment : Fragment() {
 
@@ -21,9 +21,9 @@ class ClearFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
-    private val sleepViewModel: SleepViewModel by viewModels { SleepViewModelFactory(sleepRepository) }
 
     private var selectedStar: Int = 0
+
 
     // endSleep로 채워질 값들
     private var recordId: Int = 0
@@ -46,29 +46,25 @@ class ClearFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupStars()
-        observeEndSleepResult()
-        observeReviewResult()
         setupCompleteButton()
 
         requestEndSleepAndBind()
     }
 
     private fun requestEndSleepAndBind() {
-        val token = TokenManager.getAccessToken(requireContext())
-        if (token == null) {
-            Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
-            return
-        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = TokenManager.getAccessToken(requireContext())
+            if (token.isNullOrEmpty()) {
+                Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
 
-        // 로딩 중 중복 처리 방지
-        binding.btnComplete.isEnabled = false
+            // 로딩 중 중복 처리 방지
+            binding.btnComplete.isEnabled = false
 
-        // 수면 종료 호출 → 보상/경험치/레벨 정보 받아서 UI 세팅
-        sleepViewModel.endSleep(token)
-    }
+            // 수면 종료 호출 → 보상/경험치/레벨 정보 받아서 UI 세팅
+            val result = sleepRepository.endSleep(token)
 
-    private fun observeEndSleepResult() {
-        sleepViewModel.sleepEndResult.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 // end 응답으로 값 세팅
                 recordId = data.recordId
@@ -95,6 +91,7 @@ class ClearFragment : Fragment() {
                 binding.btnComplete.isEnabled = true
             }.onFailure { e ->
                 binding.btnComplete.isEnabled = true
+                Log.e("CLEAR_FRAGMENT", "수면 종료 실패: ${e.message}")
                 Toast.makeText(requireContext(), "수면 종료 실패: ${e.message}", Toast.LENGTH_SHORT).show()
             }
         }
@@ -147,7 +144,7 @@ class ClearFragment : Fragment() {
     private fun setupCompleteButton() {
         binding.btnComplete.setOnClickListener {
             val token = TokenManager.getAccessToken(requireContext())
-            if (token == null) {
+            if (token.isNullOrEmpty()) {
                 Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
@@ -165,29 +162,28 @@ class ClearFragment : Fragment() {
             // 중복 클릭 방지
             binding.btnComplete.isEnabled = false
 
-            // 리뷰 작성 API 호출
-            sleepViewModel.createSleepReview(
-                token = token,
-                recordId = recordId,
-                star = selectedStar,
-                comment = comment
-            )
-        }
-    }
+            // 리뷰 작성 API 호출 (HeroFragment와 동일한 패턴)
+            viewLifecycleOwner.lifecycleScope.launch {
+                val result = sleepRepository.createSleepReview(
+                    token = token,
+                    recordId = recordId,
+                    star = selectedStar,
+                    comment = comment
+                )
 
-    private fun observeReviewResult() {
-        sleepViewModel.sleepReviewResult.observe(viewLifecycleOwner) { result ->
-            result.onSuccess {
-                binding.btnComplete.isEnabled = true
-                Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
+                result.onSuccess {
+                    binding.btnComplete.isEnabled = true
+                    Toast.makeText(requireContext(), "저장 완료", Toast.LENGTH_SHORT).show()
 
-                // HeroFragment로 이동
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.container_main, HeroFragment())
-                    .commit()
-            }.onFailure { e ->
-                binding.btnComplete.isEnabled = true
-                Toast.makeText(requireContext(), "저장 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    // HeroFragment로 이동
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.container_main, HeroFragment())
+                        .commit()
+                }.onFailure { e ->
+                    binding.btnComplete.isEnabled = true
+                    Log.e("CLEAR_FRAGMENT", "리뷰 작성 실패: ${e.message}")
+                    Toast.makeText(requireContext(), "저장 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }

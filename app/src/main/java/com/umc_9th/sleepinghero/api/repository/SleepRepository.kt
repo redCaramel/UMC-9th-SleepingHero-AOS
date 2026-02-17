@@ -15,6 +15,8 @@ class SleepRepository {
 */
 
 import com.umc_9th.sleepinghero.api.dto.SleepEndResponse
+import com.umc_9th.sleepinghero.api.dto.SleepGoalRequest
+import com.umc_9th.sleepinghero.api.dto.SleepGoalResponse
 import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
@@ -69,6 +71,16 @@ class SleepRepository(private val sleepService: SleepService) {
             val response = sleepService.getSleepSessions(withBearer(token), page, size)
             if (response.isSuccess && response.result != null) Result.success(response.result)
             else Result.failure(Exception(response.message ?: "수면 기록 목록 조회 실패"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    suspend fun setSleepGoal(token: String, sleepTime: String, wakeTime: String): Result<SleepGoalResponse> =
+        try {
+            val request = SleepGoalRequest(sleepTime = sleepTime, wakeTime = wakeTime)
+            val response = sleepService.setSleepGoal(withBearer(token), request)
+            if (response.isSuccess && response.result != null) Result.success(response.result)
+            else Result.failure(Exception(response.message ?: "목표 수면 시간 설정 실패"))
         } catch (e: Exception) {
             Result.failure(e)
         }

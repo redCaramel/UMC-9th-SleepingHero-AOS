@@ -90,8 +90,24 @@ data class SleepSessionsResponse(
 )
 
 data class SleepSessionItem(
-    val recordId: Int,
+    val recordId: Long,
+    val star: Int,
     val sleptTime: String,
     val wokeTime: String,
-    val isSuccess: Boolean
+    val totalMinutes: Int,
+    val summary: String
+)
+
+/**
+ * PUT /sleep-sessions/goal - 목표 수면 시간 설정
+ */
+data class SleepGoalRequest(
+    val sleepTime: String,  // "HH:MM" 형식 (예: "23:00")
+    val wakeTime: String   // "HH:MM" 형식 (예: "07:00")
+)
+
+data class SleepGoalResponse(
+    val sleepTime: String,     // "HH:MM" 형식
+    val wakeTime: String,      // "HH:MM" 형식
+    val totalMinutes: Int      // 총 수면 시간(분)
 )
