@@ -53,6 +53,7 @@ class CreateGroupActivity : AppCompatActivity() {
     }
     private fun updateSelection(selectedIcon: View) {
         iconList.forEach { it.isSelected = false }
-        selectedIcon.isSelected =
+        selectedIcon.isSelected = true
+        Log.d("tests", "${selectedIcon.id}")
     }
 }

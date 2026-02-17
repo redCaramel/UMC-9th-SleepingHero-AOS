@@ -31,7 +31,15 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.umc_9th.sleepinghero.api.ApiClient
+import com.umc_9th.sleepinghero.api.TokenManager
+import com.umc_9th.sleepinghero.api.repository.SleepRepository
+import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.SleepViewModelFactory
 import com.umc_9th.sleepinghero.databinding.FragmentSleepTrackerBinding
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -42,6 +50,10 @@ class SleepTrackerFragment : Fragment() {
 
     private var _binding: FragmentSleepTrackerBinding? = null
     private val binding get() = _binding!!
+
+    // Sleep Repository & ViewModel
+    private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
+    private val sleepViewModel: SleepViewModel by viewModels { SleepViewModelFactory(sleepRepository) }
 
     // 타이머
     private val handler = Handler(Looper.getMainLooper())
@@ -60,6 +72,7 @@ class SleepTrackerFragment : Fragment() {
     // 알림 토글 저장(추적 알림 UI용)
     private val prefsName = "sleep_tracker_prefs"
     private val keyNotiEnabled = "noti_enabled"
+    private val keyStartMillis = "start_millis"  // 타이머 시작 시간 저장용
 
     private val requestPostNotiPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -124,8 +137,23 @@ class SleepTrackerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 타이머 시작
-        startMillis = System.currentTimeMillis()
+        // API 연동: 목표 수면 시간 설정
+        requestSetSleepGoal()
+
+        // API 연동: 수면 시작 API 호출
+        observeSleepStartResult()
+        requestStartSleep()
+
+        // 타이머 시작 시간 복원 또는 새로 시작
+        val savedStartMillis = getSavedStartMillis()
+        startMillis = if (savedStartMillis > 0L) {
+            savedStartMillis  // 저장된 시작 시간이 있으면 사용
+        } else {
+            val currentTime = System.currentTimeMillis()
+            saveStartMillis(currentTime)  // 없으면 새로 시작하고 저장
+            currentTime
+        }
+
         handler.post(tickRunnable)
 
         // ✅ 앱이 꺼져 있어도 울리게: AlarmManager로 기상 알람 예약
@@ -146,6 +174,72 @@ class SleepTrackerFragment : Fragment() {
         maybeGuideExactAlarmPermission()
     }
 
+    // -------------------------
+    // API 연동: 목표 수면 시간 설정
+    // -------------------------
+    private fun requestSetSleepGoal() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = TokenManager.getAccessToken(requireContext())
+            if (token.isNullOrEmpty()) {
+                return@launch
+            }
+
+            // "11:00 PM" -> "23:00" 형식으로 변환
+            val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
+            val wakeTime24 = convertTo24HourFormat(awakeTimeStr)
+
+            val result = sleepRepository.setSleepGoal(token, sleepTime24, wakeTime24)
+
+            result.onSuccess { response ->
+                // 목표 시간 설정 성공 (로그만 남기고 UI는 변경하지 않음)
+            }.onFailure { error ->
+                // 실패해도 수면 추적은 계속 진행
+            }
+        }
+    }
+
+    /**
+     * "11:00 PM" 형식을 "23:00" 형식으로 변환
+     */
+    private fun convertTo24HourFormat(timeStr: String): String {
+        return try {
+            val (hour, minute, ampm) = parseTimeString(timeStr)
+            var hour24 = hour % 12
+            if (ampm == 1) hour24 += 12  // PM이면 12시간 추가
+            if (hour24 == 24) hour24 = 0  // 24시는 0시로
+            String.format("%02d:%02d", hour24, minute)
+        } catch (e: Exception) {
+            "23:00"  // 기본값
+        }
+    }
+
+    // -------------------------
+    // API 연동: 수면 시작
+    // -------------------------
+    private fun requestStartSleep() {
+        val token = TokenManager.getAccessToken(requireContext())
+        if (token == null) {
+            Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
+            return
+        }
+        sleepViewModel.startSleep(token)
+    }
+
+    private fun observeSleepStartResult() {
+        sleepViewModel.sleepStartResult.observe(viewLifecycleOwner) { result ->
+            result.onSuccess { data ->
+                // 수면 시작 성공 - recordId는 나중에 종료 시 필요할 수 있으니 저장 가능
+                // 현재는 타이머만 시작하면 되므로 성공만 확인
+            }.onFailure { error ->
+                Toast.makeText(
+                    requireContext(),
+                    "수면 시작 실패: ${error.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
     private fun setupClicks() {
         // 수면 종료(중단) 버튼: 알람 취소 + ClearFragment로 이동(임시 값)
         binding.btnStop.setOnClickListener {
@@ -153,6 +247,10 @@ class SleepTrackerFragment : Fragment() {
             setNotiEnabled(false)
             applyNotiUi(false)
             cancelTrackingNotification()
+
+            // 타이머 정리 및 시작 시간 초기화
+            handler.removeCallbacks(tickRunnable)
+            clearSavedStartMillis()
 
             val elapsedMinutes = ((System.currentTimeMillis() - startMillis) / 1000 / 60).toInt()
 
@@ -403,6 +501,31 @@ class SleepTrackerFragment : Fragment() {
     }
 
     // -------------------------
+    // 타이머 시작 시간 저장/복원 (백그라운드에서도 계속 실행되도록)
+    // -------------------------
+    private fun saveStartMillis(millis: Long) {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(keyStartMillis, millis)
+            .apply()
+    }
+
+    private fun getSavedStartMillis(): Long {
+        return requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .getLong(keyStartMillis, 0L)
+    }
+
+    private fun clearSavedStartMillis() {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .remove(keyStartMillis)
+            .apply()
+    }
+
+    // -------------------------
     // Utils
     // -------------------------
 
@@ -414,10 +537,27 @@ class SleepTrackerFragment : Fragment() {
         return String.format("%02d : %02d : %02d", h, m, s)
     }
 
+    override fun onPause() {
+        super.onPause()
+        // onPause에서는 타이머를 멈추지 않음 (다른 Fragment로 가도 계속 실행)
+        // 단지 UI 업데이트만 멈춤
+    }
+
+    override fun onResume() {
+        super.onResume()
+        handler.post(tickRunnable)
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacks(tickRunnable)
         _binding = null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Fragment가 완전히 destroy될 때만 시작 시간 초기화
+        // (수면 종료 시에만 호출됨)
     }
 
     companion object {

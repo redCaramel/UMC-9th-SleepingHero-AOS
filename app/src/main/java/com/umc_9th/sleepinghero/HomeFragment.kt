@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.dto.CharacterInfoResponse
@@ -20,6 +21,7 @@ import com.umc_9th.sleepinghero.api.repository.FriendRepository
 import com.umc_9th.sleepinghero.api.repository.HomeRepository
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
 import com.umc_9th.sleepinghero.api.repository.SocialRepository
+import kotlinx.coroutines.launch
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.CharacterViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.FriendViewModel
@@ -74,6 +76,7 @@ class HomeFragment : Fragment() {
     private var characterInfo: CharacterInfoResponse? = null
     private var dashboardData: DashBoardResponse? = null
     private var myRanking: Int? = null
+    private var myHeroName: String? = null  // 영웅 이름 저장용
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,8 +96,14 @@ class HomeFragment : Fragment() {
         setupButtons()
         observeData()
         observeSocial()
-        socialViewModel.myCharacter(TokenManager.getAccessToken(requireContext()).toString())
-        loadAllData()
+
+        val token = TokenManager.getAccessToken(requireContext())
+        if (token != null) {
+            socialViewModel.myCharacter(token)
+            loadAllData()
+        } else {
+            Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
+        }
 
         return binding.root
     }
@@ -124,7 +133,7 @@ class HomeFragment : Fragment() {
                 .commit()
         }
 
-        // ✅ 취침 시간 설정 (기기 내 저장)
+        // ✅ 취침 시간 설정 (기기 내 저장 + API 연동)
         binding.bedtimeContainer.setOnClickListener {
             showTimePickerDialog(
                 title = "취침 시간 설정",
@@ -132,11 +141,13 @@ class HomeFragment : Fragment() {
                 onConfirm = { finalStr ->
                     binding.tvBedtimeValue.text = finalStr
                     settingManager.setSleepTime(finalStr)
+                    // API 연동: 목표 수면 시간 설정
+                    requestSetSleepGoal()
                 }
             )
         }
 
-        // ✅ 기상 시간 설정 (기기 내 저장)
+        // ✅ 기상 시간 설정 (기기 내 저장 + API 연동)
         binding.wakeupContainer.setOnClickListener {
             showTimePickerDialog(
                 title = "기상 시간 설정",
@@ -144,6 +155,8 @@ class HomeFragment : Fragment() {
                 onConfirm = { finalStr ->
                     binding.tvWakeupValue.text = finalStr
                     settingManager.setAwakeTime(finalStr)
+                    // API 연동: 목표 수면 시간 설정
+                    requestSetSleepGoal()
                 }
             )
         }
@@ -155,6 +168,8 @@ class HomeFragment : Fragment() {
                 characterInfo = data
                 updateCharacterUI()
             }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("HomeFragment", "캐릭터 정보 불러오기 실패 : $message")
             }
         }
 
@@ -163,6 +178,8 @@ class HomeFragment : Fragment() {
                 dashboardData = data
                 updateDashboardUI()
             }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("HomeFragment", "홈 대시보드 불러오기 실패 : $message")
             }
         }
 
@@ -172,6 +189,8 @@ class HomeFragment : Fragment() {
                 myRanking = rankings.find { it.nickname == myNickname }?.rank
                 updateRankingUI()
             }.onFailure { error ->
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("HomeFragment", "친구 랭킹 불러오기 실패 : $message")
             }
         }
 
@@ -413,6 +432,50 @@ class HomeFragment : Fragment() {
         }
     }
 
+    // -------------------------
+    // API 연동: 목표 수면 시간 설정
+    // -------------------------
+    private fun requestSetSleepGoal() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val token = TokenManager.getAccessToken(requireContext())
+            if (token.isNullOrEmpty()) {
+                Log.d("HomeFragment", "토큰이 없어 목표 수면 시간 설정 불가")
+                return@launch
+            }
+
+            val sleepTimeStr = settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
+            val wakeTimeStr = settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
+
+            // "11:00 PM" -> "23:00" 형식으로 변환
+            val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
+            val wakeTime24 = convertTo24HourFormat(wakeTimeStr)
+
+            val result = sleepRepository.setSleepGoal(token, sleepTime24, wakeTime24)
+
+            result.onSuccess { response ->
+                Log.d("HomeFragment", "목표 수면 시간 설정 성공: ${response.sleepTime} ~ ${response.wakeTime} (${response.totalMinutes}분)")
+            }.onFailure { error ->
+                Log.e("HomeFragment", "목표 수면 시간 설정 실패: ${error.message}")
+            }
+        }
+    }
+
+    /**
+     * "11:00 PM" 형식을 "23:00" 형식으로 변환
+     */
+    private fun convertTo24HourFormat(timeStr: String): String {
+        return try {
+            val (hour, minute, ampm) = parseTimeString(timeStr)
+            var hour24 = hour % 12
+            if (ampm == 1) hour24 += 12  // PM이면 12시간 추가
+            if (hour24 == 24) hour24 = 0  // 24시는 0시로
+            String.format("%02d:%02d", hour24, minute)
+        } catch (e: Exception) {
+            Log.e("HomeFragment", "시간 형식 변환 실패: $timeStr", e)
+            "23:00"  // 기본값
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -429,34 +492,43 @@ class HomeFragment : Fragment() {
                 // OR more directly:
                 params.matchConstraintPercentWidth = progress.coerceIn(0f, 1f)
                 binding.progressExp.layoutParams = params
-                socialViewModel.charSearch(
-                    TokenManager.getAccessToken(requireContext()).toString(),
-                    data.name
-                )
+
+                val token = TokenManager.getAccessToken(requireContext())
+                if (token != null) {
+                    socialViewModel.charSearch(token, data.name)
+                } else {
+                    Log.d("HomeFragment", "토큰이 없어 charSearch 호출 불가")
+                }
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
-                Log.d("test", "불러오기 실패 : $message")
-
+                Log.d("HomeFragment", "myCharResponse 불러오기 실패 : $message")
             }
         }
         socialViewModel.charSearchResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
                 binding.tvUserLevelName.text = "LV. ${data.level} ${data.heroName} 님"
-                binding.tvName.text = data.heroName
+                myHeroName = data.heroName  // 변수에 저장
                 binding.tvCalendarValue.text = "${data.continuousSleepDays}일"
                 binding.tvClockValue.text = "${data.totalSleepHour}시간"
-                socialViewModel.loadFriendRanking(TokenManager.getAccessToken(requireContext()).toString())
+
+                val token = TokenManager.getAccessToken(requireContext())
+                if (token != null) {
+                    socialViewModel.loadFriendRanking(token)
+                } else {
+                    Log.d("HomeFragment", "토큰이 없어 loadFriendRanking 호출 불가")
+                }
             }.onFailure { error ->
                 val message = error.message ?: "알 수 없는 오류"
-                Log.d("test", "불러오기 실패 : $message")
+                Log.d("HomeFragment", "charSearchResponse 불러오기 실패 : $message")
             }
         }
         socialViewModel.friendRankingResponse.observe(viewLifecycleOwner) {result ->
             result.onSuccess { data ->
-                val rank = data.indexOfFirst { it.nickName == binding.tvName.text } + 1
+                val rank = data.indexOfFirst { it.nickName == myHeroName } + 1
                 binding.tvTrophyValue.text = "${rank}등"
             }.onFailure { error->
-                Log.d("test", "친구 불러오기 실패")
+                val message = error.message ?: "알 수 없는 오류"
+                Log.d("HomeFragment", "친구 불러오기 실패 : $message")
             }
         }
     }
