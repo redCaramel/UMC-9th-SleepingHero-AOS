@@ -382,9 +382,8 @@ class RoutineFragment : Fragment() {
 
     private fun updateReportFromHours(mode: ReportMode, hours: List<Float>) {
         val total = hours.sum().coerceAtLeast(0f)
-        val denom = hours.size.coerceAtLeast(1)
-        val avg = total / denom
         val recorded = hours.count { it >= recordedThresholdHours }
+        val avg = if (recorded > 0) total / recorded else 0f
 
         binding.tvTotalHours.text = "${total.toInt()}h"
         binding.tvDailyAvg.text = String.format(Locale.KOREA, "%.1fh", avg)

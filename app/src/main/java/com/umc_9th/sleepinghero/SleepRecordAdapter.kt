@@ -44,6 +44,20 @@ class SleepRecordAdapter : RecyclerView.Adapter<SleepRecordAdapter.SleepRecordVi
         holder.tvSleepTime.text = item.sleepTimeText
         holder.tvAdvice.text = item.advice
         holder.ivStar.setImageResource(getStarDrawable(item.star))
+
+        if (item.advice.isNullOrBlank()) {
+            holder.tvAdvice.visibility = View.GONE
+        } else {
+            holder.tvAdvice.visibility = View.VISIBLE
+            holder.tvAdvice.text = item.advice
+        }
+
+        if (item.star <= 0) {
+            holder.ivStar.visibility = View.GONE
+        } else {
+            holder.ivStar.visibility = View.VISIBLE
+            holder.ivStar.setImageResource(getStarDrawable(item.star))
+        }
     }
 
     private fun getStarDrawable(star: Int): Int {

@@ -95,7 +95,7 @@ data class SleepSessionItem(
     val sleptTime: String,
     val wokeTime: String,
     val totalMinutes: Int,
-    val summary: String
+    val summary: String?
 )
 
 data class GoalSleepRequest(
