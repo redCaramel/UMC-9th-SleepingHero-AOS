@@ -30,7 +30,7 @@
                 android:adjustViewBounds="true"
                 android:contentDescription="@string/map_path_description"
                 android:scaleType="fitStart"
-                android:src="@drawable/map_path"
+                android:src="@drawable/map_path_1"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />

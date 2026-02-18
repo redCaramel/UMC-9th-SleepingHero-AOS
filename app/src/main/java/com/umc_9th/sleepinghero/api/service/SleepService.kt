@@ -1,10 +1,10 @@
 package com.umc_9th.sleepinghero.api.service
 
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
-import com.umc_9th.sleepinghero.api.dto.GoalSleepRequest
-import com.umc_9th.sleepinghero.api.dto.GoalSleepResult
 
 import com.umc_9th.sleepinghero.api.dto.SleepEndResponse
+import com.umc_9th.sleepinghero.api.dto.SleepGoalRequest
+import com.umc_9th.sleepinghero.api.dto.SleepGoalResponse
 import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
@@ -33,12 +33,10 @@ interface SleepService {
     /**
      * 수면 시작
      * POST /sleep-sessions/start
-     * 파라미터 없음
+     * 파라미터 없음. 서버가 현재 시간을 sleepTime으로 기록하고 result에 반환.
      */
     @POST("/sleep-sessions/start")
-    suspend fun startSleep(
-        @Header("Authorization") token: String
-    ): ApiResponse<SleepStartResponse>
+    suspend fun startSleep(@Header("Authorization") token: String): ApiResponse<SleepStartResponse>
 
     /**
      * 수면 리뷰 작성
@@ -82,9 +80,19 @@ interface SleepService {
         @Query("size") size: Int = 10
     ): ApiResponse<SleepSessionsResponse>
 
+    /**
+     * 목표 수면 시간 설정
+     * PUT /sleep-sessions/goal
+     *
+     * Request Body:
+     * {
+     *   "sleepTime": "23:00",
+     *   "wakeTime": "07:00"
+     * }
+     */
     @PUT("/sleep-sessions/goal")
-    suspend fun putGoalSleep(
-        @Header("Authorization") authorization: String,
-        @Body body: GoalSleepRequest
-    ): ApiResponse<GoalSleepResult>
+    suspend fun setSleepGoal(
+        @Header("Authorization") token: String,
+        @Body request: SleepGoalRequest
+    ): ApiResponse<SleepGoalResponse>
 }

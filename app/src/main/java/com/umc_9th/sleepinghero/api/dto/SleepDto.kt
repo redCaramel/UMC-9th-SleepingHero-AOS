@@ -24,7 +24,7 @@ data class SleepRecordDetailResponse(
 )
 
 /**
- * POST /sleep-sessions/start - 수면 시작
+ * POST /sleep-sessions/start - 수면 시작 응답 (서버가 현재 시간을 sleepTime으로 기록)
  */
 data class SleepStartResponse(
     val recordId: Int,
@@ -98,14 +98,17 @@ data class SleepSessionItem(
     val summary: String?
 )
 
-data class GoalSleepRequest(
-    val sleepTime: String,
-    val wakeTime: String
+/**
+ * PUT /sleep-sessions/goal - 목표 수면 시간 설정
+ */
+data class SleepGoalRequest(
+    val sleepTime: String,  // "HH:MM" 형식 (예: "23:00")
+    val wakeTime: String,   // "HH:MM" 형식 (예: "07:00")
 )
 
 
-data class GoalSleepResult(
-    val sleepTime: String,
-    val wakeTime: String,
-    val totalMinutes: Int
+data class SleepGoalResponse(
+    val sleepTime: String,     // "HH:MM" 형식
+    val wakeTime: String,      // "HH:MM" 형식
+    val totalMinutes: Int      // 총 수면 시간(분)
 )

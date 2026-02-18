@@ -80,7 +80,7 @@
                 android:layout_gravity="center"
                 android:paddingStart="14dp"
                 android:paddingEnd="14dp"
-                android:layout_marginTop="-8dp"
+                android:layout_marginTop="-4dp"
                 android:text="@string/sleep_tracker_time_range"
                 android:textStyle="bold"
                 android:textColor="@color/gray_900"
@@ -115,8 +115,9 @@
             <!-- 어두운 배경 -->
             <ImageView
                 android:id="@+id/iv_circle_bg"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_width="328dp"
+                android:layout_height="296dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/home_sleep_circle_bg" />
 
@@ -146,7 +147,7 @@
                 android:layout_gravity="center"
                 android:text="@string/sleep_tracker_percent"
                 android:textColor="@color/gray_900"
-                android:textSize="42sp"
+                android:textSize="48sp"
                 android:textStyle="bold" />
         </FrameLayout>
 

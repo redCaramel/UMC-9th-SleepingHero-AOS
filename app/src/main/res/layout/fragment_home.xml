@@ -67,6 +67,7 @@
                         android:src="@drawable/home_profile_check" />
 
                     <TextView
+                        android:id="@+id/tv_condition"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="최상 컨디션"

@@ -540,39 +540,22 @@ class RoutineFragment : Fragment() {
         return String.format(Locale.US, "%02d:%02d", h, m)
     }
 
-    private fun shiftHHmm(hhmm: String, deltaMinutes: Int): String? {
-        return try {
-            val parts = hhmm.split(":")
-            if (parts.size != 2) return null
-            val h = parts[0].toInt()
-            val m = parts[1].toInt()
-            if (h !in 0..23 || m !in 0..59) return null
-
-            val mod = 24 * 60
-            val shifted = ((h * 60 + m + deltaMinutes) % mod + mod) % mod
-            val nh = shifted / 60
-            val nm = shifted % 60
-            String.format(Locale.US, "%02d:%02d", nh, nm)
-        } catch (_: Exception) {
-            null
-        }
-    }
 
     private fun putGoalSleepToServer() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
             if (raw.isNullOrEmpty()) return@launch
 
-            val sleepHHmmRaw = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
-            val wakeHHmmRaw  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
+            val sleepHHmmKst = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
+            val wakeHHmmKst  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
 
-            //9시간(=540분) 빼서 보냄
-            val sleepHHmm = shiftHHmm(sleepHHmmRaw, -540) ?: return@launch
-            val wakeHHmm  = shiftHHmm(wakeHHmmRaw,  -540) ?: return@launch
+            Log.d("GOAL_PUT", "kst=$sleepHHmmKst~$wakeHHmmKst")
 
-            Log.d("GOAL_PUT", "raw=$sleepHHmmRaw~$wakeHHmmRaw / shifted=$sleepHHmm~$wakeHHmm")
-
-            val result = sleepRepository.putGoalSleep(raw, sleepHHmm, wakeHHmm)
+            val result = sleepRepository.setSleepGoal(
+                token = raw,
+                sleepTime = sleepHHmmKst,
+                wakeTime = wakeHHmmKst
+            )
 
             result.onSuccess { data ->
                 binding.tvGoalValue.text = minutesToKoreanHourMin(data.totalMinutes)
@@ -581,5 +564,6 @@ class RoutineFragment : Fragment() {
             }
         }
     }
+
 
 }
