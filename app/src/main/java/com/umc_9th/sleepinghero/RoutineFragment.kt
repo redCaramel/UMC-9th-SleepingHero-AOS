@@ -45,6 +45,8 @@ class RoutineFragment : Fragment() {
     private lateinit var binding: FragmentRoutineBinding
     private lateinit var mainActivity: MainActivity
 
+    private lateinit var settingManager: SettingManager
+
     private val homeRepository by lazy { HomeRepository(ApiClient.homeService) }
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
 
@@ -72,6 +74,14 @@ class RoutineFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentRoutineBinding.inflate(inflater, container, false)
+
+        settingManager = SettingManager(requireContext())
+        if (settingManager.getSleepTime() == "null") settingManager.setSleepTime("11:00 PM")
+        if (settingManager.getAwakeTime() == "null") settingManager.setAwakeTime("07:00 AM")
+
+        binding.tvBedTime.text = settingManager.getSleepTime()
+        binding.tvWakeTime.text = settingManager.getAwakeTime()
+
         return binding.root
     }
 
