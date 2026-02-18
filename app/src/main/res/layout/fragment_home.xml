@@ -17,6 +17,7 @@
             android:id="@+id/profile_card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:background="@drawable/home_profile_bg"
             android:paddingStart="20dp"
             android:paddingTop="24dp"
@@ -69,8 +70,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="최상 컨디션"
                         android:layout_marginTop="-1dp"
+                        android:text="최상 컨디션"
                         android:textColor="@color/white"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -301,11 +302,11 @@
                 <View
                     android:id="@+id/progress_exp"
                     android:layout_width="0dp"
-                    app:layout_constraintWidth_percent="0.0"
                     android:layout_height="16dp"
                     android:background="@drawable/home_profile_bluebar"
                     app:layout_constraintStart_toStartOf="@id/progress_exp_bg"
-                    app:layout_constraintTop_toTopOf="@id/progress_exp_bg" />
+                    app:layout_constraintTop_toTopOf="@id/progress_exp_bg"
+                    app:layout_constraintWidth_percent="0.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
