@@ -437,12 +437,12 @@ class RoutineFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMinup.setOnClickListener {
-            min = if (min == 50) 0 else min + 1
+            min = if (min == 59) 0 else min + 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 0) 50 else min - 1
+            min = if (min == 0) 59 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
