@@ -51,7 +51,8 @@ class SleepTrackerFragment : Fragment() {
             val ratio = (elapsedMinutes.toDouble() / goalMinutes.toDouble()).coerceIn(0.0, 1.0)
             val percent = (ratio * 100.0).roundToInt()
             binding.tvPercent.text = "${percent}%"
-            binding.tvProgressInfo.text = "${elapsedMinutes} / ${goalMinutes} 분"
+            binding.tvProgressInfo.text =
+                "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
             binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
 
             if (!alarmShown && elapsedMinutes >= goalMinutes) {
@@ -88,7 +89,8 @@ class SleepTrackerFragment : Fragment() {
         binding.tvTimeRange.text = "$sleepTimeStr - $awakeTimeStr"
         binding.tvTimer.text = "00 : 00 : 00"
         binding.tvPercent.text = "0%"
-        binding.tvProgressInfo.text = "0 / ${goalMinutes} 분"
+        binding.tvProgressInfo.text =
+            "0.0 / ${minutesToRoundedHours(goalMinutes)}시간"
         binding.ivCircleProgress.rotation = 0f
 
         parentFragmentManager.setFragmentResultListener(
@@ -108,6 +110,11 @@ class SleepTrackerFragment : Fragment() {
 
         // ✅ 핵심: 여기서 startSleep 쳐서 recordId 받아두고, 성공하면 타이머 시작
         startSleepAndTracking()
+    }
+
+    private fun minutesToRoundedHours(min: Int): String {
+        val hours = min / 60.0
+        return String.format("%.1f", hours)
     }
 
     // ✅ 추가: start API 호출해서 recordId 저장
