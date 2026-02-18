@@ -65,11 +65,11 @@
                     android:background="@drawable/bg_level_a"
                     android:drawableLeft="@drawable/ic_level"
                     android:drawablePadding="4dp"
-                    android:paddingHorizontal="5dp"
+                    android:paddingHorizontal="8dp"
                     android:paddingVertical="5dp"
                     android:text="Lv.-"
                     android:textAlignment="center"
-                    android:textSize="20sp"
+                    android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/tv_social_name"
                     app:layout_constraintTop_toTopOf="parent" />
