@@ -45,6 +45,8 @@ class RoutineFragment : Fragment() {
     private lateinit var binding: FragmentRoutineBinding
     private lateinit var mainActivity: MainActivity
 
+    private lateinit var settingManager: SettingManager
+
     private val homeRepository by lazy { HomeRepository(ApiClient.homeService) }
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
 
@@ -72,6 +74,14 @@ class RoutineFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentRoutineBinding.inflate(inflater, container, false)
+
+        settingManager = SettingManager(requireContext())
+        if (settingManager.getSleepTime() == "null") settingManager.setSleepTime("11:00 PM")
+        if (settingManager.getAwakeTime() == "null") settingManager.setAwakeTime("07:00 AM")
+
+        binding.tvBedTime.text = settingManager.getSleepTime()
+        binding.tvWakeTime.text = settingManager.getAwakeTime()
+
         return binding.root
     }
 
@@ -382,9 +392,8 @@ class RoutineFragment : Fragment() {
 
     private fun updateReportFromHours(mode: ReportMode, hours: List<Float>) {
         val total = hours.sum().coerceAtLeast(0f)
-        val denom = hours.size.coerceAtLeast(1)
-        val avg = total / denom
         val recorded = hours.count { it >= recordedThresholdHours }
+        val avg = if (recorded > 0) total / recorded else 0f
 
         binding.tvTotalHours.text = "${total.toInt()}h"
         binding.tvDailyAvg.text = String.format(Locale.KOREA, "%.1fh", avg)
@@ -438,12 +447,12 @@ class RoutineFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMinup.setOnClickListener {
-            min = if (min == 50) 0 else min + 10
+            min = if (min == 59) 0 else min + 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 0) 50 else min - 10
+            min = if (min == 0) 59 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
@@ -458,10 +467,12 @@ class RoutineFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetConfirm.setOnClickListener {
-            val finalStr =
-                "${makeTimeString(hour, 0)}:${makeTimeString(min, 0)} ${makeTimeString(ampm, 1)}"
+            val finalStr = "${makeTimeString(hour, 0)}:${makeTimeString(min, 0)} ${makeTimeString(ampm, 1)}"
             targetTextView.text = finalStr
+
             updateGoalSleep()
+            putGoalSleepToServer()
+
             dialog.dismiss()
         }
 
@@ -531,4 +542,38 @@ class RoutineFragment : Fragment() {
             if (time < 10) "0$time" else time.toString()
         }
     }
+
+    private fun time12hToHHmm(timeStr: String): String? {
+        val minutes = timeStringToMinutesSafe(timeStr) ?: return null
+        val h = minutes / 60
+        val m = minutes % 60
+        return String.format(Locale.US, "%02d:%02d", h, m)
+    }
+
+
+    private fun putGoalSleepToServer() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val raw = TokenManager.getAccessToken(requireContext())
+            if (raw.isNullOrEmpty()) return@launch
+
+            val sleepHHmmKst = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
+            val wakeHHmmKst  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
+
+            Log.d("GOAL_PUT", "kst=$sleepHHmmKst~$wakeHHmmKst")
+
+            val result = sleepRepository.setSleepGoal(
+                token = raw,
+                sleepTime = sleepHHmmKst,
+                wakeTime = wakeHHmmKst
+            )
+
+            result.onSuccess { data ->
+                binding.tvGoalValue.text = minutesToKoreanHourMin(data.totalMinutes)
+            }.onFailure { e ->
+                Log.e("GOAL_PUT", e.message ?: "unknown")
+            }
+        }
+    }
+
+
 }

@@ -163,7 +163,7 @@ class HeroFragment : Fragment() {
                         date = dateText,
                         sleepTimeText = durationText,
                         star = dto.star.coerceIn(0, 5),
-                        advice = dto.summary // summary를 피드백 문구로 사용
+                        advice = dto.summary ?: "" // summary를 피드백 문구로 사용
                     )
                 }
 

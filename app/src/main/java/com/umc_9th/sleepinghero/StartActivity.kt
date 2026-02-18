@@ -21,10 +21,13 @@ import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.AuthRepository
 import com.umc_9th.sleepinghero.api.repository.SocialRepository
+import com.umc_9th.sleepinghero.api.repository.TutorialRepository
 import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.AuthViewModelFactory
 import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModel
 import com.umc_9th.sleepinghero.api.viewmodel.SocialViewModelFactory
+import com.umc_9th.sleepinghero.api.viewmodel.TutorialViewModel
+import com.umc_9th.sleepinghero.api.viewmodel.TutorialViewModelFactory
 
 class StartActivity : AppCompatActivity() {
 
@@ -42,8 +45,31 @@ class StartActivity : AppCompatActivity() {
         factoryProducer = { SocialViewModelFactory(socialRepository) }
     )
 
+    private val tutorialRepository by lazy {
+        TutorialRepository(ApiClient.tutorialService)
+    }
+
+    private val tutorialViewModel: TutorialViewModel by viewModels(
+        factoryProducer = { TutorialViewModelFactory(tutorialRepository) }
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // ✅ 디버그에서만 임시 토큰으로 바로 진입
+        if (BuildConfig.DEBUG) {
+            val debugToken =
+                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NzE0NTEzNDEsImV4cCI6MTc3MTQ1MzE0MX0.xV5lmUV-yWTKhFYggrYHTH9TwtEVRVEkWsKnriw23rBYeuuR86_Cp0DuzdJi3bD8OWXZaCE_5XX2idTBLTXsDA"
+
+            // TokenManager가 "Bearer" 없이 raw 토큰을 저장하는 구조라면 그대로 저장
+            TokenManager.setAccessToken(this, debugToken)
+
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+            return
+        }
+
+
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -140,25 +166,27 @@ class StartActivity : AppCompatActivity() {
     private fun observeCheck() {
         socialViewModel.myCharResponse.observe(this) { result ->
             result.onSuccess { data ->
-                Log.d("test", "사용자 인식 성공 - ${data.name}")
+                val token = TokenManager.getAccessToken(this).orEmpty()
+                tutorialViewModel.getTutorial(token)
+            }.onFailure { error ->
+                if (error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {
+                    startActivity(Intent(this, CreateHeroActivity::class.java))
+                    finish()
+                }
+            }
+        }
 
-                if (!TutorialActivity.isTutorialDone(this)) {
+        tutorialViewModel.tutorialStatus.observe(this) { result ->
+            result.onSuccess { status ->
+                if (!status.finished) {
                     startActivity(Intent(this, TutorialActivity::class.java))
                 } else {
                     startActivity(Intent(this, MainActivity::class.java))
                 }
-
                 finish()
-            }.onFailure { error ->
-                if(error.message?.contains("존재하지 않는 캐릭터입니다.") == true) {
-                    Log.d("test","용사 생성 화면 송출")
-                    var intent = Intent(this, CreateHeroActivity::class.java)
-                    startActivity(intent)
-                    finish()
-                }
-                val message = error.message ?: "알 수 없는 오류"
-                Log.d("test", "불러오기 실패 : $message")
-
+            }.onFailure {
+                startActivity(Intent(this, TutorialActivity::class.java))
+                finish()
             }
         }
     }

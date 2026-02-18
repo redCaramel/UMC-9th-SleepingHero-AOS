@@ -188,7 +188,7 @@ class ClearFragment : Fragment() {
             // 리뷰 작성 API 호출 (HeroFragment와 동일한 패턴)
             viewLifecycleOwner.lifecycleScope.launch {
                 val result = sleepRepository.createSleepReview(
-                    token = token,
+                    accessToken = token,
                     recordId = recordId,
                     star = selectedStar,
                     comment = comment

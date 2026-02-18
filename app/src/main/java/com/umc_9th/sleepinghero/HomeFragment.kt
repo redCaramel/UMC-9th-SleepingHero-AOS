@@ -119,12 +119,20 @@ class HomeFragment : Fragment() {
             val sleepTime = settingManager.getSleepTime().takeIf { it != "null" } ?: "11:00 PM"
             val awakeTime = settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
 
-            val frag = SleepTrackerFragment.newInstance(sleepTime, awakeTime)
+            val goalMinutes = computeGoalMinutes(sleepTime, awakeTime)
+
+
+            val frag = SleepTrackerFragment.newInstance(
+                sleepTime = sleepTime,
+                awakeTime = awakeTime,
+                goalMinutes = goalMinutes
+            )
 
             parentFragmentManager.beginTransaction()
                 .replace(R.id.container_main, frag)
                 .addToBackStack(null)
                 .commit()
+
         }
 
         binding.btnZoomIn.setOnClickListener {
@@ -162,6 +170,30 @@ class HomeFragment : Fragment() {
             )
         }
     }
+
+    private fun computeGoalMinutes(sleepTime: String, awakeTime: String): Int {
+        val (sh, sm, spm) = parseTimeString(sleepTime)
+        val (ah, am, apm) = parseTimeString(awakeTime)
+
+        fun toMinutes(h12: Int, m: Int, pm: Int): Int {
+            var h24 = h12 % 12
+            if (pm == 1) h24 += 12
+            return h24 * 60 + m
+        }
+
+        val sleepMin = toMinutes(sh, sm, spm)
+        val awakeMin = toMinutes(ah, am, apm)
+
+        val diff = if (awakeMin > sleepMin) {
+            awakeMin - sleepMin
+        } else {
+            (24 * 60 - sleepMin) + awakeMin
+        }
+
+        // ✅ 안전장치: 0분이면 1분으로 처리
+        return diff.coerceAtLeast(1)
+    }
+
 
     private fun observeData() {
         characterViewModel.characterInfo.observe(viewLifecycleOwner) { result ->
@@ -249,6 +281,14 @@ class HomeFragment : Fragment() {
     private fun updateDashboardUI() {
         val data = dashboardData ?: return
         binding.tvCalendarValue.text = "${data.currentStreak}일"
+        // 대시보드 API nonSleepStreak으로 컨디션 문구 연동 (HeroFragment와 동일 기준)
+        val conditionText = when {
+            data.nonSleepStreak <= 0 -> "최상 컨디션"
+            data.nonSleepStreak == 1 -> "컨디션 저하"
+            data.nonSleepStreak == 2 -> "무기력함"
+            else -> "감기"
+        }
+        binding.tvCondition.text = conditionText
     }
 
     private fun updateRankingUI() {
@@ -402,12 +442,12 @@ class HomeFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMinup.setOnClickListener {
-            min = if (min == 50) 0 else min + 10
+            min = if (min == 59) 0 else min + 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 0) 50 else min - 10
+            min = if (min == 0) 59 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
