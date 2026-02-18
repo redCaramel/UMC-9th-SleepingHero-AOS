@@ -1,6 +1,8 @@
 package com.umc_9th.sleepinghero.api.service
 
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
+import com.umc_9th.sleepinghero.api.dto.GoalSleepRequest
+import com.umc_9th.sleepinghero.api.dto.GoalSleepResult
 
 import com.umc_9th.sleepinghero.api.dto.SleepEndResponse
 import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
@@ -12,6 +14,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -78,4 +81,10 @@ interface SleepService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10
     ): ApiResponse<SleepSessionsResponse>
+
+    @PUT("/sleep-sessions/goal")
+    suspend fun putGoalSleep(
+        @Header("Authorization") authorization: String,
+        @Body body: GoalSleepRequest
+    ): ApiResponse<GoalSleepResult>
 }

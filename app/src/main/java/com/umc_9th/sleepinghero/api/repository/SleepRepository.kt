@@ -14,6 +14,8 @@ class SleepRepository {
 }
 */
 
+import com.umc_9th.sleepinghero.api.dto.GoalSleepRequest
+import com.umc_9th.sleepinghero.api.dto.GoalSleepResult
 import com.umc_9th.sleepinghero.api.dto.SleepEndResponse
 import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
@@ -72,5 +74,17 @@ class SleepRepository(private val sleepService: SleepService) {
         } catch (e: Exception) {
             Result.failure(e)
         }
+
+    suspend fun putGoalSleep(rawToken: String, sleepTime: String, wakeTime: String)
+            : Result<GoalSleepResult> {
+        return runCatching {
+            val res = sleepService.putGoalSleep(
+                authorization = "Bearer $rawToken",
+                body = GoalSleepRequest(sleepTime = sleepTime, wakeTime = wakeTime)
+            )
+            if (!res.isSuccess) throw RuntimeException(res.message)
+            res.result
+        }
+    }
 }
 

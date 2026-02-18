@@ -97,3 +97,15 @@ data class SleepSessionItem(
     val totalMinutes: Int,
     val summary: String
 )
+
+data class GoalSleepRequest(
+    val sleepTime: String,
+    val wakeTime: String
+)
+
+
+data class GoalSleepResult(
+    val sleepTime: String,
+    val wakeTime: String,
+    val totalMinutes: Int
+)

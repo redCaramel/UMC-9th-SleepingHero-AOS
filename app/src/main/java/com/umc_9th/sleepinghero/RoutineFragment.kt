@@ -458,10 +458,12 @@ class RoutineFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetConfirm.setOnClickListener {
-            val finalStr =
-                "${makeTimeString(hour, 0)}:${makeTimeString(min, 0)} ${makeTimeString(ampm, 1)}"
+            val finalStr = "${makeTimeString(hour, 0)}:${makeTimeString(min, 0)} ${makeTimeString(ampm, 1)}"
             targetTextView.text = finalStr
+
             updateGoalSleep()
+            putGoalSleepToServer()
+
             dialog.dismiss()
         }
 
@@ -531,4 +533,32 @@ class RoutineFragment : Fragment() {
             if (time < 10) "0$time" else time.toString()
         }
     }
+
+    private fun time12hToHHmm(timeStr: String): String? {
+        val minutes = timeStringToMinutesSafe(timeStr) ?: return null
+        val h = minutes / 60
+        val m = minutes % 60
+        return String.format(Locale.US, "%02d:%02d", h, m)
+    }
+
+    private fun putGoalSleepToServer() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val raw = TokenManager.getAccessToken(requireContext())
+            if (raw.isNullOrEmpty()) return@launch
+
+            val sleepHHmm = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
+            val wakeHHmm  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
+
+            val result = sleepRepository.putGoalSleep(raw, sleepHHmm, wakeHHmm)
+
+            result.onSuccess { data ->
+                Log.d("GOAL_PUT", "성공: ${data.sleepTime} ~ ${data.wakeTime}, ${data.totalMinutes}min")
+                binding.tvGoalValue.text = minutesToKoreanHourMin(data.totalMinutes)
+            }.onFailure { e ->
+                Log.e("GOAL_PUT", e.message ?: "unknown")
+
+            }
+        }
+    }
+
 }
