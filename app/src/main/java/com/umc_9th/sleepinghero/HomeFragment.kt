@@ -249,6 +249,14 @@ class HomeFragment : Fragment() {
     private fun updateDashboardUI() {
         val data = dashboardData ?: return
         binding.tvCalendarValue.text = "${data.currentStreak}일"
+        // 대시보드 API nonSleepStreak으로 컨디션 문구 연동 (HeroFragment와 동일 기준)
+        val conditionText = when {
+            data.nonSleepStreak <= 0 -> "최상 컨디션"
+            data.nonSleepStreak == 1 -> "컨디션 저하"
+            data.nonSleepStreak == 2 -> "무기력함"
+            else -> "감기"
+        }
+        binding.tvCondition.text = conditionText
     }
 
     private fun updateRankingUI() {

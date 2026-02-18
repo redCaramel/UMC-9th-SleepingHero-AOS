@@ -10,10 +10,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="16dp"
-        android:paddingTop="50dp">
+        android:padding="16dp">
 
         <!-- 1. 상단 프로필 카드 -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -70,6 +67,7 @@
                         android:src="@drawable/home_profile_check" />
 
                     <TextView
+                        android:id="@+id/tv_condition"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="최상 컨디션"
@@ -532,7 +530,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="8시간"
-                        android:textColor="#1B4E81"
+                        android:textColor="#2FA4A9"
                         android:textSize="16sp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
@@ -546,18 +544,14 @@
         <Button
             android:id="@+id/btn_start_sleep"
             android:layout_width="0dp"
-            android:layout_height="74dp"
+            android:layout_height="56dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/home_startsleepbar"
             android:text="수면 시작하기"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:letterSpacing="0.04"
-            android:lineSpacingExtra="24dp"
-            android:gravity="center"
-            android:includeFontPadding="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
