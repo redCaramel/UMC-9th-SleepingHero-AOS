@@ -3,15 +3,19 @@ package com.umc_9th.sleepinghero.api.service
 import com.umc_9th.sleepinghero.api.dto.ApiResponse
 
 import com.umc_9th.sleepinghero.api.dto.SleepEndResponse
+import com.umc_9th.sleepinghero.api.dto.SleepGoalRequest
+import com.umc_9th.sleepinghero.api.dto.SleepGoalResponse
 import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionsResponse
+import com.umc_9th.sleepinghero.api.dto.SleepStartRequest
 import com.umc_9th.sleepinghero.api.dto.SleepStartResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -30,11 +34,12 @@ interface SleepService {
     /**
      * 수면 시작
      * POST /sleep-sessions/start
-     * 파라미터 없음
+     * 목표 수면 시간과 동일한 sleepTime, wakeTime 전달 필요 (서버 검증)
      */
     @POST("/sleep-sessions/start")
     suspend fun startSleep(
-        @Header("Authorization") token: String
+        @Header("Authorization") token: String,
+        @Body request: SleepStartRequest
     ): ApiResponse<SleepStartResponse>
 
     /**
@@ -78,4 +83,20 @@ interface SleepService {
         @Query("page") page: Int = 0,
         @Query("size") size: Int = 10
     ): ApiResponse<SleepSessionsResponse>
+
+    /**
+     * 목표 수면 시간 설정
+     * PUT /sleep-sessions/goal
+     *
+     * Request Body:
+     * {
+     *   "sleepTime": "23:00",
+     *   "wakeTime": "07:00"
+     * }
+     */
+    @PUT("/sleep-sessions/goal")
+    suspend fun setSleepGoal(
+        @Header("Authorization") token: String,
+        @Body request: SleepGoalRequest
+    ): ApiResponse<SleepGoalResponse>
 }

@@ -32,6 +32,7 @@ class MapFragment : Fragment() {
     private val clearedLevelMarkers = mutableListOf<ImageView>() // 파란 점들
     private var currentLevelMarker: ImageView? = null            // 보라 점
     private var locationLabel: ImageView? = null                 // "현재 위치" 라벨
+    private var heroIconView: ImageView? = null                  // 캐릭터 아이콘
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -92,6 +93,7 @@ class MapFragment : Fragment() {
             setupClearedLevelMarkers()
             setupCurrentLevelMarker()
             setupLocationLabel()
+            setupHeroIcon()
             scrollToHeroLevel(animated = true)
         }
     }
@@ -206,6 +208,43 @@ class MapFragment : Fragment() {
     }
 
     /**
+     * 현재 레벨 위치에 캐릭터 아이콘(영웅)을 표시
+     * - HeroFragment와 동일한 스킨을 쓰고 싶다면 추후 SkinRepository 연동 가능
+     * - 일단은 공통 기본 스킨 이미지(hero_skin_1)를 사용
+     */
+    private fun setupHeroIcon() {
+        val mapContainer = binding.ivMapPath.parent as? ConstraintLayout ?: return
+        heroIconView?.let { mapContainer.removeView(it) }
+
+        val (cx, cy) = getLevelCenterPx(currentHeroLevel)
+        val size = 40.dpToPx()
+
+        heroIconView = ImageView(requireContext()).apply {
+            setImageResource(R.drawable.hero_skin_1)
+            id = View.generateViewId()
+            layoutParams = ConstraintLayout.LayoutParams(size, size).apply {
+                startToStart = binding.ivMapPath.id
+                topToTop = binding.ivMapPath.id
+                marginStart = (cx - size / 2).coerceAtLeast(0)
+                topMargin = (cy - size / 2).coerceAtLeast(0)
+            }
+
+            // 살짝 확대되며 나타나는 애니메이션
+            scaleX = 0f
+            scaleY = 0f
+            alpha = 0f
+            animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .alpha(1f)
+                .setDuration(300)
+                .start()
+        }
+
+        mapContainer.addView(heroIconView)
+    }
+
+    /**
      * 현재 레벨 점이 화면 중앙에 오도록 스크롤
      */
     private fun scrollToHeroLevel(animated: Boolean) {
@@ -255,6 +294,7 @@ class MapFragment : Fragment() {
         clearedLevelMarkers.clear()
         currentLevelMarker = null
         locationLabel = null
+        heroIconView = null
         _binding = null
     }
 

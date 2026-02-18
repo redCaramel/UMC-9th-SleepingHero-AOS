@@ -152,6 +152,7 @@ class HeroFragment : Fragment() {
             val result = sleepRepository.getSleepSessions(raw, page = 0, size = 10)
 
             result.onSuccess { data ->
+
                 val uiList = data.content.map { dto ->
                     val durationText = minutesToHourMin(dto.totalMinutes)
 
@@ -195,7 +196,8 @@ class HeroFragment : Fragment() {
             }
             baseSkinId = res.result.skins.firstOrNull { it.equipped }?.skinId ?: 1L
 
-            applyResolvedSkinIfReady()
+            val equippedSkinId = res.result.skins.firstOrNull { it.equipped }?.skinId ?: 1L
+            applySkinImage(equippedSkinId)
         }
     }
 
