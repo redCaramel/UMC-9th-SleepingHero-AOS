@@ -407,7 +407,7 @@ class HomeFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 59) 50 else min - 1
+            min = if (min == 0) 59 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
