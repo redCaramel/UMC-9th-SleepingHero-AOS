@@ -438,12 +438,12 @@ class RoutineFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMinup.setOnClickListener {
-            min = if (min == 50) 0 else min + 10
+            min = if (min == 50) 0 else min + 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 0) 50 else min - 10
+            min = if (min == 0) 50 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
@@ -541,22 +541,44 @@ class RoutineFragment : Fragment() {
         return String.format(Locale.US, "%02d:%02d", h, m)
     }
 
+    private fun shiftHHmm(hhmm: String, deltaMinutes: Int): String? {
+        return try {
+            val parts = hhmm.split(":")
+            if (parts.size != 2) return null
+            val h = parts[0].toInt()
+            val m = parts[1].toInt()
+            if (h !in 0..23 || m !in 0..59) return null
+
+            val mod = 24 * 60
+            val shifted = ((h * 60 + m + deltaMinutes) % mod + mod) % mod
+            val nh = shifted / 60
+            val nm = shifted % 60
+            String.format(Locale.US, "%02d:%02d", nh, nm)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun putGoalSleepToServer() {
         viewLifecycleOwner.lifecycleScope.launch {
             val raw = TokenManager.getAccessToken(requireContext())
             if (raw.isNullOrEmpty()) return@launch
 
-            val sleepHHmm = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
-            val wakeHHmm  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
+            val sleepHHmmRaw = time12hToHHmm(binding.tvBedTime.text.toString()) ?: return@launch
+            val wakeHHmmRaw  = time12hToHHmm(binding.tvWakeTime.text.toString()) ?: return@launch
+
+            //9시간(=540분) 빼서 보냄
+            val sleepHHmm = shiftHHmm(sleepHHmmRaw, -540) ?: return@launch
+            val wakeHHmm  = shiftHHmm(wakeHHmmRaw,  -540) ?: return@launch
+
+            Log.d("GOAL_PUT", "raw=$sleepHHmmRaw~$wakeHHmmRaw / shifted=$sleepHHmm~$wakeHHmm")
 
             val result = sleepRepository.putGoalSleep(raw, sleepHHmm, wakeHHmm)
 
             result.onSuccess { data ->
-                Log.d("GOAL_PUT", "성공: ${data.sleepTime} ~ ${data.wakeTime}, ${data.totalMinutes}min")
                 binding.tvGoalValue.text = minutesToKoreanHourMin(data.totalMinutes)
             }.onFailure { e ->
                 Log.e("GOAL_PUT", e.message ?: "unknown")
-
             }
         }
     }
