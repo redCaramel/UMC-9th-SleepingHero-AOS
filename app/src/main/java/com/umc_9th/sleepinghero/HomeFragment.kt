@@ -125,6 +125,7 @@ class HomeFragment : Fragment() {
                 .replace(R.id.container_main, frag)
                 .addToBackStack(null)
                 .commit()
+
         }
 
         binding.btnZoomIn.setOnClickListener {
