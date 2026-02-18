@@ -17,9 +17,10 @@ class TutorialActivity : AppCompatActivity() {
     private lateinit var binding: ActivityTutorialBinding
 
     private val pages = listOf(
-        TutorialPage(R.drawable.tutorial_1, "홈에서 대시보드와 기록을 확인해요"),
-        TutorialPage(R.drawable.tutorial_2, "루틴에서 주간/월간 수면 패턴을 확인해요"),
-        TutorialPage(R.drawable.tutorial_3, "소셜에서 친구들과 용사를 공유해요")
+        TutorialPage(R.drawable.tutorial_1, "홈에서 대시보드를 확인하고 수면을 기록해요"),
+        TutorialPage(R.drawable.tutorial_2, "용사에서 용사 정보와 최근 수면 기록을 확인해요"),
+        TutorialPage(R.drawable.tutorial_3, "루틴에서 주간/월간 수면 패턴을 확인해요"),
+        TutorialPage(R.drawable.tutorial_4, "소셜에서 친구들과 용사를 공유해요")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
