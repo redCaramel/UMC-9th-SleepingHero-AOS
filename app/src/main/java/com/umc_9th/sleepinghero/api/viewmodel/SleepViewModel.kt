@@ -45,11 +45,11 @@ class SleepViewModel(private val repository: SleepRepository) : ViewModel() {
     }
 
     /**
-     * 수면 시작 (목표와 동일한 sleepTime, wakeTime 전달)
+     * 수면 시작 (파라미터 없음. 서버가 현재 시간을 sleepTime으로 기록)
      */
-    fun startSleep(token: String, sleepTime: String, wakeTime: String) {
+    fun startSleep(token: String) {
         viewModelScope.launch {
-            val result = repository.startSleep(token, sleepTime, wakeTime)
+            val result = repository.startSleep(token)
             _sleepStartResult.value = result
         }
     }

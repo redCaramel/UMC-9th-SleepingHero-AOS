@@ -24,15 +24,7 @@ data class SleepRecordDetailResponse(
 )
 
 /**
- * POST /sleep-sessions/start - 수면 시작 요청 (목표와 동일한 시간 전달 필요)
- */
-data class SleepStartRequest(
-    val sleepTime: String,  // "HH:MM" 형식 (예: "22:50")
-    val wakeTime: String   // "HH:MM" 형식 (예: "07:00")
-)
-
-/**
- * POST /sleep-sessions/start - 수면 시작
+ * POST /sleep-sessions/start - 수면 시작 응답 (서버가 현재 시간을 sleepTime으로 기록)
  */
 data class SleepStartResponse(
     val recordId: Int,

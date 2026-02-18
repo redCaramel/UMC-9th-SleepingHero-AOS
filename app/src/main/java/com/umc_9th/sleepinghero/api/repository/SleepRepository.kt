@@ -21,7 +21,6 @@ import com.umc_9th.sleepinghero.api.dto.SleepRecordDetailResponse
 import com.umc_9th.sleepinghero.api.dto.SleepReviewRequest
 import com.umc_9th.sleepinghero.api.dto.SleepReviewResponse
 import com.umc_9th.sleepinghero.api.dto.SleepSessionsResponse
-import com.umc_9th.sleepinghero.api.dto.SleepStartRequest
 import com.umc_9th.sleepinghero.api.dto.SleepStartResponse
 import com.umc_9th.sleepinghero.api.service.SleepService
 
@@ -29,6 +28,20 @@ class SleepRepository(private val sleepService: SleepService) {
 
     private fun withBearer(token: String): String =
         if (token.startsWith("Bearer ")) token else "Bearer $token"
+
+    /**
+     * 9시간을 뺀 시각으로 변환하여 전달
+     */
+    private fun kstTimeToUtc(hhMmKst: String): String {
+        val parts = hhMmKst.trim().split(":")
+        val hour = parts.getOrNull(0)?.toIntOrNull() ?: 0
+        val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+        var totalMinutes = hour * 60 + minute - 9 * 60  // KST -> UTC (9시간 차감)
+        if (totalMinutes < 0) totalMinutes += 24 * 60
+        val utcHour = totalMinutes / 60
+        val utcMinute = totalMinutes % 60
+        return String.format("%02d:%02d", utcHour, utcMinute)
+    }
 
     suspend fun getSleepRecordDetail(token: String, sleepRecordId: Int): Result<SleepRecordDetailResponse> =
         try {
@@ -39,10 +52,9 @@ class SleepRepository(private val sleepService: SleepService) {
             Result.failure(e)
         }
 
-    suspend fun startSleep(token: String, sleepTime: String, wakeTime: String): Result<SleepStartResponse> =
+    suspend fun startSleep(token: String): Result<SleepStartResponse> =
         try {
-            val request = SleepStartRequest(sleepTime = sleepTime, wakeTime = wakeTime)
-            val response = sleepService.startSleep(withBearer(token), request)
+            val response = sleepService.startSleep(withBearer(token))
             if (response.isSuccess && response.result != null) Result.success(response.result)
             else Result.failure(Exception(response.message ?: "수면 시작 실패"))
         } catch (e: Exception) {
@@ -77,12 +89,19 @@ class SleepRepository(private val sleepService: SleepService) {
             Result.failure(e)
         }
 
-    suspend fun setSleepGoal(token: String, sleepTime: String, wakeTime: String): Result<SleepGoalResponse> =
+    suspend fun setSleepGoal(token: String, sleepTime: String, wakeTime: String, totalMinutes: Int = 0): Result<SleepGoalResponse> =
         try {
-            val request = SleepGoalRequest(sleepTime = sleepTime, wakeTime = wakeTime)
+            // 서버가 UTC 기준이므로, 사용자 선택(KST)을 전송 직전에 UTC로 변환
+            val sleepTimeUtc = kstTimeToUtc(sleepTime)
+            val wakeTimeUtc = kstTimeToUtc(wakeTime)
+            val request = SleepGoalRequest(sleepTime = sleepTimeUtc, wakeTime = wakeTimeUtc, totalMinutes = totalMinutes)
             val response = sleepService.setSleepGoal(withBearer(token), request)
-            if (response.isSuccess && response.result != null) Result.success(response.result)
-            else Result.failure(Exception(response.message ?: "목표 수면 시간 설정 실패"))
+            when {
+                response.isSuccess -> Result.success(
+                    response.result ?: SleepGoalResponse(sleepTime = sleepTimeUtc, wakeTime = wakeTimeUtc, totalMinutes = totalMinutes)
+                )
+                else -> Result.failure(Exception(response.message ?: "목표 수면 시간 설정 실패"))
+            }
         } catch (e: Exception) {
             Result.failure(e)
         }

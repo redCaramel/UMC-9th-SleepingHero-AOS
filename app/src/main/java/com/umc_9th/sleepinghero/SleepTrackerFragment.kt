@@ -193,10 +193,13 @@ class SleepTrackerFragment : Fragment() {
 
             val goalResult = sleepRepository.setSleepGoal(token, sleepTime24, wakeTime24)
             goalResult.onSuccess {
-                sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
+                sleepViewModel.startSleep(token)
             }.onFailure {
-                // 목표 설정 실패해도 수면 시작 시도 (이미 서버에 목표가 있을 수 있음)
-                sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
+                Toast.makeText(
+                    requireContext(),
+                    "수면 목표 설정에 실패했습니다. 홈에서 취침/기상 시간을 설정한 뒤 다시 시도해 주세요.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
@@ -217,7 +220,7 @@ class SleepTrackerFragment : Fragment() {
     }
 
     // -------------------------
-    // API 연동: 수면 시작 (목표와 동일한 시간 전달 - 서버 검증)
+    // API 연동: 수면 시작 (파라미터 없음. 서버가 현재 시간을 sleepTime으로 기록)
     // -------------------------
     private fun requestStartSleep() {
         val token = TokenManager.getAccessToken(requireContext())
@@ -225,9 +228,7 @@ class SleepTrackerFragment : Fragment() {
             Toast.makeText(requireContext(), "로그인이 필요합니다", Toast.LENGTH_SHORT).show()
             return
         }
-        val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
-        val wakeTime24 = convertTo24HourFormat(awakeTimeStr)
-        sleepViewModel.startSleep(token, sleepTime24, wakeTime24)
+        sleepViewModel.startSleep(token)
     }
 
     private fun observeSleepStartResult() {
@@ -235,11 +236,13 @@ class SleepTrackerFragment : Fragment() {
             result.onSuccess { data ->
                 currentRecordId = data.recordId
             }.onFailure { error ->
-                Toast.makeText(
-                    requireContext(),
-                    "수면 시작 실패: ${error.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                val msg = error.message ?: ""
+                val userMessage = if (msg.contains("목표") || msg.contains("SLEEP404")) {
+                    "수면 목표가 설정되지 않았습니다. 홈에서 취침/기상 시간을 먼저 설정해 주세요."
+                } else {
+                    "수면 시작 실패: $msg"
+                }
+                Toast.makeText(requireContext(), userMessage, Toast.LENGTH_LONG).show()
             }
         }
     }
