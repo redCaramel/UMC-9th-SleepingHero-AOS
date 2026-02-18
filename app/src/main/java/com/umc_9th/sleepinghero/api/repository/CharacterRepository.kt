@@ -9,9 +9,10 @@ class CharacterRepository(private val characterService: CharacterService) {
      * 캐릭터 정보 조회
      * GET /characters/me
      */
-    suspend fun getCharacterInfo(token: String): Result<CharacterInfoResponse> {
+    suspend fun getCharacterInfo(accessToken: String): Result<CharacterInfoResponse> {
         return try {
-            val response = characterService.getCharacterInfo(token)
+            val bearer = if (accessToken.startsWith("Bearer ")) accessToken else "Bearer $accessToken"
+            val response = characterService.getCharacterInfo(bearer)
 
             if (response.isSuccess) {
                 Result.success(response.result!!)

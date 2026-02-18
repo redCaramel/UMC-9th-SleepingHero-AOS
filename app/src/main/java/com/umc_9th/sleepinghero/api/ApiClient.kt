@@ -14,6 +14,7 @@ import com.umc_9th.sleepinghero.api.service.FriendService
 import com.umc_9th.sleepinghero.api.service.HomeService
 
 import com.umc_9th.sleepinghero.api.service.SleepService
+import com.umc_9th.sleepinghero.api.service.TutorialService
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -51,4 +52,5 @@ object ApiClient {
     val characterService: CharacterService = retrofit.create(CharacterService::class.java)
     val sleepService: SleepService = retrofit.create(SleepService::class.java)
     val friendService: FriendService = retrofit.create(FriendService::class.java)
+    val tutorialService: TutorialService = retrofit.create(TutorialService::class.java)
 }
