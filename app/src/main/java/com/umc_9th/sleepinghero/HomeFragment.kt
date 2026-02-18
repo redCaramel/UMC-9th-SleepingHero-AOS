@@ -402,12 +402,12 @@ class HomeFragment : Fragment() {
         }
 
         dialogBinding.btnTimesetMinup.setOnClickListener {
-            min = if (min == 50) 0 else min + 10
+            min = if (min == 59) 0 else min + 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
         dialogBinding.btnTimesetMindown.setOnClickListener {
-            min = if (min == 0) 50 else min - 10
+            min = if (min == 59) 50 else min - 1
             dialogBinding.tvTimesetMin.text = makeTimeString(min, 0)
         }
 
@@ -455,6 +455,24 @@ class HomeFragment : Fragment() {
         }
     }
 
+    private fun shiftHHmm(hhmm: String, deltaMinutes: Int): String? {
+        return try {
+            val parts = hhmm.split(":")
+            if (parts.size != 2) return null
+            val h = parts[0].toInt()
+            val m = parts[1].toInt()
+            if (h !in 0..23 || m !in 0..59) return null
+
+            val mod = 24 * 60
+            val shifted = ((h * 60 + m + deltaMinutes) % mod + mod) % mod
+            val nh = shifted / 60
+            val nm = shifted % 60
+            String.format(Locale.US, "%02d:%02d", nh, nm)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     // -------------------------
     // API 연동: 목표 수면 시간 설정
     // -------------------------
@@ -470,10 +488,16 @@ class HomeFragment : Fragment() {
             val wakeTimeStr = settingManager.getAwakeTime().takeIf { it != "null" } ?: "07:00 AM"
 
             // "11:00 PM" -> "23:00" 형식으로 변환
-            val sleepTime24 = convertTo24HourFormat(sleepTimeStr)
-            val wakeTime24 = convertTo24HourFormat(wakeTimeStr)
+            val sleepHHmmRaw = convertTo24HourFormat(sleepTimeStr)
+            val wakeHHmmRaw = convertTo24HourFormat(wakeTimeStr)
 
-            val result = sleepRepository.putGoalSleep(token, sleepTime24, wakeTime24)
+            // 9시간(540분) 빼서 보냄
+            val sleepHHmm = shiftHHmm(sleepHHmmRaw, -540) ?: return@launch
+            val wakeHHmm  = shiftHHmm(wakeHHmmRaw,  -540) ?: return@launch
+
+            Log.d("HomeFragment", "raw=$sleepHHmmRaw~$wakeHHmmRaw / shifted=$sleepHHmm~$wakeHHmm")
+
+            val result = sleepRepository.putGoalSleep(token, sleepHHmm, wakeHHmm)
 
 
             result.onSuccess { response ->
