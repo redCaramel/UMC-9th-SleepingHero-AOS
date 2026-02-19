@@ -56,20 +56,6 @@ class StartActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // ✅ 디버그에서만 임시 토큰으로 바로 진입
-        if (BuildConfig.DEBUG) {
-            val debugToken =
-                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMyIsInJvbGUiOiJST0xFX1VTRVIiLCJpYXQiOjE3NzE0NTEzNDEsImV4cCI6MTc3MTQ1MzE0MX0.xV5lmUV-yWTKhFYggrYHTH9TwtEVRVEkWsKnriw23rBYeuuR86_Cp0DuzdJi3bD8OWXZaCE_5XX2idTBLTXsDA"
-
-            // TokenManager가 "Bearer" 없이 raw 토큰을 저장하는 구조라면 그대로 저장
-            TokenManager.setAccessToken(this, debugToken)
-
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-            return
-        }
-
-
         enableEdgeToEdge()
         binding = ActivityStartBinding.inflate(layoutInflater)
         setContentView(binding.root)
