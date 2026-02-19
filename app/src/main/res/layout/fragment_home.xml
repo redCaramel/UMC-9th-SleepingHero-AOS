@@ -10,7 +10,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingTop="40dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
         <!-- 1. 상단 프로필 카드 -->
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -299,12 +302,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/tv_exp_label" />
 
-                <!-- EXP 바 진행 -->
+                <!-- EXP 바 진행 (matchConstraintPercentWidth로 채움) -->
                 <View
                     android:id="@+id/progress_exp"
                     android:layout_width="0dp"
                     android:layout_height="16dp"
                     android:background="@drawable/home_profile_bluebar"
+                    app:layout_constraintEnd_toEndOf="@id/progress_exp_bg"
                     app:layout_constraintStart_toStartOf="@id/progress_exp_bg"
                     app:layout_constraintTop_toTopOf="@id/progress_exp_bg"
                     app:layout_constraintWidth_percent="0.0" />
