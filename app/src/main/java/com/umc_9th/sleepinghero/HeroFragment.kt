@@ -154,7 +154,7 @@ class HeroFragment : Fragment() {
             result.onSuccess { data ->
 
                 val uiList = data.content
-                    .filter { it.totalMinutes > 0 }   // ✅ 0시간 0분이면 저장 안 함
+                    .filter { it.totalMinutes > 0 }    // ✅ 0시간 0분이면 저장 안 함
                     .map { dto ->
 
                         val durationText = minutesToHourMin(dto.totalMinutes)
