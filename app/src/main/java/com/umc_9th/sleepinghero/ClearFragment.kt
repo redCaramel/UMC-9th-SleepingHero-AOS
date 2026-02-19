@@ -65,15 +65,17 @@ class ClearFragment : Fragment() {
 
         setupStars()
         setupCompleteButton()
-
         loadUserInfoAndUpdateTitle()
-        // arguments로 값이 넘어온 경우(예: SleepTracker에서 수면 종료) 먼저 UI 반영
-        if (arguments?.containsKey(ARG_DURATION_MINUTES) == true) {
-            bindResultUi()
-        }
+
+        // POST /sleep-sessions/end 로 획득 경험치·레벨 정보 받아서 UI 세팅 (단일 소스)
         requestEndSleepAndBind()
     }
 
+    /**
+     * 수면 종료 API 연동: POST /sleep-sessions/end
+     * 응답 SleepEndResponse → sleepReward.gainedExp(획득 경험치), sleepReward.levelChange(레벨업 반영)
+     * 성공 시 해당 데이터로 화면 갱신, 실패 시 arguments 값으로 폴백 후 토스트
+     */
     private fun requestEndSleepAndBind() {
         viewLifecycleOwner.lifecycleScope.launch {
             val token = TokenManager.getAccessToken(requireContext())
@@ -82,41 +84,30 @@ class ClearFragment : Fragment() {
                 return@launch
             }
 
-            // 로딩 중 중복 처리 방지
             binding.btnComplete.isEnabled = false
 
-            // 수면 종료 호출 → 보상/경험치/레벨 정보 받아서 UI 세팅
-            val result = sleepRepository.endSleep(token)
-
-            result.onSuccess { data ->
-                // end 응답으로 값 세팅
-                recordId = data.recordId
-                durationMinutes = data.durationMinutes
-                gainedExp = data.sleepReward.gainedExp
-
-                // 질병/디버프는 일단 무시: data.sleepReward.isDebuff
-
-                val lc = data.sleepReward.levelChange
-                if (lc != null) {
-                    currentLevel = lc.currentLevel
-                    currentExp = lc.currentExp
-                    needExp = lc.needExp
-                } else {
-                    // 레벨변동 정보가 없을 수 있으니 안전 처리
-                    currentLevel = 0
-                    currentExp = 0
-                    needExp = 0
+            sleepRepository.endSleep(token)
+                .onSuccess { data ->
+                    recordId = data.recordId
+                    durationMinutes = data.durationMinutes
+                    gainedExp = data.sleepReward.gainedExp
+                    data.sleepReward.levelChange?.let { lc ->
+                        currentLevel = lc.currentLevel
+                        currentExp = lc.currentExp
+                        needExp = lc.needExp
+                    } ?: run {
+                        currentLevel = 0
+                        currentExp = 0
+                        needExp = 0
+                    }
+                    bindResultUi()
                 }
-
-                bindResultUi()
-
-                // end 성공하면 이제 리뷰 저장 가능
-                binding.btnComplete.isEnabled = true
-            }.onFailure { e ->
-                binding.btnComplete.isEnabled = true
-                Log.e("CLEAR_FRAGMENT", "수면 종료 실패: ${e.message}")
-                Toast.makeText(requireContext(), "수면 종료 실패: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+                .onFailure { e ->
+                    Log.e("CLEAR_FRAGMENT", "수면 종료 실패: ${e.message}")
+                    Toast.makeText(requireContext(), "수면 종료 실패: ${e.message}", Toast.LENGTH_SHORT).show()
+                    bindResultUi() // API 실패 시 arguments 값이라도 표시
+                }
+            binding.btnComplete.isEnabled = true
         }
     }
 
@@ -136,9 +127,11 @@ class ClearFragment : Fragment() {
         // 실제 수면 시간
         binding.tvActualSleepValue.text = String.format("%02d H %02d M", h, m)
 
-        // 다음 레벨까지 exp
-        binding.tvNextLevelValue.text =
-            if (needExp > 0) "${currentExp}/${needExp}exp" else "-/-exp"
+        // 다음 레벨까지 exp + 남은 경험치 (기존 TextView 하나로 표시)
+        binding.tvNextLevelValue.text = if (needExp > 0) {
+            val remaining = (needExp - currentExp).coerceAtLeast(0)
+            "${currentExp}/${needExp}exp · 남은 $remaining EXP"
+        } else "-/-exp"
     }
 
     private fun setupStars() {

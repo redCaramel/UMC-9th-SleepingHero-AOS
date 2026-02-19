@@ -297,18 +297,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun updateExpBar(percentage: Int) {
-        binding.progressExp.post {
-            val containerWidth = binding.progressExpBg.width
-            if (containerWidth > 0) {
-                val progress = percentage / 100f
-                val progressWidth = (containerWidth * progress).toInt()
-
-                val layoutParams = binding.progressExp.layoutParams
-                layoutParams.width = progressWidth
-                binding.progressExp.layoutParams = layoutParams
-            }
-        }
+        val progress = (percentage.coerceIn(0, 100) / 100f)
         binding.tvExpPercentage.text = "$percentage%"
+        val params = binding.progressExp.layoutParams as? ConstraintLayout.LayoutParams
+        if (params != null) {
+            params.matchConstraintPercentWidth = progress
+            binding.progressExp.layoutParams = params
+        }
     }
 
     private fun formatTimeToAMPM(isoTime: String): String {
@@ -547,13 +542,17 @@ class HomeFragment : Fragment() {
     private fun observeSocial() {
         socialViewModel.myCharResponse.observe(viewLifecycleOwner) { result ->
             result.onSuccess { data ->
-                binding.tvExpRemaining.text = "-${data.needExp - data.currentExp} EXP"
-                var per: Int = (data.currentExp.toFloat() / data.needExp.toFloat() * 100).toInt()
+                val needExp = data.needExp
+                val currentExp = data.currentExp
+                val remaining = (needExp - currentExp).coerceAtLeast(0)
+                binding.tvExpRemaining.text = "-$remaining EXP"
+                val per = if (needExp > 0) {
+                    ((currentExp.toFloat() / needExp) * 100).toInt().coerceIn(0, 100)
+                } else 0
                 binding.tvExpPercentage.text = "$per%"
-                val progress = data.currentExp.toFloat() / data.needExp.toFloat()
+                val progress = if (needExp > 0) (currentExp.toFloat() / needExp).coerceIn(0f, 1f) else 0f
                 val params = binding.progressExp.layoutParams as ConstraintLayout.LayoutParams
-                // OR more directly:
-                params.matchConstraintPercentWidth = progress.coerceIn(0f, 1f)
+                params.matchConstraintPercentWidth = progress
                 binding.progressExp.layoutParams = params
 
                 val token = TokenManager.getAccessToken(requireContext())
