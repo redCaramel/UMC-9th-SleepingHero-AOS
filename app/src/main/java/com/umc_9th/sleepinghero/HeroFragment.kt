@@ -153,19 +153,21 @@ class HeroFragment : Fragment() {
 
             result.onSuccess { data ->
 
-                val uiList = data.content.map { dto ->
-                    val durationText = minutesToHourMin(dto.totalMinutes)
+                val uiList = data.content
+                    .filter { it.totalMinutes > 0 }   // ✅ 0시간 0분이면 저장 안 함
+                    .map { dto ->
 
-                    // sleptTime: "2026-02-12T11:09:26.846Z" -> "2026-02-12"
-                    val dateText = dto.sleptTime.take(10)
+                        val durationText = minutesToHourMin(dto.totalMinutes)
 
-                    SleepRecordUiModel(
-                        date = dateText,
-                        sleepTimeText = durationText,
-                        star = dto.star.coerceIn(0, 5),
-                        advice = dto.summary ?: "" // summary를 피드백 문구로 사용
-                    )
-                }
+                        val dateText = dto.sleptTime.take(10)
+
+                        SleepRecordUiModel(
+                            date = dateText,
+                            sleepTimeText = durationText,
+                            star = dto.star.coerceIn(0, 5),
+                            advice = dto.summary ?: ""
+                        )
+                    }
 
                 sleepAdapter.submitList(uiList)
             }.onFailure { e ->
