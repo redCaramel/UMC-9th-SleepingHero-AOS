@@ -1,6 +1,7 @@
 package com.umc_9th.sleepinghero
 
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import com.umc_9th.sleepinghero.databinding.ActivityMainBinding
@@ -15,9 +16,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.container_main, HomeFragment())
-            .commit()
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.container_main, HomeFragment())
+                .commit()
+        }
 
         binding.navMain.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -60,8 +63,12 @@ class MainActivity : AppCompatActivity() {
 
                 else -> false
 
-                //TODO - 자기 파트 화면전환 추가
             }
         }
     }
+
+    fun setBottomNavVisible(visible: Boolean) {
+        binding.navMain.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
 }
