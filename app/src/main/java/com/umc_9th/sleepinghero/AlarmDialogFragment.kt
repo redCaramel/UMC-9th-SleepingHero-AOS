@@ -6,15 +6,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.fragment.app.DialogFragment
 
-class AlarmDialogFragment : androidx.fragment.app.DialogFragment() {
+class AlarmDialogFragment : DialogFragment() {
 
     private var player: MediaPlayer? = null
 
@@ -52,7 +49,9 @@ class AlarmDialogFragment : androidx.fragment.app.DialogFragment() {
         root.addView(sub)
         root.addView(btn)
 
-        startAlarm()
+        // ✅ 핵심: 소리 재생 여부
+        val playSound = arguments?.getBoolean(ARG_PLAY_SOUND, false) ?: false
+        if (playSound) startAlarm() // ON일 때만 소리
 
         return android.app.AlertDialog.Builder(ctx)
             .setView(root)
@@ -63,6 +62,7 @@ class AlarmDialogFragment : androidx.fragment.app.DialogFragment() {
     private fun startAlarm() {
         val alarmUri: Uri =
             Settings.System.DEFAULT_ALARM_ALERT_URI ?: Settings.System.DEFAULT_NOTIFICATION_URI
+
         try {
             player = MediaPlayer().apply {
                 setDataSource(requireContext(), alarmUri)
@@ -88,5 +88,17 @@ class AlarmDialogFragment : androidx.fragment.app.DialogFragment() {
     override fun onDestroy() {
         stopAlarm()
         super.onDestroy()
+    }
+
+    companion object {
+        private const val ARG_PLAY_SOUND = "arg_play_sound"
+
+        fun newInstance(playSound: Boolean): AlarmDialogFragment {
+            return AlarmDialogFragment().apply {
+                arguments = Bundle().apply {
+                    putBoolean(ARG_PLAY_SOUND, playSound)
+                }
+            }
+        }
     }
 }

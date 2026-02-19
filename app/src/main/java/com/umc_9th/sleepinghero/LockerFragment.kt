@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import com.umc_9th.sleepinghero.databinding.FragmentLockerBinding
 
@@ -16,6 +18,9 @@ class LockerFragment : Fragment() {
 
     private var _binding: FragmentLockerBinding? = null
     private val binding get() = _binding!!
+
+    // 시스템 바 컨트롤러
+    private var insetsController: WindowInsetsControllerCompat? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -29,7 +34,7 @@ class LockerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 🔓 화면 잠금 해제 → LockTask 종료 + SleepTrackerFragment로 복귀
+        // 🔓 화면 잠금 해제 → LockTask 종료 + 뒤로가기(=SleepTrackerFragment로 복귀)
         binding.btnUnlock.setOnClickListener {
             stopAppPinningIfRunning()
             parentFragmentManager.popBackStack()
@@ -39,33 +44,47 @@ class LockerFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        // ✅ 화면 꺼짐 방지(잠금 유지 느낌)
+        // ✅ 화면 꺼짐 방지
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        // ✅ 하단 BottomNavigation 숨김 (ActivityMainBinding 접근)
+        (activity as? MainActivity)?.setBottomNavVisible(false)
+
+        // ✅ 시스템 네비/상태바 숨김
+        val window = requireActivity().window
+        val decorView = window.decorView
+        insetsController = WindowInsetsControllerCompat(window, decorView).apply {
+            systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            hide(WindowInsetsCompat.Type.systemBars())
+        }
 
         startAppPinningIfPossible()
     }
 
     override fun onPause() {
         super.onPause()
-        // 화면 유지 플래그는 필요하면 유지해도 됨. 여기서는 잠금 화면에서만 유지하려고 제거.
+
+        // ✅ 잠금 화면에서만 유지하려고 제거
         requireActivity().window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        // ✅ 시스템 바 복구
+        insetsController?.show(WindowInsetsCompat.Type.systemBars())
+        insetsController = null
+
+        // ✅ BottomNavigation 복구
+        (activity as? MainActivity)?.setBottomNavVisible(true)
     }
 
     private fun startAppPinningIfPossible() {
         val activity = activity ?: return
-
-        // 이미 LockTask 중이면 중복 호출 방지
         if (isInLockTaskMode(activity)) return
 
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                // startLockTask()가 성공하려면:
-                // 1) Device Owner로 allowlist 되었거나
-                // 2) 사용자가 시스템에서 "화면 고정"을 켜고, 현재 앱을 고정하는 흐름이 허용되어야 함
                 activity.startLockTask()
             }
         } catch (t: Throwable) {
-            // 기기 설정/정책상 막히면 여기로 옴
             Toast.makeText(
                 requireContext(),
                 "이 기기에서는 '앱 고정(화면 고정)'을 사용할 수 없습니다. 설정에서 '화면 고정'을 켜야 할 수 있습니다.",

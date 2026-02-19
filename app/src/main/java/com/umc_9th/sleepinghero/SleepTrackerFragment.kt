@@ -1,12 +1,22 @@
 package com.umc_9th.sleepinghero
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.NotificationChannelCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.api.ApiClient
@@ -39,6 +49,31 @@ class SleepTrackerFragment : Fragment() {
     private var trackingStarted = false
     private var alarmShown = false
 
+    // -------------------------
+    // Notification ON/OFF
+    // -------------------------
+    private val prefsName = "sleep_tracker_prefs"
+    private val keyNotiEnabled = "noti_enabled"
+
+    // ✅ tracking 복원용
+    private val keyTrackingActive = "tracking_active"
+    private val keyTrackingStartMillis = "tracking_start_millis"
+    private val keyTrackingRecordId = "tracking_record_id"
+
+    private val requestPostNotiPermission =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                setNotiEnabled(true)
+                applyNotiUi(true)
+                showTrackingNotification()
+                Toast.makeText(requireContext(), "알림 ON", Toast.LENGTH_SHORT).show()
+            } else {
+                setNotiEnabled(false)
+                applyNotiUi(false)
+                Toast.makeText(requireContext(), "알림 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     private val tickRunnable = object : Runnable {
         override fun run() {
             if (!trackingStarted) return
@@ -51,12 +86,14 @@ class SleepTrackerFragment : Fragment() {
             val ratio = (elapsedMinutes.toDouble() / goalMinutes.toDouble()).coerceIn(0.0, 1.0)
             val percent = (ratio * 100.0).roundToInt()
             binding.tvPercent.text = "${percent}%"
-            binding.tvProgressInfo.text = "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
+            binding.tvProgressInfo.text =
+                "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
             binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
 
+            // ✅ 핵심 수정: "알람 ON(=noti enabled)"일 때만 알람 다이얼로그 뜨게
             if (!alarmShown && elapsedMinutes >= goalMinutes) {
                 alarmShown = true
-                showAlarmDialog()
+                showAlarmDialog(playSound = isNotiEnabled())
             }
 
             handler.postDelayed(this, 1000L)
@@ -115,9 +152,61 @@ class SleepTrackerFragment : Fragment() {
                     goToClear()
                 }
                 SleepStopFragment.ACTION_RESUME -> {
-                    // ✅ 아무 것도 안 하면 그냥 계속 타이머 돌고 있는 상태 유지
-                    // 만약 다이얼로그 띄우면서 타이머를 멈췄다면 여기서 다시 startTracking() 하면 됨
+                    // 그대로 유지
                 }
+            }
+        }
+
+        // ✅ 화면 잠금 설정 -> fragment_locker로 이동
+        binding.tvScreenLock.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container_main, LockerFragment())
+                .addToBackStack(null)
+                .commit()
+        }
+
+        // ✅ 알림 설정 ON/OFF (로컬 저장 + 실제 알림 표시/해제)
+        binding.btnAlarm.setOnClickListener {
+            val next = !isNotiEnabled()
+
+            if (next) {
+                if (needsPostNotiPermission() && !hasPostNotiPermission()) {
+                    requestPostNotiPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    return@setOnClickListener
+                }
+                setNotiEnabled(true)
+                applyNotiUi(true)
+                showTrackingNotification()
+                Toast.makeText(requireContext(), "알림 ON", Toast.LENGTH_SHORT).show()
+            } else {
+                setNotiEnabled(false)
+                applyNotiUi(false)
+                cancelTrackingNotification()
+                Toast.makeText(requireContext(), "알림 OFF", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // ✅ 알림 상태 복원
+        val enabled = isNotiEnabled()
+        applyNotiUi(enabled)
+        if (enabled) {
+            ensureNotificationChannel()
+            showTrackingNotification()
+        }
+
+        // ✅ 추가: tracking 복원
+        if (isTrackingActive()) {
+            currentRecordId = getTrackingRecordId()
+            startMillis = getTrackingStartMillis()
+            // startMillis이 0이면 복원 실패 -> 그냥 기존 로직 타게
+            if (currentRecordId != 0 && startMillis != 0L) {
+                trackingStarted = true
+                alarmShown = false
+                handler.removeCallbacks(tickRunnable)
+                handler.post(tickRunnable)
+                return
+            } else {
+                clearTrackingState()
             }
         }
 
@@ -126,9 +215,7 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun showSleepStopDialog() {
-        // 중복 show 방지
         if (parentFragmentManager.findFragmentByTag("SleepStopDialog") != null) return
-
         SleepStopFragment().show(parentFragmentManager, "SleepStopDialog")
     }
 
@@ -149,8 +236,8 @@ class SleepTrackerFragment : Fragment() {
             val result = sleepRepository.startSleep(token)
 
             result.onSuccess { data ->
-                currentRecordId = data.recordId   // ✅ 저장
-                startTracking()                   // ✅ 그 다음 타이머 시작
+                currentRecordId = data.recordId
+                startTracking()
             }.onFailure { e ->
                 Toast.makeText(requireContext(), "수면 시작 실패: ${e.message}", Toast.LENGTH_LONG).show()
                 parentFragmentManager.popBackStack()
@@ -164,6 +251,11 @@ class SleepTrackerFragment : Fragment() {
         alarmShown = false
         startMillis = System.currentTimeMillis()
 
+        // ✅ tracking 상태 저장
+        setTrackingActive(true)
+        setTrackingStartMillis(startMillis)
+        setTrackingRecordId(currentRecordId)
+
         handler.removeCallbacks(tickRunnable)
         handler.post(tickRunnable)
     }
@@ -171,25 +263,32 @@ class SleepTrackerFragment : Fragment() {
     private fun stopTracking() {
         trackingStarted = false
         handler.removeCallbacks(tickRunnable)
+
+        // ✅ tracking 상태 해제
+        clearTrackingState()
     }
 
-    private fun showAlarmDialog() {
+    private fun showAlarmDialog(playSound: Boolean) {
         if (parentFragmentManager.findFragmentByTag("AlarmDialog") != null) return
-        AlarmDialogFragment().show(parentFragmentManager, "AlarmDialog")
+        AlarmDialogFragment.newInstance(playSound).show(parentFragmentManager, "AlarmDialog")
     }
 
     private fun goToClear() {
         val elapsedMinutes = ((System.currentTimeMillis() - startMillis) / 1000 / 60).toInt()
         stopTracking()
 
-        // ✅ 여기서 recordId = 0 박지 말고 start에서 받은 거 넘김
         if (currentRecordId == 0) {
             Toast.makeText(requireContext(), "recordId가 없습니다. start API가 먼저 성공해야 합니다.", Toast.LENGTH_LONG).show()
             return
         }
 
+        // 추적 알림 끄기
+        setNotiEnabled(false)
+        applyNotiUi(false)
+        cancelTrackingNotification()
+
         val clearFragment = ClearFragment.newInstance(
-            recordId = currentRecordId,   // ✅ 이게 핵심
+            recordId = currentRecordId,
             durationMinutes = elapsedMinutes,
             gainedExp = 0,
             currentLevel = 0,
@@ -212,6 +311,129 @@ class SleepTrackerFragment : Fragment() {
         return String.format("%02d : %02d : %02d", h, m, s)
     }
 
+    private fun isNotiEnabled(): Boolean {
+        return requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .getBoolean(keyNotiEnabled, false)
+    }
+
+    private fun setNotiEnabled(enabled: Boolean) {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(keyNotiEnabled, enabled)
+            .apply()
+    }
+
+    private fun applyNotiUi(enabled: Boolean) {
+        findInnerTextView(binding.btnAlarm)?.text = if (enabled) "알림 ON" else "알림 OFF"
+        binding.btnAlarm.alpha = if (enabled) 1.0f else 0.75f
+    }
+
+    private fun findInnerTextView(container: ViewGroup): TextView? {
+        for (i in 0 until container.childCount) {
+            val v = container.getChildAt(i)
+            if (v is TextView) return v
+        }
+        return null
+    }
+
+    private fun needsPostNotiPermission(): Boolean =
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+
+    private fun hasPostNotiPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun ensureNotificationChannel() {
+        val nm = NotificationManagerCompat.from(requireContext())
+        val channel = NotificationChannelCompat.Builder(
+            NOTI_CHANNEL_ID,
+            NotificationManagerCompat.IMPORTANCE_LOW
+        )
+            .setName("Sleep Tracker")
+            .setDescription("수면 추적 알림")
+            .build()
+        nm.createNotificationChannel(channel)
+    }
+
+    private fun showTrackingNotification() {
+        ensureNotificationChannel()
+        if (needsPostNotiPermission() && !hasPostNotiPermission()) return
+
+        val noti = NotificationCompat.Builder(requireContext(), NOTI_CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+            .setContentTitle("수면 추적 중")
+            .setContentText("수면 추적이 진행 중입니다.")
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .build()
+
+        NotificationManagerCompat.from(requireContext()).notify(NOTI_ID, noti)
+    }
+
+    private fun cancelTrackingNotification() {
+        NotificationManagerCompat.from(requireContext()).cancel(NOTI_ID)
+    }
+
+    // -------------------------
+    // tracking state (prefs)
+    // -------------------------
+    private fun isTrackingActive(): Boolean {
+        return requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .getBoolean(keyTrackingActive, false)
+    }
+
+    private fun setTrackingActive(active: Boolean) {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(keyTrackingActive, active)
+            .apply()
+    }
+
+    private fun setTrackingStartMillis(millis: Long) {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putLong(keyTrackingStartMillis, millis)
+            .apply()
+    }
+
+    private fun getTrackingStartMillis(): Long {
+        return requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .getLong(keyTrackingStartMillis, 0L)
+    }
+
+    private fun setTrackingRecordId(recordId: Int) {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putInt(keyTrackingRecordId, recordId)
+            .apply()
+    }
+
+    private fun getTrackingRecordId(): Int {
+        return requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .getInt(keyTrackingRecordId, 0)
+    }
+
+    private fun clearTrackingState() {
+        requireContext()
+            .getSharedPreferences(prefsName, Context.MODE_PRIVATE)
+            .edit()
+            .putBoolean(keyTrackingActive, false)
+            .putLong(keyTrackingStartMillis, 0L)
+            .putInt(keyTrackingRecordId, 0)
+            .apply()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         handler.removeCallbacks(tickRunnable)
@@ -223,7 +445,14 @@ class SleepTrackerFragment : Fragment() {
         private const val ARG_AWAKE_TIME = "arg_awake_time"
         private const val ARG_GOAL_MINUTES = "arg_goal_minutes"
 
-        fun newInstance(sleepTime: String, awakeTime: String, goalMinutes: Int = 1): SleepTrackerFragment {
+        private const val NOTI_CHANNEL_ID = "sleep_tracker_channel"
+        private const val NOTI_ID = 91001
+
+        fun newInstance(
+            sleepTime: String,
+            awakeTime: String,
+            goalMinutes: Int = 1
+        ): SleepTrackerFragment {
             return SleepTrackerFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_SLEEP_TIME, sleepTime)
