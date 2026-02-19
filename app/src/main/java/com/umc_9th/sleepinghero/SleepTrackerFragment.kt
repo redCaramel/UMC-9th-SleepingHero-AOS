@@ -1,8 +1,10 @@
 package com.umc_9th.sleepinghero
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -106,6 +108,18 @@ class SleepTrackerFragment : Fragment() {
                 return@setOnClickListener
             }
             goToClear()
+        }
+
+        binding.btnAlarm.setOnClickListener {
+            Toast.makeText(requireContext(), "기상 알람은 기기 알람 앱을 이용해 주세요.", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.tvScreenLock.setOnClickListener {
+            try {
+                startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "보안 설정을 열 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         // ✅ 핵심: 여기서 startSleep 쳐서 recordId 받아두고, 성공하면 타이머 시작
