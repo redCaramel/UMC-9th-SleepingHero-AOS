@@ -167,7 +167,9 @@
                 android:id="@+id/btn_alarm"
                 android:layout_width="140dp"
                 android:layout_height="50dp"
-                android:layout_marginEnd="10dp">
+                android:layout_marginEnd="10dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -191,7 +193,9 @@
                 android:id="@+id/btn_stop"
                 android:layout_width="140dp"
                 android:layout_height="50dp"
-                android:layout_marginStart="10dp">
+                android:layout_marginStart="10dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -211,12 +215,14 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 화면 잠금 설정 텍스트 -->
+        <!-- 화면 잠금 설정 (클릭 시 보안/잠금 설정 화면으로) -->
         <TextView
             android:id="@+id/tv_screen_lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:clickable="true"
+            android:focusable="true"
             android:text="@string/sleep_tracker_screen_lock"
             android:textColor="@color/gray_700"
             android:textSize="12sp"
