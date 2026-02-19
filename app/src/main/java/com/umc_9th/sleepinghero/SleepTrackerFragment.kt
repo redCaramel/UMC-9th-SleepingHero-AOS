@@ -1,19 +1,19 @@
 package com.umc_9th.sleepinghero
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.umc_9th.sleepinghero.api.ApiClient
 import com.umc_9th.sleepinghero.api.TokenManager
 import com.umc_9th.sleepinghero.api.repository.SleepRepository
+import com.umc_9th.sleepinghero.api.viewmodel.SleepTrackerViewModel
 import com.umc_9th.sleepinghero.databinding.FragmentSleepTrackerBinding
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -24,41 +24,32 @@ class SleepTrackerFragment : Fragment() {
     private var _binding: FragmentSleepTrackerBinding? = null
     private val binding get() = _binding!!
 
-    // ✅ 추가: repository
     private val sleepRepository by lazy { SleepRepository(ApiClient.sleepService) }
+    private val trackerViewModel: SleepTrackerViewModel by activityViewModels()
 
-    // ✅ 추가: start에서 받은 recordId 저장용
-    private var currentRecordId: Int = 0
-
-    // 타이머
     private val handler = Handler(Looper.getMainLooper())
-    private var startMillis: Long = 0L
-
     private var sleepTimeStr: String = "11:00 PM"
     private var awakeTimeStr: String = "07:00 AM"
     private var goalMinutes: Int = 1
 
-    private var trackingStarted = false
-    private var alarmShown = false
-
     private val tickRunnable = object : Runnable {
         override fun run() {
-            if (!trackingStarted) return
+            if (!trackerViewModel.trackingStarted || _binding == null) return
 
-            val elapsedMillis = System.currentTimeMillis() - startMillis
+            val elapsedMillis = System.currentTimeMillis() - trackerViewModel.startMillis
             val elapsedMinutes = (elapsedMillis / 1000 / 60).toInt()
+            val goalMin = trackerViewModel.goalMinutes
 
             binding.tvTimer.text = formatElapsed(elapsedMillis)
-
-            val ratio = (elapsedMinutes.toDouble() / goalMinutes.toDouble()).coerceIn(0.0, 1.0)
+            val ratio = (elapsedMinutes.toDouble() / goalMin.toDouble()).coerceIn(0.0, 1.0)
             val percent = (ratio * 100.0).roundToInt()
             binding.tvPercent.text = "${percent}%"
             binding.tvProgressInfo.text =
-                "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
+                "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMin)}시간"
             binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
 
-            if (!alarmShown && elapsedMinutes >= goalMinutes) {
-                alarmShown = true
+            if (!trackerViewModel.alarmShown && elapsedMinutes >= goalMin) {
+                trackerViewModel.markAlarmShown()
                 showAlarmDialog()
             }
 
@@ -89,11 +80,26 @@ class SleepTrackerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvTimeRange.text = "$sleepTimeStr - $awakeTimeStr"
-        binding.tvTimer.text = "00 : 00 : 00"
         binding.tvPercent.text = "0%"
         binding.tvProgressInfo.text =
             "0.0 / ${minutesToRoundedHours(goalMinutes)}시간"
         binding.ivCircleProgress.rotation = 0f
+
+        if (trackerViewModel.trackingStarted && trackerViewModel.startMillis > 0L) {
+            // Locker 등에서 복귀: 경과 시간 복원 후 타이머 계속
+            val elapsed = System.currentTimeMillis() - trackerViewModel.startMillis
+            binding.tvTimer.text = formatElapsed(elapsed)
+            val elapsedMin = (elapsed / 1000 / 60).toInt()
+            val ratio = (elapsedMin.toDouble() / trackerViewModel.goalMinutes.toDouble()).coerceIn(0.0, 1.0)
+            binding.tvPercent.text = "${(ratio * 100).toInt()}%"
+            binding.tvProgressInfo.text =
+                "${minutesToRoundedHours(elapsedMin)} / ${minutesToRoundedHours(trackerViewModel.goalMinutes)}시간"
+            binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
+            handler.removeCallbacks(tickRunnable)
+            handler.post(tickRunnable)
+        } else {
+            binding.tvTimer.text = "00 : 00 : 00"
+        }
 
         parentFragmentManager.setFragmentResultListener(
             "ALARM_DISMISSED",
@@ -103,27 +109,23 @@ class SleepTrackerFragment : Fragment() {
         }
 
         binding.btnStop.setOnClickListener {
-            if (!trackingStarted) {
+            if (!trackerViewModel.trackingStarted) {
                 Toast.makeText(requireContext(), "수면이 시작되지 않았습니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
             goToClear()
         }
 
-        binding.btnAlarm.setOnClickListener {
-            Toast.makeText(requireContext(), "기상 알람은 기기 알람 앱을 이용해 주세요.", Toast.LENGTH_SHORT).show()
-        }
-
         binding.tvScreenLock.setOnClickListener {
-            try {
-                startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "보안 설정을 열 수 없습니다.", Toast.LENGTH_SHORT).show()
-            }
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.container_main, LockerFragment())
+                .addToBackStack(null)
+                .commit()
         }
 
-        // ✅ 핵심: 여기서 startSleep 쳐서 recordId 받아두고, 성공하면 타이머 시작
-        startSleepAndTracking()
+        if (!trackerViewModel.trackingStarted) {
+            startSleepAndTracking()
+        }
     }
 
     private fun minutesToRoundedHours(min: Int): String {
@@ -143,8 +145,12 @@ class SleepTrackerFragment : Fragment() {
             val result = sleepRepository.startSleep(token)
 
             result.onSuccess { data ->
-                currentRecordId = data.recordId   // ✅ 저장
-                startTracking()                   // ✅ 그 다음 타이머 시작
+                startTracking(
+                    recordId = data.recordId,
+                    sleepTime = sleepTimeStr,
+                    awakeTime = awakeTimeStr,
+                    goalMin = goalMinutes
+                )
             }.onFailure { e ->
                 Toast.makeText(requireContext(), "수면 시작 실패: ${e.message}", Toast.LENGTH_LONG).show()
                 parentFragmentManager.popBackStack()
@@ -152,18 +158,15 @@ class SleepTrackerFragment : Fragment() {
         }
     }
 
-    private fun startTracking() {
-        if (trackingStarted) return
-        trackingStarted = true
-        alarmShown = false
-        startMillis = System.currentTimeMillis()
-
+    private fun startTracking(recordId: Int, sleepTime: String, awakeTime: String, goalMin: Int) {
+        if (trackerViewModel.trackingStarted) return
+        trackerViewModel.startTracking(recordId, sleepTime, awakeTime, goalMin)
         handler.removeCallbacks(tickRunnable)
         handler.post(tickRunnable)
     }
 
     private fun stopTracking() {
-        trackingStarted = false
+        trackerViewModel.stopTracking()
         handler.removeCallbacks(tickRunnable)
     }
 
@@ -173,24 +176,27 @@ class SleepTrackerFragment : Fragment() {
     }
 
     private fun goToClear() {
-        val elapsedMinutes = ((System.currentTimeMillis() - startMillis) / 1000 / 60).toInt()
+        val elapsedMinutes = ((System.currentTimeMillis() - trackerViewModel.startMillis) / 1000 / 60).toInt()
+        val recordId = trackerViewModel.currentRecordId
+        val sleepStr = trackerViewModel.sleepTimeStr
+        val awakeStr = trackerViewModel.awakeTimeStr
         stopTracking()
+        trackerViewModel.clear()
 
-        // ✅ 여기서 recordId = 0 박지 말고 start에서 받은 거 넘김
-        if (currentRecordId == 0) {
+        if (recordId == 0) {
             Toast.makeText(requireContext(), "recordId가 없습니다. start API가 먼저 성공해야 합니다.", Toast.LENGTH_LONG).show()
             return
         }
 
         val clearFragment = ClearFragment.newInstance(
-            recordId = currentRecordId,   // ✅ 이게 핵심
+            recordId = recordId,
             durationMinutes = elapsedMinutes,
             gainedExp = 0,
             currentLevel = 0,
             currentExp = 0,
             needExp = 0,
-            sleepTimeStr = sleepTimeStr,
-            awakeTimeStr = awakeTimeStr
+            sleepTimeStr = sleepStr,
+            awakeTimeStr = awakeStr
         )
 
         parentFragmentManager.beginTransaction()
