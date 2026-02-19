@@ -1,10 +1,8 @@
 package com.umc_9th.sleepinghero
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,8 +51,7 @@ class SleepTrackerFragment : Fragment() {
             val ratio = (elapsedMinutes.toDouble() / goalMinutes.toDouble()).coerceIn(0.0, 1.0)
             val percent = (ratio * 100.0).roundToInt()
             binding.tvPercent.text = "${percent}%"
-            binding.tvProgressInfo.text =
-                "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
+            binding.tvProgressInfo.text = "${minutesToRoundedHours(elapsedMinutes)} / ${minutesToRoundedHours(goalMinutes)}시간"
             binding.ivCircleProgress.rotation = (360f * ratio).toFloat()
 
             if (!alarmShown && elapsedMinutes >= goalMinutes) {
@@ -91,8 +88,7 @@ class SleepTrackerFragment : Fragment() {
         binding.tvTimeRange.text = "$sleepTimeStr - $awakeTimeStr"
         binding.tvTimer.text = "00 : 00 : 00"
         binding.tvPercent.text = "0%"
-        binding.tvProgressInfo.text =
-            "0.0 / ${minutesToRoundedHours(goalMinutes)}시간"
+        binding.tvProgressInfo.text = "0.0 / ${minutesToRoundedHours(goalMinutes)}시간"
         binding.ivCircleProgress.rotation = 0f
 
         parentFragmentManager.setFragmentResultListener(
@@ -107,23 +103,33 @@ class SleepTrackerFragment : Fragment() {
                 Toast.makeText(requireContext(), "수면이 시작되지 않았습니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            goToClear()
+            showSleepStopDialog()
         }
 
-        binding.btnAlarm.setOnClickListener {
-            Toast.makeText(requireContext(), "기상 알람은 기기 알람 앱을 이용해 주세요.", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.tvScreenLock.setOnClickListener {
-            try {
-                startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "보안 설정을 열 수 없습니다.", Toast.LENGTH_SHORT).show()
+        parentFragmentManager.setFragmentResultListener(
+            SleepStopFragment.REQ_KEY,
+            viewLifecycleOwner
+        ) { _, bundle ->
+            when (bundle.getString("action")) {
+                SleepStopFragment.ACTION_STOP -> {
+                    goToClear()
+                }
+                SleepStopFragment.ACTION_RESUME -> {
+                    // ✅ 아무 것도 안 하면 그냥 계속 타이머 돌고 있는 상태 유지
+                    // 만약 다이얼로그 띄우면서 타이머를 멈췄다면 여기서 다시 startTracking() 하면 됨
+                }
             }
         }
 
         // ✅ 핵심: 여기서 startSleep 쳐서 recordId 받아두고, 성공하면 타이머 시작
         startSleepAndTracking()
+    }
+
+    private fun showSleepStopDialog() {
+        // 중복 show 방지
+        if (parentFragmentManager.findFragmentByTag("SleepStopDialog") != null) return
+
+        SleepStopFragment().show(parentFragmentManager, "SleepStopDialog")
     }
 
     private fun minutesToRoundedHours(min: Int): String {
