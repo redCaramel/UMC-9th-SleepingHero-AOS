@@ -197,9 +197,7 @@ class HeroFragment : Fragment() {
                 return@launch
             }
             baseSkinId = res.result.skins.firstOrNull { it.equipped }?.skinId ?: 1L
-
-            val equippedSkinId = res.result.skins.firstOrNull { it.equipped }?.skinId ?: 1L
-            applySkinImage(equippedSkinId)
+            applyResolvedSkinIfReady()
         }
     }
 
