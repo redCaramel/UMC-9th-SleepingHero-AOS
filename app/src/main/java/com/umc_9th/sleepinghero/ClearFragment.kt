@@ -173,6 +173,8 @@ class ClearFragment : Fragment() {
                 return@setOnClickListener
             }
 
+            Toast.makeText(requireContext(), "처리중입니다. 잠시만 기다려주세요.", Toast.LENGTH_SHORT).show()
+
             val comment = binding.etMemo.text?.toString()?.trim().orEmpty()
 
             // 중복 클릭 방지

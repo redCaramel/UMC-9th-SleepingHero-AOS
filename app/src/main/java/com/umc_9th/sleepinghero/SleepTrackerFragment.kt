@@ -239,7 +239,7 @@ class SleepTrackerFragment : Fragment() {
                 currentRecordId = data.recordId
                 startTracking()
             }.onFailure { e ->
-                Toast.makeText(requireContext(), "수면 시작 실패: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "목표 시간과 현재 시간이 다릅니다: ${e.message}", Toast.LENGTH_LONG).show()
                 parentFragmentManager.popBackStack()
             }
         }
